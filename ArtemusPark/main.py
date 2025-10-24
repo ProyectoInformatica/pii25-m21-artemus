@@ -1,16 +1,12 @@
-# This is a sample Python script.
+import tkinter as tk
 
-# Press Mayús+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# Example Tinker Code
 
+root = tk.Tk()
+root.title("Hola, Mundo")
+root.geometry("300x200")
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+label = tk.Label(root, text="¡Bienvenido a Tkinter!")
+label.pack(pady=20)
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+root.mainloop()
