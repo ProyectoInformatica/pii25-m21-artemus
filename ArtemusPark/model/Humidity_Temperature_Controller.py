@@ -9,11 +9,14 @@ logging.basicConfig(
 # Clase de humedad y de temperatura
 class Humidity_Temperature_Controller:
     def humidity(self):
+        irrigation = False
         humidity = random.randint(0, 100)
         if humidity < 30.00:
-            message = f"Humidity it is low {humidity}"
+            irrigation = True
+            message = f"Humidity it is low {humidity}, we active the irrigation"
+
         elif humidity < 70.00:
-            message = f"Humidity it is high {humidity}"
+            message = f"Humidity it is high {humidity}, we deactivated the irrigation"
         else:
             message = f"Humidity it is {humidity}"
 
