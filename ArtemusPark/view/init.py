@@ -5,4 +5,3 @@ controller = Humidity_Temperature_Controller()
 controller.humidity()
 # Y con está a la de temp
 controller.temperature()
-
