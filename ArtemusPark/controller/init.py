@@ -1,5 +1,5 @@
 import threading
-from ArtemusPark.model.Humidity_Temperature_Controller  import HumidityTemperatureController
+from model.Humidity_Temperature_Controller  import HumidityTemperatureController
 
 
 class SensorController:
