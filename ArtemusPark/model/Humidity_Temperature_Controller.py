@@ -1,39 +1,43 @@
 import random
 import logging
+import time
 
-# Logs
 logging.basicConfig(
-    filename="humidity_temperature_controller.log",
-    level=logging.INFO,  # Esto hay que cambiarlo por Debug pero me gusta más en INFO
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    filename='humidity_temperature_controller.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
 
-# Clase de humedad y de temperatura
-class Humidity_Temperature_Controller:
+class HumidityTemperatureController:
+    """Modelo: simula sensores de humedad y temperatura."""
+
     def humidity(self):
-        irrigation = False
-        humidity = random.randint(0, 100)
-        if humidity < 30.00:
-            irrigation = True
-            message = f"Humidity it is low {humidity}, we active the irrigation"
+        while True:
+            humidity = random.randint(0, 100)
 
-        elif humidity < 70.00:
-            message = f"Humidity it is high {humidity}, we deactivated the irrigation"
-        else:
-            message = f"Humidity it is {humidity}"
+            if humidity < 30:
+                message = f"Humidity low ({humidity}%) → activating irrigation."
+            elif humidity < 70:
+                message = f"Humidity moderate ({humidity}%) → irrigation off."
+            else:
+                message = f"Humidity high ({humidity}%) → irrigation off."
 
-        print(message)
-        logging.info(message)
+            print(message)
+            logging.info(message)
+            time.sleep(1)  # espera 10 segundos antes de repetir
 
     def temperature(self):
-        temperature = random.randint(-5, 40)
-        if temperature > 30.00:
-            message = f"The weather it is heat {temperature}º"
-        elif temperature < 15.00:
-            message = f"The weather it is cold {temperature}º"
-        else:
-            message = f"The weather it is {temperature}º"
+        while True:
+            temperature = random.randint(-5, 40)
 
-        print(message)
-        logging.info(message)
+            if temperature > 30:
+                message = f"Hot weather ({temperature}°C)."
+            elif temperature < 15:
+                message = f"Cold weather ({temperature}°C)."
+            else:
+                message = f"Mild weather ({temperature}°C)."
+
+            print(message)
+            logging.info(message)
+            time.sleep(1)
