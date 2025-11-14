@@ -3,9 +3,9 @@ import logging
 import time
 
 logging.basicConfig(
-    filename='humidity_temperature_controller.log',
+    filename="humidity_temperature_controller.log",
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 
