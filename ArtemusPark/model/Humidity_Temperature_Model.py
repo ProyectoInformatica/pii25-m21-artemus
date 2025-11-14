@@ -9,7 +9,7 @@ logging.basicConfig(
 )
 
 
-class HumidityTemperatureController:
+class HumidityTemperatureModel:
     """Modelo: simula sensores de humedad y temperatura."""
 
     def humidity(self):
