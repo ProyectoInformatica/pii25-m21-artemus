@@ -8,12 +8,14 @@ from ArtemusPark.model.Temperature_Model import TemperatureModel
 logging.basicConfig(
     filename="temperature_controller.log",
     level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 
 class TemperatureController:
-    def __init__(self, on_new_data: Optional[Callable[[TemperatureModel], None]] = None):
+    def __init__(
+        self, on_new_data: Optional[Callable[[TemperatureModel], None]] = None
+    ):
         self.on_new_data = on_new_data
 
     def run(self, name):

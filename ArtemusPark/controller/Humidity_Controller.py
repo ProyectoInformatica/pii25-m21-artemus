@@ -8,7 +8,7 @@ from ArtemusPark.model.Humidity_Model import HumidityModel
 logging.basicConfig(
     filename="humidity_controller.log",
     level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 

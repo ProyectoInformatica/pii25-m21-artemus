@@ -8,7 +8,7 @@ from ArtemusPark.model.Wind_Model import WindModel
 logging.basicConfig(
     filename="wind_controller.log",
     level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 

@@ -17,7 +17,9 @@ class SensorController:
         self.wind_history: List[WindModel] = []
 
         self.humidity_controller = HumidityController(on_new_data=self._on_humidity)
-        self.temperature_controller = TemperatureController(on_new_data=self._on_temperature)
+        self.temperature_controller = TemperatureController(
+            on_new_data=self._on_temperature
+        )
         self.wind_controller = WindController(on_new_data=self._on_wind)
 
     def _on_humidity(self, data: HumidityModel):
@@ -36,19 +38,19 @@ class SensorController:
             threading.Thread(
                 target=self.humidity_controller.run,
                 daemon=True,
-                args=(f"Humidity {i + 1}",)   # 👈 tupla
+                args=(f"Humidity {i + 1}",),  # 👈 tupla
             ).start()
 
             threading.Thread(
                 target=self.temperature_controller.run,
                 daemon=True,
-                args=(f"Temperature {i + 1}",)  # 👈 tupla
+                args=(f"Temperature {i + 1}",),  # 👈 tupla
             ).start()
 
             threading.Thread(
                 target=self.wind_controller.run,
                 daemon=True,
-                args=(f"Wind {i + 1}",)   # 👈 tupla
+                args=(f"Wind {i + 1}",),  # 👈 tupla
             ).start()
 
     def latest_humidity(self) -> Optional[HumidityModel]:
