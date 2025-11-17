@@ -8,7 +8,9 @@ from ArtemusPark.controller.Wind_Controller import WindController
 from ArtemusPark.model.Humidity_Model import HumidityModel
 from ArtemusPark.model.Temperature_Model import TemperatureModel
 from ArtemusPark.model.Wind_Model import WindModel
-from ArtemusPark.model.DoorModel import DoorModel
+from ArtemusPark.controller.Door_Controller import DoorController
+from ArtemusPark.model.Door_Model import DoorModel
+
 
 
 class SensorController:
@@ -26,6 +28,7 @@ class SensorController:
         self.humidity_history: List[HumidityModel] = []
         self.temperature_history: List[TemperatureModel] = []
         self.wind_history: List[WindModel] = []
+        self.door_history: List[DoorModel] = []
 
         # Controllers de sensores (nueva arquitectura)
         self.humidity_controller = HumidityController(on_new_data=self._on_humidity)
@@ -33,10 +36,13 @@ class SensorController:
             on_new_data=self._on_temperature
         )
         self.wind_controller = WindController(on_new_data=self._on_wind)
+        self.door_controller = DoorController(controller_ref=self, on_new_data=self._on_door)
 
         # Modelo de puertas (versión antigua, referencia al controller)
-        self.door_model = DoorModel(controller_ref=self)
-
+        self.door_controller = DoorController(
+            controller_ref=self,
+            on_new_data=self._on_door
+        )
     # ---------- CALLBACKS DE DATOS (nueva arquitectura) ---------- #
 
     def _on_humidity(self, data: HumidityModel):
@@ -47,6 +53,9 @@ class SensorController:
 
     def _on_wind(self, data: WindModel):
         self.wind_history.append(data)
+
+    def _on_door(self, data: DoorModel):
+        self.door_history.append(data)
 
     # ---------- SIMULACIÓN DE TIEMPO Y ESTADO DEL PARQUE ---------- #
 
@@ -116,9 +125,9 @@ class SensorController:
         for i in range(door_sensors):
             sensor_num = i + 1
             threading.Thread(
-                target=self.door_model.door,
+                target=self.door_controller.run,
                 daemon=True,
-                args=(f"DoorSens{sensor_num}",),
+                args=(f"DoorSens{i + 1}",),
             ).start()
 
         print("Sensores activos.")
