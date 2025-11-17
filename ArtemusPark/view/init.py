@@ -9,4 +9,5 @@ try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
+    controller.stop()
     print("Programa detenido.")
