@@ -4,9 +4,9 @@ import time
 
 # Asumiendo que quieres que este archivo use un log diferente
 logging.basicConfig(
-    filename='doorModel.log',
+    filename="doorModel.log",
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 

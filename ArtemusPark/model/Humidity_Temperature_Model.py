@@ -3,9 +3,9 @@ import logging
 import time
 
 logging.basicConfig(
-    filename='humidity_temperature_controller.log',
+    filename="humidity_temperature_controller.log",
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 
@@ -25,7 +25,9 @@ class HumidityTemperatureModel:
             humidity = random.randint(0, 100)
 
             if humidity < 30:
-                message = f"[{name}] Humidity low ({humidity}%) → activating irrigation."
+                message = (
+                    f"[{name}] Humidity low ({humidity}%) → activating irrigation."
+                )
             elif humidity < 70:
                 message = f"[{name}] Humidity moderate ({humidity}%) → irrigation off."
             else:
