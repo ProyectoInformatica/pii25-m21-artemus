@@ -1,14 +1,11 @@
 import threading
 import time
-import random
 
-# IMPORTA TUS MODELOS (ajusta la ruta si es necesario)
 from ArtemusPark.model.Humidity_Temperature_Model import HumidityTemperatureModel
 from ArtemusPark.model.DoorModel import DoorModel
 
 
 class SensorController:
-    # Definir el horario de operación del parque (Horas simuladas)
     OPEN_HOUR = 9
     CLOSE_HOUR = 18
 
@@ -20,7 +17,6 @@ class SensorController:
         self.door_model = DoorModel(controller_ref=self)
 
     def simulate_time_and_status(self):
-        """Función que corre en un hilo para simular el paso del tiempo y cambiar el estado del parque."""
 
         while self.running:
             is_open_time = self.OPEN_HOUR <= self.simulated_hour < self.CLOSE_HOUR
@@ -51,26 +47,14 @@ class SensorController:
 
         for i in range(sens):
             sensor_num = i + 1
-            threading.Thread(
-                target=self.model.humidity,
-                daemon=True,
-                args=(f"HumiditySens{sensor_num}",),
-            ).start()
-            threading.Thread(
-                target=self.model.temperature,
-                daemon=True,
-                args=(f"TempSens{sensor_num}",),
-            ).start()
+            threading.Thread(target=self.model.humidity,daemon=True,args=(f"HumiditySens{sensor_num}",)).start()
+            threading.Thread(target=self.model.temperature,daemon=True,args=(f"TempSens{sensor_num}",) ).start()
 
         for i in range(doorsens):
             sensor_num = i + 1
-            threading.Thread(
-                target=self.door_model.door,
-                daemon=True,
-                args=(f"DoorSens{sensor_num}",),
-            ).start()
+            threading.Thread(target=self.door_model.door,daemon=True,args=(f"DoorSens{sensor_num}",)).start()
 
-        print("Sensores activos. Usa Ctrl+C para detener.")
+        print("Sensores activos.")
 
     def stop(self):
         print(
@@ -79,17 +63,3 @@ class SensorController:
         self.running = False
         time.sleep(6)
         print("Controlador y hilos terminados.")
-
-
-if __name__ == "__main__":
-    controller = SensorController()
-
-    try:
-        controller.start()
-        # Mantiene el hilo principal vivo
-        while True:
-            time.sleep(1)
-
-    except KeyboardInterrupt:
-        # Permite detener la ejecución con Ctrl+C
-        controller.stop()
