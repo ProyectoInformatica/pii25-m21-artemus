@@ -1,6 +1,5 @@
 import time
-from ArtemusPark.controller.init import SensorController
-
+from ArtemusPark.controller.Sensor_Controller import SensorController
 
 controller = SensorController()
 controller.start()
@@ -10,5 +9,4 @@ try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
-    controller.stop()
     print("Programa detenido.")
