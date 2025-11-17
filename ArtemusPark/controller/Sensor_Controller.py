@@ -47,12 +47,24 @@ class SensorController:
 
         for i in range(sens):
             sensor_num = i + 1
-            threading.Thread(target=self.model.humidity,daemon=True,args=(f"HumiditySens{sensor_num}",)).start()
-            threading.Thread(target=self.model.temperature,daemon=True,args=(f"TempSens{sensor_num}",) ).start()
+            threading.Thread(
+                target=self.model.humidity,
+                daemon=True,
+                args=(f"HumiditySens{sensor_num}",),
+            ).start()
+            threading.Thread(
+                target=self.model.temperature,
+                daemon=True,
+                args=(f"TempSens{sensor_num}",),
+            ).start()
 
         for i in range(doorsens):
             sensor_num = i + 1
-            threading.Thread(target=self.door_model.door,daemon=True,args=(f"DoorSens{sensor_num}",)).start()
+            threading.Thread(
+                target=self.door_model.door,
+                daemon=True,
+                args=(f"DoorSens{sensor_num}",),
+            ).start()
 
         print("Sensores activos.")
 
