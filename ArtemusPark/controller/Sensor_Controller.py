@@ -12,7 +12,6 @@ from ArtemusPark.controller.Door_Controller import DoorController
 from ArtemusPark.model.Door_Model import DoorModel
 
 
-
 class SensorController:
     # Horario del parque
     OPEN_HOUR = 9
@@ -21,8 +20,8 @@ class SensorController:
     def __init__(self):
         # Estado general
         self.running = False
-        self.park_open = False          # Parque cerrado por defecto
-        self.simulated_hour = 8         # Hora simulada inicial (8:00)
+        self.park_open = False  # Parque cerrado por defecto
+        self.simulated_hour = 8  # Hora simulada inicial (8:00)
 
         # Históricos de sensores (nueva arquitectura)
         self.humidity_history: List[HumidityModel] = []
@@ -36,13 +35,15 @@ class SensorController:
             on_new_data=self._on_temperature
         )
         self.wind_controller = WindController(on_new_data=self._on_wind)
-        self.door_controller = DoorController(controller_ref=self, on_new_data=self._on_door)
+        self.door_controller = DoorController(
+            controller_ref=self, on_new_data=self._on_door
+        )
 
         # Modelo de puertas (versión antigua, referencia al controller)
         self.door_controller = DoorController(
-            controller_ref=self,
-            on_new_data=self._on_door
+            controller_ref=self, on_new_data=self._on_door
         )
+
     # ---------- CALLBACKS DE DATOS (nueva arquitectura) ---------- #
 
     def _on_humidity(self, data: HumidityModel):
@@ -88,16 +89,13 @@ class SensorController:
     def start(self):
         self.running = True
 
-        num_sensors = 5     # humedad / temperatura / viento
-        door_sensors = 2    # número de sensores de puerta
+        num_sensors = 5  # humedad / temperatura / viento
+        door_sensors = 2  # número de sensores de puerta
 
         print("--- Iniciando Sensores y Reloj de Parque ---")
 
         # Hilo de reloj y estado del parque
-        threading.Thread(
-            target=self.simulate_time_and_status,
-            daemon=True
-        ).start()
+        threading.Thread(target=self.simulate_time_and_status, daemon=True).start()
 
         # Sensores de humedad, temperatura y viento
         for i in range(num_sensors):
