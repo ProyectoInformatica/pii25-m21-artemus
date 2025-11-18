@@ -41,3 +41,4 @@ class DoorModel:
 
         self._log(f"[{name}] Hilo de puerta terminado.")
 
+
