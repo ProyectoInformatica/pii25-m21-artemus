@@ -5,12 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="logs">
-      <change afterPath="$PROJECT_DIR$/ArtemusPark/model/DoorModel.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ArtemusPark/view/HU6.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Sensor_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Sensor_Controller.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/init.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/model/DoorModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/model/DoorModel.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ArtemusPark/model/Humidity_Temperature_Model.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/model/Humidity_Temperature_Model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/init.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/init.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,10 +23,21 @@
       </list>
     </option>
   </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform)); sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo, NoAppException&#10;for module in [&quot;main.py&quot;, &quot;wsgi.py&quot;, &quot;app.py&quot;]:&#10;    try: locals().update(ScriptInfo(app_import_path=module, create_app=None).load_app().make_shell_context()); print(&quot;\nFlask App: %s&quot; % app.import_name); break&#10;    except NoAppException: pass">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform)); sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo, NoAppException&#10;for module in [&quot;main.py&quot;, &quot;wsgi.py&quot;, &quot;app.py&quot;]:&#10;    try: locals().update(ScriptInfo(app_import_path=module, create_app=None).load_app().make_shell_context()); print(&quot;\nFlask App: %s&quot; % app.import_name); break&#10;    except NoAppException: pass" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="development" />
+        <entry key="$PROJECT_DIR$" value="feature/issue_Aldo_idk" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -38,12 +48,15 @@
     &quot;assignee&quot;: &quot;igomez-22484886&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ProyectoInformatica/pii25-m21-artemus.git&quot;,
-    &quot;accountId&quot;: &quot;6f7b6a08-1de6-4174-840f-a62f63cf254f&quot;
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="7cdacd35-11dd-4172-9c63-786d12d59ee5" />
+  </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ProyectoInformatica/pii25-m21-artemus.git",
+    "accountId": "7cdacd35-11dd-4172-9c63-786d12d59ee5"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -55,10 +68,11 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.DoorModel.executor": "Run",
+    "Python.Sensor_Controller.executor": "Run",
     "Python.init.executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "feature/issue4__1__ppiqueras__Door__Model",
     "ignore.virus.scanning.warn.message": "true",
@@ -67,7 +81,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -77,8 +91,8 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="init" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="pii25-m21-artemus" />
+    <configuration name="Sensor_Controller" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="pii25-m21-artemuss" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -86,12 +100,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ArtemusPark/view" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ArtemusPark/controller" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ArtemusPark/view/init.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ArtemusPark/controller/Sensor_Controller.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -102,15 +116,15 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.init" />
+        <item itemvalue="Python.Sensor_Controller" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-PY-252.25557.178" />
-        <option value="bundled-python-sdk-ce6832f46686-7b97d883f26b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.25557.178" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
       </set>
     </attachedChunks>
   </component>
@@ -130,8 +144,7 @@
       <workItem from="1762446762617" duration="578000" />
       <workItem from="1762450745543" duration="1051000" />
       <workItem from="1762532708462" duration="1015000" />
-      <workItem from="1763142035546" duration="7000" />
-      <workItem from="1763379421318" duration="3323000" />
+      <workItem from="1763506886593" duration="405000" />
     </task>
     <task id="LOCAL-00001" summary="logs">
       <option name="closed" value="true" />
@@ -187,8 +200,17 @@
     <option name="LAST_COMMIT_MESSAGE" value="logs" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/pii25_m21_artemus$init.coverage" NAME="init Coverage Results" MODIFIED="1763382376956" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemus$DoorModel.coverage" NAME="DoorModel Coverage Results" MODIFIED="1763379820576" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/model" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1763379848231" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1762533022899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$init.coverage" NAME="init Coverage Results" MODIFIED="1763403532633" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$init.coverage" NAME="init Coverage Results" MODIFIED="1762533672375" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$Sensor_Controller.coverage" NAME="Sensor_Controller Coverage Results" MODIFIED="1763403418228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/controller" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>

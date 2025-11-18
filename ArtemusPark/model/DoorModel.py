@@ -17,22 +17,26 @@ class DoorModel:
     def __init__(self, controller_ref=None):
         self.controller_ref = controller_ref
 
-    def door(self, name):
-        """Simula lecturas de puerta (0=Cerrada, 1=Abierta)."""
-
-        # El bucle verifica la bandera 'running' del controlador
-        while self.controller_ref.running:
-            if self.controller_ref.park_open:
-                door_status = random.randint(0, 1)
-                if door_status == 0:
-                    message = f"[{name}] The door is close."
-                else:
-                    message = f"[{name}] The door is open."
-            else:
-                message = f"The park it is close."
-
+    def _log(self, message: str):
+        if self.controller_ref and hasattr(self.controller_ref, "log"):
+            self.controller_ref.log(message)
+        else:
             print(message)
-            logging.info(message)
+
+    def door(self, name):
+        """Abre la puerta a las 9:00 y la cierra a las 18:00 según la hora simulada."""
+
+        while self.controller_ref.running:
+            hour = self.controller_ref.simulated_hour
+
+            if 9 <= hour < 18:
+                # Horario de apertura
+                message = f"[{name}] {hour}:00 → The door is open."
+            else:
+                # Fuera de horario
+                message = f"[{name}] {hour}:00 → The door is close."
+
+            self._log(message)
             time.sleep(5)
 
-        print(f"[{name}] Hilo de puerta terminado.")
+        self._log(f"[{name}] Hilo de puerta terminado.")

@@ -1,6 +1,7 @@
 import threading
 import time
 import random
+import queue
 
 # IMPORTA TUS MODELOS (ajusta la ruta si es necesario)
 from ArtemusPark.model.Humidity_Temperature_Model import HumidityTemperatureModel
@@ -16,8 +17,25 @@ class SensorController:
         self.running = False
         self.park_open = False  # Estado de apertura del parque (Cerrado por defecto)
         self.simulated_hour = 8  # Hora simulada inicial (8:00 AM)
+        self.message_queue = queue.Queue()
+
         self.model = HumidityTemperatureModel(controller_ref=self)
         self.door_model = DoorModel(controller_ref=self)
+
+        def log(self, message: str):
+            """Encola mensajes para que los imprima el hilo de logging."""
+            self.message_queue.put(message)
+
+    def logger_thread(self):
+        """Hilo único que lee de la cola y hace print/log en orden."""
+        while self.running or not self.message_queue.empty():
+            try:
+                msg = self.message_queue.get(timeout=0.5)
+            except queue.Empty:
+                continue
+            print(msg)
+            # Aquí también podrías hacer logging a archivo si quieres
+            self.message_queue.task_done()
 
     def simulate_time_and_status(self):
         """Función que corre en un hilo para simular el paso del tiempo y cambiar el estado del parque."""
@@ -79,17 +97,3 @@ class SensorController:
         self.running = False
         time.sleep(6)
         print("Controlador y hilos terminados.")
-
-
-if __name__ == "__main__":
-    controller = SensorController()
-
-    try:
-        controller.start()
-        # Mantiene el hilo principal vivo
-        while True:
-            time.sleep(1)
-
-    except KeyboardInterrupt:
-        # Permite detener la ejecución con Ctrl+C
-        controller.stop()
