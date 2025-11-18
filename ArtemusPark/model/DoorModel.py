@@ -40,3 +40,4 @@ class DoorModel:
             time.sleep(5)
 
         self._log(f"[{name}] Hilo de puerta terminado.")
+
