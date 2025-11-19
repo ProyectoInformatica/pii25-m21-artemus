@@ -27,7 +27,9 @@ class HumidityTemperatureModel:
         while self.controller_ref.running:
             humidity = random.randint(0, 100)
             if humidity < 30:
-                message = f"[{name}] Humidity low ({humidity}%) → activating irrigation."
+                message = (
+                    f"[{name}] Humidity low ({humidity}%) → activating irrigation."
+                )
             elif humidity < 70:
                 message = f"[{name}] Humidity moderate ({humidity}%) → irrigation off."
             else:
