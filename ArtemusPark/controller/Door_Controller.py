@@ -18,9 +18,13 @@ class DoorController:
     Usa callbacks tipo on_new_data para entregar DoorModel al SensorController.
     """
 
-    def __init__(self, controller_ref=None, on_new_data: Optional[Callable[[DoorModel], None]] = None):
-        self.controller_ref = controller_ref           # Para leer running y park_open
-        self.on_new_data = on_new_data                 # Callback con DoorModel
+    def __init__(
+        self,
+        controller_ref=None,
+        on_new_data: Optional[Callable[[DoorModel], None]] = None,
+    ):
+        self.controller_ref = controller_ref  # Para leer running y park_open
+        self.on_new_data = on_new_data  # Callback con DoorModel
 
     def run(self, name: str):
         """Bucle que simula el sensor de puerta."""

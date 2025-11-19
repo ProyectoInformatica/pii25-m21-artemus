@@ -42,6 +42,7 @@ class SensorController:
             on_new_data=self._on_temperature
         )
         self.wind_controller = WindController(on_new_data=self._on_wind)
+        self.door_controller = DoorController(controller_ref=self, on_new_data=self._on_door)
 
         # Door controller (model-based)
         self.door_controller = DoorController(
