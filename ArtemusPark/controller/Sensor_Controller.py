@@ -1,3 +1,4 @@
+import logging
 import threading
 import time
 from typing import List, Optional
@@ -5,45 +6,50 @@ from typing import List, Optional
 from ArtemusPark.controller.Humidity_Controller import HumidityController
 from ArtemusPark.controller.Temperature_Controller import TemperatureController
 from ArtemusPark.controller.Wind_Controller import WindController
+from ArtemusPark.controller.Door_Controller import DoorController
+
 from ArtemusPark.model.Humidity_Model import HumidityModel
 from ArtemusPark.model.Temperature_Model import TemperatureModel
 from ArtemusPark.model.Wind_Model import WindModel
-from ArtemusPark.controller.Door_Controller import DoorController
 from ArtemusPark.model.Door_Model import DoorModel
 
+from ArtemusPark.repository.wind_repository import save_wind_measurement
+from ArtemusPark.service.wind_risk_service import check_wind_risk
+
+logger = logging.getLogger(__name__)
 
 
 class SensorController:
-    # Horario del parque
+    # Park schedule
     OPEN_HOUR = 9
     CLOSE_HOUR = 18
 
     def __init__(self):
-        # Estado general
+        # General state
         self.running = False
-        self.park_open = False          # Parque cerrado por defecto
-        self.simulated_hour = 8         # Hora simulada inicial (8:00)
+        self.park_open = False      # Park closed by default
+        self.simulated_hour = 8     # Initial simulated hour (8:00)
 
-        # Históricos de sensores (nueva arquitectura)
+        # Sensor histories
         self.humidity_history: List[HumidityModel] = []
         self.temperature_history: List[TemperatureModel] = []
         self.wind_history: List[WindModel] = []
         self.door_history: List[DoorModel] = []
 
-        # Controllers de sensores (nueva arquitectura)
+        # Sensor controllers
         self.humidity_controller = HumidityController(on_new_data=self._on_humidity)
         self.temperature_controller = TemperatureController(
             on_new_data=self._on_temperature
         )
         self.wind_controller = WindController(on_new_data=self._on_wind)
-        self.door_controller = DoorController(controller_ref=self, on_new_data=self._on_door)
 
-        # Modelo de puertas (versión antigua, referencia al controller)
+        # Door controller (model-based)
         self.door_controller = DoorController(
             controller_ref=self,
             on_new_data=self._on_door
         )
-    # ---------- CALLBACKS DE DATOS (nueva arquitectura) ---------- #
+
+    # ---------- DATA CALLBACKS ---------- #
 
     def _on_humidity(self, data: HumidityModel):
         self.humidity_history.append(data)
@@ -52,54 +58,81 @@ class SensorController:
         self.temperature_history.append(data)
 
     def _on_wind(self, data: WindModel):
+        """
+        Called automatically by WindController when a new wind measurement arrives.
+
+        Responsibilities:
+        - Store measurement in history
+        - Persist measurement to JSON "database"
+        - Check against risk threshold
+        - Trigger automatic alert if above limit
+        """
+        # 1) Store in memory history
         self.wind_history.append(data)
+
+        # 2) Persist to JSON (repository)
+        save_wind_measurement(data)
+
+        # 3) Check risk level
+        risk_result = check_wind_risk(data)
+
+        # 4) Trigger alert if risky
+        if risk_result.is_risky:
+            alert_msg = f"[ALERT] {risk_result.message}"
+            print(alert_msg)
+            logger.warning(alert_msg)
+
+            # TODO (future):
+            # - Notify Flet UI
+            # - Activate LEDs / buzzer
+            # - Send notification to cloud / dashboard
 
     def _on_door(self, data: DoorModel):
         self.door_history.append(data)
 
-    # ---------- SIMULACIÓN DE TIEMPO Y ESTADO DEL PARQUE ---------- #
+    # ---------- TIME SIMULATION AND PARK STATUS ---------- #
 
     def simulate_time_and_status(self):
-        """Hilo que simula la hora y el estado ABIERTO/CERRADO del parque."""
+        """Thread that simulates hour and park OPEN/CLOSED status."""
         while self.running:
             is_open_time = self.OPEN_HOUR <= self.simulated_hour < self.CLOSE_HOUR
 
             if is_open_time and not self.park_open:
                 self.park_open = True
-                print(f"\n--- PARQUE ABIERTO a las {self.simulated_hour}:00 ---")
+                print(f"\n--- PARK OPEN at {self.simulated_hour}:00 ---")
             elif not is_open_time and self.park_open:
                 self.park_open = False
-                print(f"\n--- PARQUE CERRADO a las {self.simulated_hour}:00 ---")
+                print(f"\n--- PARK CLOSED at {self.simulated_hour}:00 ---")
 
             print(
-                f"[Hora Simulada: {self.simulated_hour}:00] "
-                f"Parque {'ABIERTO' if self.park_open else 'CERRADO'}"
+                f"[Simulated Time: {self.simulated_hour}:00] "
+                f"Park {'OPEN' if self.park_open else 'CLOSED'}"
             )
 
-            # Avanzar hora simulada
+            # Advance simulated hour
             self.simulated_hour += 1
             if self.simulated_hour >= 24:
                 self.simulated_hour = 0
 
             time.sleep(1)
 
-    # ---------- ARRANQUE / PARADA DE SENSORES ---------- #
+    # ---------- START / STOP SENSORS ---------- #
 
     def start(self):
         self.running = True
 
-        num_sensors = 5     # humedad / temperatura / viento
-        door_sensors = 2    # número de sensores de puerta
+        num_sensors = 5     # humidity / temperature / wind sensors
+        door_sensors = 2    # number of door sensors
 
-        print("--- Iniciando Sensores y Reloj de Parque ---")
+        print("--- Starting Sensors and Park Clock ---")
 
-        # Hilo de reloj y estado del parque
+        # Time + park status thread
         threading.Thread(
             target=self.simulate_time_and_status,
             daemon=True
         ).start()
 
-        # Sensores de humedad, temperatura y viento
+        # Humidity, temperature and wind sensors
         for i in range(num_sensors):
             sensor_num = i + 1
 
@@ -121,28 +154,26 @@ class SensorController:
                 args=(f"WindSens{sensor_num}",),
             ).start()
 
-        # Sensores de puertas (siguen usando DoorModel)
+        # Door sensors
         for i in range(door_sensors):
             sensor_num = i + 1
             threading.Thread(
                 target=self.door_controller.run,
                 daemon=True,
-                args=(f"DoorSens{i + 1}",),
+                args=(f"DoorSens{sensor_num}",),
             ).start()
 
-        print("Sensores activos.")
+        print("Sensors are now active.")
 
     def stop(self):
-        print(
-            "\n--- Petición de Parada Recibida. Esperando a que los hilos terminen... ---"
-        )
+        print("\n--- Stop request received. Waiting for threads to finish... ---")
         self.running = False
-        # Los hilos de sensores tienen bucles infinitos, así que aquí de momento
-        # solo damos un pequeño margen por si alguno chequea flags internos.
+        # Sensor threads have infinite loops; for now we just give them some time
+        # in case they check internal flags.
         time.sleep(6)
-        print("Controlador y hilos terminados.")
+        print("Controller and threads stopped.")
 
-    # ---------- MÉTODOS DE CONSULTA (para UI / API) ---------- #
+    # ---------- QUERY METHODS (for UI / API) ---------- #
 
     def latest_humidity(self) -> Optional[HumidityModel]:
         return self.humidity_history[-1] if self.humidity_history else None
