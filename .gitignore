@@ -24,7 +24,7 @@ env/
 
 # --- IDEs y editores ---
 .vscode/
-.idea/
+.ArtemusPark/idea/
 *.swp
 *.swo
 *.bak

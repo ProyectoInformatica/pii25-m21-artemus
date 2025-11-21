@@ -13,8 +13,8 @@ from ArtemusPark.model.Temperature_Model import TemperatureModel
 from ArtemusPark.model.Wind_Model import WindModel
 from ArtemusPark.model.Door_Model import DoorModel
 
-from ArtemusPark.repository.wind_repository import save_wind_measurement
-from ArtemusPark.service.wind_risk_service import check_wind_risk
+from ArtemusPark.repository.Wind_Repository import save_wind_measurement
+from ArtemusPark.service.Wind_Risk_Service import check_wind_risk
 
 logger = logging.getLogger(__name__)
 
