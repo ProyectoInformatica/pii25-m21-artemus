@@ -27,8 +27,8 @@ class SensorController:
     def __init__(self):
         # General state
         self.running = False
-        self.park_open = False      # Park closed by default
-        self.simulated_hour = 8     # Initial simulated hour (8:00)
+        self.park_open = False  # Park closed by default
+        self.simulated_hour = 8  # Initial simulated hour (8:00)
 
         # Sensor histories
         self.humidity_history: List[HumidityModel] = []
@@ -42,12 +42,13 @@ class SensorController:
             on_new_data=self._on_temperature
         )
         self.wind_controller = WindController(on_new_data=self._on_wind)
-        self.door_controller = DoorController(controller_ref=self, on_new_data=self._on_door)
+        self.door_controller = DoorController(
+            controller_ref=self, on_new_data=self._on_door
+        )
 
         # Door controller (model-based)
         self.door_controller = DoorController(
-            controller_ref=self,
-            on_new_data=self._on_door
+            controller_ref=self, on_new_data=self._on_door
         )
 
     # ---------- DATA CALLBACKS ---------- #
@@ -122,16 +123,13 @@ class SensorController:
     def start(self):
         self.running = True
 
-        num_sensors = 5     # humidity / temperature / wind sensors
-        door_sensors = 2    # number of door sensors
+        num_sensors = 5  # humidity / temperature / wind sensors
+        door_sensors = 2  # number of door sensors
 
         print("--- Starting Sensors and Park Clock ---")
 
         # Time + park status thread
-        threading.Thread(
-            target=self.simulate_time_and_status,
-            daemon=True
-        ).start()
+        threading.Thread(target=self.simulate_time_and_status, daemon=True).start()
 
         # Humidity, temperature and wind sensors
         for i in range(num_sensors):
