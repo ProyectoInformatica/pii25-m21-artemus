@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from ArtemusPark.config.Wind_Config import RISK_THRESHOLD_KMH
 from ArtemusPark.model.Wind_Model import WindModel
 
+
 @dataclass
 class WindRiskResult:
     is_risky: bool
