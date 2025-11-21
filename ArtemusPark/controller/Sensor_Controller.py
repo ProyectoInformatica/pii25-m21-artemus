@@ -13,8 +13,13 @@ from ArtemusPark.model.Temperature_Model import TemperatureModel
 from ArtemusPark.model.Wind_Model import WindModel
 from ArtemusPark.model.Door_Model import DoorModel
 
-from ArtemusPark.repository.wind_repository import save_wind_measurement
-from ArtemusPark.service.wind_risk_service import check_wind_risk
+from ArtemusPark.repository.Wind_Repository import save_wind_measurement
+from ArtemusPark.service.Wind_Risk_Service import check_wind_risk
+
+from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
+from ArtemusPark.repository.Temperature_Repository import save_temperature_measurement
+from ArtemusPark.repository.Door_Repository import save_door_event
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,9 +60,11 @@ class SensorController:
 
     def _on_humidity(self, data: HumidityModel):
         self.humidity_history.append(data)
+        save_humidity_measurement(data)
 
     def _on_temperature(self, data: TemperatureModel):
         self.temperature_history.append(data)
+        save_temperature_measurement(data)
 
     def _on_wind(self, data: WindModel):
         """
@@ -91,6 +98,7 @@ class SensorController:
 
     def _on_door(self, data: DoorModel):
         self.door_history.append(data)
+        save_door_event(data)
 
     # ---------- TIME SIMULATION AND PARK STATUS ---------- #
 
