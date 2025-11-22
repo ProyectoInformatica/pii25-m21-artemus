@@ -74,8 +74,10 @@ class ScheduleTest(unittest.TestCase):
 
         # Simular el paso de 23:00 a 0:00
         controller.advance_simulated_hour()
-        self.assertEqual(controller.simulated_hour, 0, "Fallo: La hora debe reiniciarse a 0.")
+        self.assertEqual(
+            controller.simulated_hour, 0, "Fallo: La hora debe reiniciarse a 0."
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

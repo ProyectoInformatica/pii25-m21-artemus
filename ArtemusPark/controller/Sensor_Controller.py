@@ -49,9 +49,7 @@ class SensorController:
         self.wind_controller = WindController(on_new_data=self._on_wind)
 
         # Smoke Controller setup
-        self.smoke_controller = SmokeController(
-            on_new_data=self._on_smoke
-        )
+        self.smoke_controller = SmokeController(on_new_data=self._on_smoke)
 
         # Door Controller setup
         # Nota: Eliminé la duplicación que tenías en tu código original
@@ -145,15 +143,35 @@ class SensorController:
         # Sensors
         for i in range(num_sensors):
             sensor_num = i + 5
-            threading.Thread(target=self.humidity_controller.run,daemon=True,args=(f"HumiditySens{sensor_num}",),).start()
-            threading.Thread(target=self.temperature_controller.run,daemon=True,args=(f"TempSens{sensor_num}",), ).start()
-            threading.Thread(target=self.wind_controller.run,daemon=True,args=(f"WindSens{sensor_num}",),).start()
-            threading.Thread(target=self.smoke_controller.run,daemon=True, args=(f"SmokeSens{sensor_num}",),).start()
+            threading.Thread(
+                target=self.humidity_controller.run,
+                daemon=True,
+                args=(f"HumiditySens{sensor_num}",),
+            ).start()
+            threading.Thread(
+                target=self.temperature_controller.run,
+                daemon=True,
+                args=(f"TempSens{sensor_num}",),
+            ).start()
+            threading.Thread(
+                target=self.wind_controller.run,
+                daemon=True,
+                args=(f"WindSens{sensor_num}",),
+            ).start()
+            threading.Thread(
+                target=self.smoke_controller.run,
+                daemon=True,
+                args=(f"SmokeSens{sensor_num}",),
+            ).start()
 
         # Door sensors
         for i in range(door_sensors):
             sensor_num = i + 1
-            threading.Thread(target=self.door_controller.run,daemon=True,args=(f"DoorSens{sensor_num}",),).start()
+            threading.Thread(
+                target=self.door_controller.run,
+                daemon=True,
+                args=(f"DoorSens{sensor_num}",),
+            ).start()
 
         print("Sensors are now active.")
 

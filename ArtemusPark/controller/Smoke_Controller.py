@@ -14,9 +14,7 @@ logging.basicConfig(
 
 
 class SmokeController:
-    def __init__(
-            self, on_new_data: Optional[Callable[[SmokeModel], None]] = None
-    ):
+    def __init__(self, on_new_data: Optional[Callable[[SmokeModel], None]] = None):
         self.on_new_data = on_new_data
 
     def run(self, name):
