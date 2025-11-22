@@ -1,9 +1,14 @@
 [
   {
-    "timestamp": 1763582712.494037,
+    "timestamp": 1763819240.728801,
+    "speed": 51,
+    "state": "DANGER",
+    "label": "Danger! Strong wind"
+  },
+  {
+    "timestamp": 1763819240.7293177,
     "speed": 57,
     "state": "DANGER",
     "label": "Danger! Strong wind"
   }
-]
-]
+]]
