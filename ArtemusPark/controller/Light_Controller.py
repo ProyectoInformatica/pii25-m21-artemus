@@ -86,7 +86,6 @@ class LightController:
 
 
 
-
 #hacer que enciendan a las 19 y se apaguen a las 7
 
 
