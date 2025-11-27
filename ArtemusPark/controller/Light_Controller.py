@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import Callable, Optional
 
 
-
 logging.basicConfig(
     filename="light_controller.log",
     level=logging.INFO,
@@ -22,15 +21,18 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+
 class LightController:
-    def __init__(self, on_new_data: Optional[Callable[[LightModel], None]] = None,
-                 tick_seconds: int = 3600):
+    def __init__(
+        self,
+        on_new_data: Optional[Callable[[LightModel], None]] = None,
+        tick_seconds: int = 3600,
+    ):
         self.light_model = LightModel()
         self.on_new_data = on_new_data
         self.tick_seconds = max(1, tick_seconds)
         self._stop_event = threading.Event()
         self._thread: Optional[threading.Thread] = None
-
 
     def _should_be_on(self, now: datetime) -> bool:
         hour = now.hour
@@ -54,7 +56,7 @@ class LightController:
             should_on = self._should_be_on(now)
             self._update_state(should_on)
             # esperar un intervalo configurable
-            #self._stop_event.wait(self.tick_seconds)
+            # self._stop_event.wait(self.tick_seconds)
 
             logging.info(
                 "Estado horario - Luz: %s (is_on=%s)",
@@ -83,9 +85,4 @@ class LightController:
         logging.info("LightController stopped")
 
 
-
-
-
-#hacer que enciendan a las 19 y se apaguen a las 7
-
-
+# hacer que enciendan a las 19 y se apaguen a las 7

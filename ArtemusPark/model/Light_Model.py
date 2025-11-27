@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import time
 
+
 @dataclass
 class LightModel:
     value: int = 0  # porcentaje %
