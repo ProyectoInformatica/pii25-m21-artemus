@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="idk&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;ArtemusPark/controller/Light_Controller.py">
-      <change afterPath="$PROJECT_DIR$/ArtemusPark/Notifications/Notification_system.py" afterDir="false" />
+    <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="logs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Light_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Light_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Sensor_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Sensor_Controller.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +23,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feature/issue_Aldo_light_sensor" />
+        <entry key="$PROJECT_DIR$" value="feature/issue4_1-ppiquerasDoor" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -49,8 +48,7 @@
     },
     "owner": "ProyectoInformatica",
     "repository": "pii25-m21-artemus"
-  },
-  "editorReviewEnabled": false
+  }
 }]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -63,22 +61,19 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.Humidity_Model.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Light_Controller.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Light_Model.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Ligt_Repository.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Sensor_Controller.executor&quot;: &quot;Run&quot;,
+    &quot;Python.DoorModel.executor&quot;: &quot;Run&quot;,
     &quot;Python.init.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;#26 on feature/issue__Aldo__light__sensor&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#19 on feature/issue4__1__ppiqueras__Door__Model&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -86,6 +81,36 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\ppiqu\PycharmProjects\pii25-m21-artemus\ArtemusPark\model" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="init" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="pii25-m21-artemus" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ArtemusPark/view" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ArtemusPark/view/init.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.init" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -111,9 +136,8 @@
       <workItem from="1762446762617" duration="578000" />
       <workItem from="1762450745543" duration="1051000" />
       <workItem from="1762532708462" duration="1015000" />
-      <workItem from="1764199464265" duration="507000" />
-      <workItem from="1764238870290" duration="3117000" />
-      <workItem from="1764344727633" duration="2680000" />
+      <workItem from="1763142035546" duration="7000" />
+      <workItem from="1763379421318" duration="3323000" />
     </task>
     <task id="LOCAL-00001" summary="logs">
       <option name="closed" value="true" />
@@ -169,22 +193,9 @@
     <option name="LAST_COMMIT_MESSAGE" value="logs" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$Humidity_Model.coverage" NAME="Humidity_Model Coverage Results" MODIFIED="1764241847121" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/model" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1762533022899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$Ligt_Repository.coverage" NAME="Ligt_Repository Coverage Results" MODIFIED="1764242510102" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/repository" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$Light_Controller.coverage" NAME="Light_Controller Coverage Results" MODIFIED="1764242519420" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/controller" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemus$init.coverage" NAME="init Coverage Results" MODIFIED="1762533672375" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$main.coverage" NAME="main Coverage Results" MODIFIED="1764006519163" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$Light_Model.coverage" NAME="Light_Model Coverage Results" MODIFIED="1764238890824" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/model" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$Sensor_Controller.coverage" NAME="Sensor_Controller Coverage Results" MODIFIED="1764241826683" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/controller" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemuss$Humidity_Temperature_Model.coverage" NAME="Humidity_Temperature_Model Coverage Results" MODIFIED="1764006506808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/model" />
-  </component>
-  <component name="github-copilot-workspace">
-    <instructionFileLocations>
-      <option value=".github/instructions" />
-    </instructionFileLocations>
-    <promptFileLocations>
-      <option value=".github/prompts" />
-    </promptFileLocations>
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$Sensor_Controller.coverage" NAME="Sensor_Controller Coverage Results" MODIFIED="1763402088675" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/controller" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$init.coverage" NAME="init Coverage Results" MODIFIED="1763402463082" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$DoorModel.coverage" NAME="DoorModel Coverage Results" MODIFIED="1763379820576" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/model" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1763379848231" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark" />
   </component>
 </project>

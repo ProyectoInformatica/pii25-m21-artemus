@@ -3,8 +3,7 @@ from dataclasses import dataclass, field
 
 
 @dataclass
-class LightModel:
+class HumidityModel:
     value: int  # %
-    status: str  # "ON" | "OFF"
-    is_on: bool
+    status: str  # "LOW" | "NORMAL" | "HIGH"
     timestamp: float = field(default_factory=time.time)

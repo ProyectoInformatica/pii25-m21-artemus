@@ -1,23 +1,9 @@
-import threading
-import time
 import logging
+import time
 from datetime import datetime
 from typing import Callable, Optional
-from ArtemusPark.Notifications.Notification_system import (
-    NotificationSystem,
-    Notification,
-)
-
-
-logging.basicConfig(
-    filename="light_controller.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-
 
 from ArtemusPark.model.Light_Model import LightModel
-
 
 logging.basicConfig(
     filename="light_controller.log",
@@ -29,89 +15,41 @@ logging.basicConfig(
 class LightController:
     def __init__(
         self,
+        controller_ref=None,
         on_new_data: Optional[Callable[[LightModel], None]] = None,
-        tick_seconds: int = 3600,
-        notification_system: Optional[NotificationSystem] = None,
     ):
-        self.light_model = LightModel()
+        self.controller_ref = controller_ref
         self.on_new_data = on_new_data
-        self.tick_seconds = max(1, tick_seconds)
-        self._stop_event = threading.Event()
-        self._thread: Optional[threading.Thread] = None
-        self.notification_system = notification_system
 
-    def _should_be_on(self, now: datetime) -> bool:
-        hour = now.hour
-        return hour >= 19 or hour < 7
-
-
-    def _notify_out_of_schedule(self, now: datetime, is_on: bool) -> None:
-        """Notificar cuando el estado de la luz no coincide con el horario."""
-        if not self.notification_system:
+    def run(self, name: str):
+        """
+        Simulates a light sensor/controller.
+        Logic: Lights turn ON between 19:00 and 07:00 based on SIMULATED time.
+        """
+        # Si no hay referencia, no podemos leer la hora simulada, así que fallamos o usamos hora real
+        if not self.controller_ref:
+            logging.error(
+                "LightController needs controller_ref to read simulated time."
+            )
             return
 
-        scheduled_on = self._should_be_on(now)
-        if is_on != scheduled_on:
-            state = "ENCENDIDA" if is_on else "APAGADA"
-            msg = (
-                f"Luz {state} fuera del horario programado "
-                f"(hora actual: {now.strftime('%H:%M')}, "
-                f"debería estar {'ENCENDIDA' if scheduled_on else 'APAGADA'})."
-            )
-            notification = Notification(
-                source="LightController",
-                level="WARNING",
-                message=msg,
-            )
-            self.notification_system.notify("LIGHT", notification)
+        while self.controller_ref.running:
+            # Check SIMULATED time from the main controller
+            current_hour = self.controller_ref.simulated_hour
 
-    def _update_state(self, is_on: bool) -> None:
-        if self.light_model.is_on != is_on:
-            now = datetime.now()
-            self.light_model.is_on = is_on
-            self.light_model.status = "ON" if is_on else "OFF"
-            self.light_model.update_timestamp()
-            logging.info("Light changed: %s", self.light_model.status)
-            self._notify_out_of_schedule(now, is_on)
+            # Logic: ON between 19:00 and 07:00
+            should_be_on = current_hour >= 19 or current_hour < 7
+
+            status = "ON" if should_be_on else "OFF"
+            value = 100 if should_be_on else 0
+
+            data = LightModel(is_on=should_be_on, status=status, value=value)
+
+            msg = f"[{name}] Light {status} (Simulated Hour: {current_hour})"
+            print(msg)
+            logging.info(msg)
+
             if self.on_new_data:
-                try:
-                    self.on_new_data(self.light_model)
-                except Exception:
-                    logging.exception("Error in on_new_data callback")
+                self.on_new_data(data)
 
-    def _run_loop(self) -> None:
-        while not self._stop_event.is_set():
-            now = datetime.now()
-            should_on = self._should_be_on(now)
-            self._update_state(should_on)
-            # esperar un intervalo configurable
-            # self._stop_event.wait(self.tick_seconds)
-
-            logging.info(
-                "Estado horario - Luz: %s (is_on=%s)",
-                self.light_model.status,
-                self.light_model.is_on,
-            )
-
-            self._stop_event.wait(self.tick_seconds)
-
-    def start(self) -> None:
-        if self._thread and self._thread.is_alive():
-            return
-        self._stop_event.clear()
-        self._thread = threading.Thread(
-            target=self._run_loop,
-            daemon=True,
-            name="LightControllerThread",
-        )
-        self._thread.start()
-        logging.info("LightController started")
-
-    def stop(self) -> None:
-        self._stop_event.set()
-        if self._thread:
-            self._thread.join(timeout=2)
-        logging.info("LightController stopped")
-
-
-# hacer que enciendan a las 19 y se apaguen a las 7
+            time.sleep(1)
