@@ -14,9 +14,9 @@ logging.basicConfig(
 
 class LightController:
     def __init__(
-            self,
-            controller_ref=None,
-            on_new_data: Optional[Callable[[LightModel], None]] = None,
+        self,
+        controller_ref=None,
+        on_new_data: Optional[Callable[[LightModel], None]] = None,
     ):
         self.controller_ref = controller_ref
         self.on_new_data = on_new_data
@@ -28,7 +28,9 @@ class LightController:
         """
         # Si no hay referencia, no podemos leer la hora simulada, así que fallamos o usamos hora real
         if not self.controller_ref:
-            logging.error("LightController needs controller_ref to read simulated time.")
+            logging.error(
+                "LightController needs controller_ref to read simulated time."
+            )
             return
 
         while self.controller_ref.running:
