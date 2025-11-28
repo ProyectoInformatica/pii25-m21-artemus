@@ -1,12 +1,22 @@
-import tkinter as tk
+import flet as ft
+from ArtemusPark.controller.App_Controller import AppController
+from ArtemusPark.view.Main_View import MainView
 
-# Example Tinker Code
 
-root = tk.Tk()
-root.title("Hola, Mundo")
-root.geometry("300x200")
+def main(page: ft.Page):
+    print(f"[Main] Application started")
 
-label = tk.Label(root, text="¡Bienvenido a Tkinter!")
-label.pack(pady=20)
+    page.title = "Artemus Smart Park"
+    page.padding = 0
+    page.bgcolor = "#131921"  # Matches sidebar background
+    page.theme_mode = ft.ThemeMode.LIGHT
 
-root.mainloop()
+    # Initialize Controller
+    controller = AppController(page)
+
+    # Build UI
+    page.add(MainView(page, controller))
+
+
+if __name__ == "__main__":
+    ft.app(target=main)
