@@ -17,7 +17,7 @@ def _serialize(event: LightModel) -> Dict[str, Any]:
 
 def save_light_event(event: LightModel) -> None:
     """
-    Agrega un evento de luz al archivo JSON.
+    Append a single light event to the JSON 'database'.
     """
     if DATA_FILE.exists():
         try:
@@ -33,7 +33,7 @@ def save_light_event(event: LightModel) -> None:
 
 def load_all_light_events() -> List[Dict[str, Any]]:
     """
-    Retorna todos los eventos de luz como diccionarios.
+    Returns all stored light events as plain dicts.
     """
     if not DATA_FILE.exists():
         return []
