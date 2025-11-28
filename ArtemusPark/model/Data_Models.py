@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class SensorData:
     temperature: float
@@ -8,6 +9,7 @@ class SensorData:
     air_quality: int
     capacity_current: int
     capacity_max: int
+
 
 @dataclass
 class Alert:

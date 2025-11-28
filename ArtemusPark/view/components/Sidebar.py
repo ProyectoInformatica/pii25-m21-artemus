@@ -15,10 +15,14 @@ def Sidebar(controller):
             content=ft.Row(
                 controls=[
                     ft.Text(icon, size=18),
-                    ft.Text(label, color="#f9fafb" if active else "#9ca3af", weight=ft.FontWeight.W_500),
+                    ft.Text(
+                        label,
+                        color="#f9fafb" if active else "#9ca3af",
+                        weight=ft.FontWeight.W_500,
+                    ),
                 ],
-                spacing=12
-            )
+                spacing=12,
+            ),
         )
 
     nav_items = ft.Column(
@@ -28,7 +32,7 @@ def Sidebar(controller):
             create_nav_item("🧾", "Historial", "history"),
             create_nav_item("🛠", "Mantenimiento", "maintenance"),
             create_nav_item("⚙️", "Administración", "admin"),
-        ]
+        ],
     )
 
     # Registramos la columna en el controlador para poder actualizar los estados visuales (active)
@@ -41,11 +45,13 @@ def Sidebar(controller):
         content=ft.Column(
             controls=[
                 # CORRECCIÓN: Se eliminó 'letter_spacing=2' porque causaba el error
-                ft.Text("ARTEMUS", size=26, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                ft.Text(
+                    "ARTEMUS", size=26, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE
+                ),
                 ft.Container(height=30),
                 nav_items,
                 ft.Container(expand=True),
-                ft.Text("Artemus Smart Park · v0.4", color="#4b5563", size=12)
+                ft.Text("Artemus Smart Park · v0.4", color="#4b5563", size=12),
             ]
-        )
+        ),
     )
