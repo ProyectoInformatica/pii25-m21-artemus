@@ -19,13 +19,17 @@ from ArtemusPark.model.Door_Model import DoorModel
 from ArtemusPark.model.Light_Model import LightModel
 from ArtemusPark.model.Smoke_Model import SmokeModel
 
-# --- Imports de Repositorios y Servicios ---
+# --- Imports de Repositorios ---
 from ArtemusPark.repository.Wind_Repository import save_wind_measurement
-from ArtemusPark.service.Wind_Risk_Service import check_wind_risk
 from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
 from ArtemusPark.repository.Temperature_Repository import save_temperature_measurement
 from ArtemusPark.repository.Door_Repository import save_door_event
 from ArtemusPark.repository.Light_Repository import save_light_event
+from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement  # <--- NUEVO
+
+# --- Imports de Servicios ---
+from ArtemusPark.service.Wind_Risk_Service import check_wind_risk
+from ArtemusPark.service.Smoke_Risk_Service import check_smoke_risk  # <--- NUEVO
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +60,10 @@ class SensorController:
         )
         self.wind_controller = WindController(on_new_data=self._on_wind)
 
-        # Smoke Controller
-        self.smoke_controller = SmokeController(on_new_data=self._on_smoke)
+        # Smoke Controller (necesita controller_ref para parar bien)
+        self.smoke_controller = SmokeController(
+            controller_ref=self, on_new_data=self._on_smoke
+        )
 
         # Door Controller (con referencia al controller principal)
         self.door_controller = DoorController(
@@ -86,9 +92,10 @@ class SensorController:
         self.wind_history.append(data)
         save_wind_measurement(data)
 
+        # Usamos el servicio de riesgo de viento
         risk_result = check_wind_risk(data)
         if risk_result.is_risky:
-            alert_msg = f"[ALERT] {risk_result.message}"
+            alert_msg = f"[WIND ALERT] {risk_result.message}"
             print(alert_msg)
             logger.warning(alert_msg)
 
@@ -102,14 +109,27 @@ class SensorController:
 
     def _on_smoke(self, data: SmokeModel):
         self.smoke_history.append(data)
-        # Nota: Si tienes un repositorio de humo, añádelo aquí (save_smoke_measurement)
+        save_smoke_measurement(data)  # <--- Guardamos en JSON
 
-        if data.status == "ALARM":
-            msg = f"[EMERGENCY] SMOKE ALARM TRIGGERED! Density: {data.value}"
+        # Usamos el servicio de riesgo de humo
+        risk_result = check_smoke_risk(data)
+
+        if risk_result.is_emergency:
+            # Caso CRITICO (ALARM)
+            msg = f"[FIRE EMERGENCY] {risk_result.message}"
             print(msg)
             logger.critical(msg)
-            # Lógica opcional: Abrir puertas por seguridad
-            # self.park_open = True
+
+            # Lógica de seguridad: Si hay fuego, abrimos el parque para evacuación
+            if not self.park_open:
+                print(">>> EMERGENCY PROTOCOL: FORCING GATES OPEN <<<")
+                self.park_open = True
+
+        elif risk_result.status == "WARNING":
+            # Caso PRECAUCIÓN
+            msg = f"[SMOKE WARNING] {risk_result.message}"
+            print(msg)
+            logger.warning(msg)
 
     # ---------- TIME SIMULATION AND PARK STATUS ---------- #
 
@@ -122,6 +142,8 @@ class SensorController:
                 self.park_open = True
                 print(f"\n--- PARK OPEN at {self.simulated_hour}:00 ---")
             elif not is_open_time and self.park_open:
+                # Solo cerramos si NO hay una emergencia de humo activa (simplificado)
+                # (Para este ejemplo simple, permitimos cerrar, pero en realidad chequearíamos flags de emergencia)
                 self.park_open = False
                 print(f"\n--- PARK CLOSED at {self.simulated_hour}:00 ---")
 
@@ -143,8 +165,8 @@ class SensorController:
         self.running = True
 
         num_standard_sensors = 5  # Humidity, Temp, Wind, Smoke
-        num_light_sensors = 5     # Light
-        door_sensors = 2          # Doors
+        num_light_sensors = 5  # Light
+        door_sensors = 2  # Doors
 
         print("--- Starting Sensors and Park Clock ---")
 
