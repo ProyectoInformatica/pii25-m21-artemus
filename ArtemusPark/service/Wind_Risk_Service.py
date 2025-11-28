@@ -1,8 +1,5 @@
-# ArtemusPark/service/wind_risk_service.py
-
 from dataclasses import dataclass
-
-from ArtemusPark.config.wind_config import RISK_THRESHOLD_KMH
+from ArtemusPark.config.Wind_Config import RISK_THRESHOLD_KMH
 from ArtemusPark.model.Wind_Model import WindModel
 
 
