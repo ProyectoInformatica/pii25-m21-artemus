@@ -7,11 +7,13 @@ from ArtemusPark.controller.Humidity_Controller import HumidityController
 from ArtemusPark.controller.Temperature_Controller import TemperatureController
 from ArtemusPark.controller.Wind_Controller import WindController
 from ArtemusPark.controller.Door_Controller import DoorController
+from ArtemusPark.controller.Light_Controller import LightController
 
 from ArtemusPark.model.Humidity_Model import HumidityModel
 from ArtemusPark.model.Temperature_Model import TemperatureModel
 from ArtemusPark.model.Wind_Model import WindModel
 from ArtemusPark.model.Door_Model import DoorModel
+from ArtemusPark.model.Light_Model import LightModel
 
 from ArtemusPark.repository.Wind_Repository import save_wind_measurement
 from ArtemusPark.service.Wind_Risk_Service import check_wind_risk
@@ -19,6 +21,7 @@ from ArtemusPark.service.Wind_Risk_Service import check_wind_risk
 from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
 from ArtemusPark.repository.Temperature_Repository import save_temperature_measurement
 from ArtemusPark.repository.Door_Repository import save_door_event
+from ArtemusPark.repository.Light_Repository import save_light_event
 
 
 logger = logging.getLogger(__name__)
@@ -40,6 +43,7 @@ class SensorController:
         self.temperature_history: List[TemperatureModel] = []
         self.wind_history: List[WindModel] = []
         self.door_history: List[DoorModel] = []
+        self.light_history: List[LightModel] = []
 
         # Sensor controllers
         self.humidity_controller = HumidityController(on_new_data=self._on_humidity)
@@ -51,9 +55,9 @@ class SensorController:
             controller_ref=self, on_new_data=self._on_door
         )
 
-        # Door controller (model-based)
-        self.door_controller = DoorController(
-            controller_ref=self, on_new_data=self._on_door
+        # AQUÍ ESTÁ EL CAMBIO: Pasamos controller_ref=self
+        self.light_controller = LightController(
+            controller_ref=self, on_new_data=self._on_light
         )
 
     # ---------- DATA CALLBACKS ---------- #
@@ -100,6 +104,10 @@ class SensorController:
         self.door_history.append(data)
         save_door_event(data)
 
+    def _on_light(self, data: LightModel):
+        self.light_history.append(data)
+        save_light_event(data)
+
     # ---------- TIME SIMULATION AND PARK STATUS ---------- #
 
     def simulate_time_and_status(self):
@@ -132,6 +140,7 @@ class SensorController:
         self.running = True
 
         num_sensors = 5  # humidity / temperature / wind sensors
+        num_light_sensors = 5  # light sensors
         door_sensors = 2  # number of door sensors
 
         print("--- Starting Sensors and Park Clock ---")
@@ -139,26 +148,35 @@ class SensorController:
         # Time + park status thread
         threading.Thread(target=self.simulate_time_and_status, daemon=True).start()
 
-        # Humidity, temperature and wind sensors
+        # Humidity, temperature, wind and light sensors
         for i in range(num_sensors):
             sensor_num = i + 1
 
-            threading.Thread(
-                target=self.humidity_controller.run,
-                daemon=True,
-                args=(f"HumiditySens{sensor_num}",),
-            ).start()
+            # threading.Thread(
+            #     target=self.humidity_controller.run,
+            #     daemon=True,
+            #     args=(f"HumiditySens{sensor_num}",),
+            # ).start()
+            #
+            # threading.Thread(
+            #     target=self.temperature_controller.run,
+            #     daemon=True,
+            #     args=(f"TempSens{sensor_num}",),
+            # ).start()
+            #
+            # threading.Thread(
+            #     target=self.wind_controller.run,
+            #     daemon=True,
+            #     args=(f"WindSens{sensor_num}",),
+            # ).start()
 
+        # Light sensors
+        for i in range(num_light_sensors):
+            sensor_num = i + 1
             threading.Thread(
-                target=self.temperature_controller.run,
+                target=self.light_controller.run,
                 daemon=True,
-                args=(f"TempSens{sensor_num}",),
-            ).start()
-
-            threading.Thread(
-                target=self.wind_controller.run,
-                daemon=True,
-                args=(f"WindSens{sensor_num}",),
+                args=(f"LightSens{sensor_num}",),
             ).start()
 
         # Door sensors
@@ -190,3 +208,6 @@ class SensorController:
 
     def latest_wind(self) -> Optional[WindModel]:
         return self.wind_history[-1] if self.wind_history else None
+
+    def latest_light(self) -> Optional[LightModel]:
+        return self.light_history[-1] if self.light_history else None
