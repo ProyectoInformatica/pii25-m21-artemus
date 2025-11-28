@@ -3,6 +3,10 @@ import time
 import logging
 from datetime import datetime
 from typing import Callable, Optional
+from ArtemusPark.Notifications.Notification_system import (
+    NotificationSystem,
+    Notification,
+)
 
 
 logging.basicConfig(
@@ -27,23 +31,48 @@ class LightController:
         self,
         on_new_data: Optional[Callable[[LightModel], None]] = None,
         tick_seconds: int = 3600,
+        notification_system: Optional[NotificationSystem] = None,
     ):
         self.light_model = LightModel()
         self.on_new_data = on_new_data
         self.tick_seconds = max(1, tick_seconds)
         self._stop_event = threading.Event()
         self._thread: Optional[threading.Thread] = None
+        self.notification_system = notification_system
 
     def _should_be_on(self, now: datetime) -> bool:
         hour = now.hour
         return hour >= 19 or hour < 7
 
+
+    def _notify_out_of_schedule(self, now: datetime, is_on: bool) -> None:
+        """Notificar cuando el estado de la luz no coincide con el horario."""
+        if not self.notification_system:
+            return
+
+        scheduled_on = self._should_be_on(now)
+        if is_on != scheduled_on:
+            state = "ENCENDIDA" if is_on else "APAGADA"
+            msg = (
+                f"Luz {state} fuera del horario programado "
+                f"(hora actual: {now.strftime('%H:%M')}, "
+                f"debería estar {'ENCENDIDA' if scheduled_on else 'APAGADA'})."
+            )
+            notification = Notification(
+                source="LightController",
+                level="WARNING",
+                message=msg,
+            )
+            self.notification_system.notify("LIGHT", notification)
+
     def _update_state(self, is_on: bool) -> None:
         if self.light_model.is_on != is_on:
+            now = datetime.now()
             self.light_model.is_on = is_on
             self.light_model.status = "ON" if is_on else "OFF"
             self.light_model.update_timestamp()
             logging.info("Light changed: %s", self.light_model.status)
+            self._notify_out_of_schedule(now, is_on)
             if self.on_new_data:
                 try:
                     self.on_new_data(self.light_model)

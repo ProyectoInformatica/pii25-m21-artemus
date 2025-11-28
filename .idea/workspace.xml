@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="fix: add spacing for improved readability in DoorModel.py">
-      <change afterPath="$PROJECT_DIR$/ArtemusPark/controller/Light_Controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ArtemusPark/model/Light_Model.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ArtemusPark/repository/Ligt_Repository.py" afterDir="false" />
+    <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="idk&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;ArtemusPark/controller/Light_Controller.py">
+      <change afterPath="$PROJECT_DIR$/ArtemusPark/Notifications/Notification_system.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Light_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Light_Controller.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +24,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="development" />
+        <entry key="$PROJECT_DIR$" value="feature/issue_Aldo_light_sensor" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -50,7 +49,8 @@
     },
     "owner": "ProyectoInformatica",
     "repository": "pii25-m21-artemus"
-  }
+  },
+  "editorReviewEnabled": false
 }]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -60,28 +60,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.Humidity_Model.executor": "Run",
-    "Python.Light_Controller.executor": "Run",
-    "Python.Light_Model.executor": "Run",
-    "Python.Ligt_Repository.executor": "Run",
-    "Python.Sensor_Controller.executor": "Run",
-    "Python.init.executor": "Run",
-    "Python.main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "development",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.Humidity_Model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Light_Controller.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Light_Model.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Ligt_Repository.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Sensor_Controller.executor&quot;: &quot;Run&quot;,
+    &quot;Python.init.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#26 on feature/issue__Aldo__light__sensor&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\ppiqu\PycharmProjects\pii25-m21-artemus\ArtemusPark\model" />
@@ -113,6 +113,7 @@
       <workItem from="1762532708462" duration="1015000" />
       <workItem from="1764199464265" duration="507000" />
       <workItem from="1764238870290" duration="3117000" />
+      <workItem from="1764344727633" duration="2680000" />
     </task>
     <task id="LOCAL-00001" summary="logs">
       <option name="closed" value="true" />
