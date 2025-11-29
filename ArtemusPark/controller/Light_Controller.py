@@ -33,9 +33,6 @@ class LightController:
 
         return simulated_hour >= 19 or simulated_hour < 7
 
-
-
-
     def _notify_out_of_schedule(
         self,
         simulated_hour: int,
@@ -58,10 +55,6 @@ class LightController:
                 message=msg,
             )
             self.notification_system.notify("LIGHT", notification)
-
-
-
-
 
     def run(self, name: str):
         """

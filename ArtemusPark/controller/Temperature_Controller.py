@@ -71,6 +71,4 @@ class TemperatureController:
                 except Exception:
                     logging.exception("Error in on_new_data callback")
 
-
             time.sleep(1)
-

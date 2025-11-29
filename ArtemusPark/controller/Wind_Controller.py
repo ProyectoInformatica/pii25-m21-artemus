@@ -30,7 +30,9 @@ class WindController:
         self.warning_threshold_kmh = warning_threshold_kmh
         self.notification_system = notification_system
 
-    def _notify_wind(self, speed: int, state: str, label: str, sensor_name: str) -> None:
+    def _notify_wind(
+        self, speed: int, state: str, label: str, sensor_name: str
+    ) -> None:
         if not self.notification_system:
             return
 

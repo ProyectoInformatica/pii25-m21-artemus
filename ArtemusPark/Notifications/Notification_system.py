@@ -15,7 +15,6 @@ logging.basicConfig(
 )
 
 
-
 class Notification:
     def __init__(self, source: str, level: str, message: str):
         self.source = source
@@ -28,12 +27,13 @@ class Notification:
         return f"[{self.timestamp}] [{self.source}] [{self.level}] {self.message}"
 
 
-
 class NotificationSystem:
     def __init__(self):
         self._subscribers: Dict[str, List[Callable[[Notification], None]]] = {}
 
-    def subscribe(self, event_type: str, callback: Callable[[Notification], None]) -> None:
+    def subscribe(
+        self, event_type: str, callback: Callable[[Notification], None]
+    ) -> None:
         """event_type p.ej. 'LIGHT', 'HUMIDITY', 'TEMPERATURE'."""
         self._subscribers.setdefault(event_type, []).append(callback)
 
@@ -49,8 +49,8 @@ class NotificationSystem:
                 logging.exception("Error en callback de notificación")
 
 
-
 from ArtemusPark.Notifications.Notification_system import NotificationSystem
+
 
 class SensorController:
     OPEN_HOUR = 9

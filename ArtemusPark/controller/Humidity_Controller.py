@@ -18,9 +18,9 @@ logging.basicConfig(
 
 class HumidityController:
     def __init__(
-            self,
-            on_new_data: Optional[Callable[[HumidityModel], None]] = None,
-            notification_system: Optional[NotificationSystem] = None,
+        self,
+        on_new_data: Optional[Callable[[HumidityModel], None]] = None,
+        notification_system: Optional[NotificationSystem] = None,
     ):
         self.on_new_data = on_new_data
         self.notification_system = notification_system
