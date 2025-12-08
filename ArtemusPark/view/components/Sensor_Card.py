@@ -1,38 +1,41 @@
 import flet as ft
+# Import ajustado a tu estructura (Mayúsculas)
+from ArtemusPark.config.Colors import AppColors
 
 
 class SensorCard(ft.Container):
     def __init__(self, title: str, icon: str, value: str, unit: str, footer_text: str):
         super().__init__()
-        # Configurar propiedades visuales del contenedor
-        self.border = ft.border.all(1, "#e5e7eb")
-        self.border_radius = 18
-        self.padding = 12
-        self.bgcolor = "#f9fafb"
-        self.width = 200  # Ancho fijo o flexible segun necesites
+        self.width = 180
+        self.height = 110
+        self.bgcolor = AppColors.BG_CARD
+        self.border_radius = 12
+        self.padding = 15
 
-        # Estructura interna
+        self.shadow = ft.BoxShadow(
+            spread_radius=1,
+            blur_radius=5,
+            color=AppColors.SHADOW  # si es un color válido de Flet
+        )
+
         self.content = ft.Column(
-            spacing=4,
+            spacing=5,
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                # Header: Titulo e Icono
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        ft.Text(title, size=13, color="#6b7280"),  # muted text
-                        ft.Text(icon, size=18)
-                    ]
+                        ft.Text(title, size=12, color=AppColors.TEXT_MUTED),
+                        ft.Text(icon, size=16),
+                    ],
                 ),
-                # Value: Valor y Unidad
                 ft.Row(
-                    alignment=ft.MainAxisAlignment.START,
                     vertical_alignment=ft.CrossAxisAlignment.BASELINE,
                     controls=[
-                        ft.Text(value, size=22, weight=ft.FontWeight.W_600),
-                        ft.Text(unit, size=14, color="#6b7280")
-                    ]
+                        ft.Text(value, size=22, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
+                        ft.Text(unit, size=12, color=AppColors.TEXT_MUTED),
+                    ],
                 ),
-                # Footer
-                ft.Text(footer_text, size=12, color="#6b7280")
-            ]
+                ft.Text(footer_text, size=10, color=AppColors.TEXT_LIGHT_GREY, no_wrap=True),
+            ],
         )
