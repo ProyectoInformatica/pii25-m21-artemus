@@ -3,8 +3,7 @@ from view.components.Sidebar import Sidebar
 from view.pages.Dashboard import DashboardPage
 from view.pages.Placeholder_Page import PlaceholderPage
 
-
-def main(page: ft.Page):
+async def main(page: ft.Page):
     page.title = "Artemus Smart Park"
     page.padding = 0
 
@@ -13,20 +12,17 @@ def main(page: ft.Page):
         expand=True,
         bgcolor="#e5e7eb",
         padding=20,
-        content=ft.Text("Iniciando...")  # Texto temporal
+        content=ft.Text("Iniciando...")
     )
 
     # Función que se ejecuta al clicar en el Sidebar
     def change_view(page_name):
-        print(f"Main: Cambiando vista a {page_name}")
+        print(f"change_view: Switching to {page_name}")
 
-        content_area.content = None  # Limpiamos
+        content_area.content = None
 
         if page_name == "dashboard":
-            # PRUEBA: Si el Dashboard falla, comenta la linea de abajo y descomenta el Text
             content_area.content = DashboardPage()
-            # content_area.content = ft.Text("ESTO ES EL DASHBOARD", size=30, color="black")
-
         elif page_name == "educational":
             content_area.content = PlaceholderPage("Zona Educativa", "Contenido...")
         elif page_name == "admin":
@@ -36,7 +32,7 @@ def main(page: ft.Page):
         elif page_name == "history":
             content_area.content = PlaceholderPage("Historial", "Gráficos...")
 
-        content_area.update()  # IMPORTANTE: Refrescar pantalla
+        content_area.update()
 
     # Creamos la Sidebar
     sidebar = Sidebar(on_nav_change=change_view)
@@ -53,6 +49,6 @@ def main(page: ft.Page):
     # Forzamos la carga inicial
     change_view("dashboard")
 
-
 if __name__ == "__main__":
+    # Importante: ft.app(target=main) maneja async automáticamente
     ft.app(target=main)

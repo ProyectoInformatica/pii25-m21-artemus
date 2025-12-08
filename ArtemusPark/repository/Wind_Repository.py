@@ -3,9 +3,10 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 from ArtemusPark.model.Wind_Model import WindModel
+from model.Wind_Model import WindModel
 
-DATA_FILE = Path("wind_measurements.json")
-
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "wind_measurements.json"
 
 def _serialize_measurement(measurement: WindModel) -> Dict[str, Any]:
     return {
