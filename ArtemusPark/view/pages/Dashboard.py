@@ -87,17 +87,17 @@ class DashboardPage(ft.Container):
                     ft.Text("Estado de Sensores", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
 
                     # --- TARJETAS COMENTADAS ---
-                    # ft.Container(
-                    #     content=ft.Row(
-                    #         wrap=True,
-                    #         spacing=15,
-                    #         run_spacing=15,
-                    #         alignment=ft.MainAxisAlignment.START,
-                    #         controls=[
-                    #             self.card_temp, self.card_hum, self.card_wind, self.card_air
-                    #         ]
-                    #     )
-                    # ),
+                    ft.Container(
+                        content=ft.Row(
+                            wrap=True,
+                            spacing=15,
+                            run_spacing=15,
+                            run_alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[
+                                self.card_temp, self.card_hum, self.card_wind, self.card_air
+                            ]
+                        )
+                    ),
                     # ---------------------------
 
                     ft.Divider(height=10, color="transparent"),

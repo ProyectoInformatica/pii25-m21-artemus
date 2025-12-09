@@ -18,7 +18,6 @@ class Sidebar(ft.Container):
 
                 # Botones creados directamente
                 self._make_button("Dashboard", "📊", "dashboard", active=True),
-                self._make_button("Educativa", "📚", "educational"),
                 self._make_button("Administración", "⚙️", "admin"),
                 self._make_button("Mantenimiento", "🛠", "maintenance"),
                 self._make_button("Historial", "🧾", "history"),
@@ -56,12 +55,12 @@ class Sidebar(ft.Container):
 
         # 2. Actualizar visualmente la Sidebar (Reseteamos todos a transparente y marcamos el nuevo)
         # Recorremos los hijos de la columna (saltamos el título y divider, indices 0 y 1)
-        for item in self.content.controls[2:7]:
-            # Si el item es el que hemos clicado
-            if item.data == clicked_key:
-                item.bgcolor = "#111827"
-                item.content.controls[1].color = "white"  # Texto blanco
-            else:
-                item.bgcolor = "transparent"
-                item.content.controls[1].color = "#9ca3af"  # Texto gris
-            item.update()
+        # for item in self.content.Control[2:7]:
+        #     # Si el item es el que hemos clicado
+        #     if item.data == clicked_key:
+        #         item.bgcolor = "#111827"
+        #         item.content.controls[1].color = "white"  # Texto blanco
+        #     else:
+        #         item.bgcolor = "transparent"
+        #         item.content.controls[1].color = "#9ca3af"  # Texto gris
+        #     item.update()

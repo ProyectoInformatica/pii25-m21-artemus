@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 from typing import List, Dict, Any
 from ArtemusPark.model.Humidity_Model import HumidityModel
-from model.Humidity_Model import HumidityModel
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "humidity_measurements.json"

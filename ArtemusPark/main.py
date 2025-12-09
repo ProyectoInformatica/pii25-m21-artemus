@@ -23,8 +23,6 @@ async def main(page: ft.Page):
 
         if page_name == "dashboard":
             content_area.content = DashboardPage()
-        elif page_name == "educational":
-            content_area.content = PlaceholderPage("Zona Educativa", "Contenido...")
         elif page_name == "admin":
             content_area.content = PlaceholderPage("Administración", "Config...")
         elif page_name == "maintenance":

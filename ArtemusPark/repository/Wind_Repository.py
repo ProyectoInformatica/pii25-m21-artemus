@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 from ArtemusPark.model.Wind_Model import WindModel
-from model.Wind_Model import WindModel
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "wind_measurements.json"
