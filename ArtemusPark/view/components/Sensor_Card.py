@@ -16,10 +16,7 @@ class SensorCard(ft.Container):
 
         # 1. Variable para el texto del valor (se actualizará después)
         self.value_text = ft.Text(
-            value,
-            size=22,
-            weight=ft.FontWeight.BOLD,
-            color=AppColors.TEXT_MAIN
+            value, size=22, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN
         )
 
         self.content = ft.Column(
@@ -34,7 +31,6 @@ class SensorCard(ft.Container):
                         ft.Text(icon, size=16),
                     ],
                 ),
-
                 # Fila Central: Valor y Unidad (AHORA DESCOMENTADA)
                 ft.Row(
                     vertical_alignment=ft.CrossAxisAlignment.END,
@@ -43,14 +39,13 @@ class SensorCard(ft.Container):
                         ft.Text(unit, size=12, color=AppColors.TEXT_MUTED),
                     ],
                 ),
-
                 # Fila Inferior: Texto de pie de tarjeta
                 ft.Text(
                     footer_text,
                     size=10,
                     color=AppColors.TEXT_LIGHT_GREY,
                     no_wrap=True,
-                    overflow=ft.TextOverflow.ELLIPSIS
+                    overflow=ft.TextOverflow.ELLIPSIS,
                 ),
             ],
         )

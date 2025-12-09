@@ -6,6 +6,7 @@ from ArtemusPark.model.Door_Model import DoorModel
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "door_events.json"
 
+
 def _serialize(event: DoorModel) -> Dict[str, Any]:
     return {
         "timestamp": event.timestamp,

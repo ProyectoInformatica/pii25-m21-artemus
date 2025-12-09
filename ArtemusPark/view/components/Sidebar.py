@@ -15,15 +15,13 @@ class Sidebar(ft.Container):
             controls=[
                 ft.Text("ARTEMUS", size=22, weight=ft.FontWeight.BOLD, color="white"),
                 ft.Divider(height=30, color="transparent"),
-
                 # Botones creados directamente
                 self._make_button("Dashboard", "📊", "dashboard", active=True),
                 self._make_button("Administración", "⚙️", "admin"),
                 self._make_button("Mantenimiento", "🛠", "maintenance"),
                 self._make_button("Historial", "🧾", "history"),
-
                 ft.Container(expand=True),
-                ft.Text("v0.1", color="grey")
+                ft.Text("v0.1", color="grey"),
             ]
         )
 
@@ -34,17 +32,17 @@ class Sidebar(ft.Container):
             padding=10,
             border_radius=10,
             bgcolor="#111827" if active else "transparent",
-
             # LAS DOS CLAVES QUE HICIERON FUNCIONAR TU PRUEBA:
             ink=True,
             on_click=self._handle_click,
-
             content=ft.Row(
                 controls=[
                     ft.Text(icon, size=16),
-                    ft.Text(text, size=14, color="white" if active else "#9ca3af")  # Gris si no está activo
+                    ft.Text(
+                        text, size=14, color="white" if active else "#9ca3af"
+                    ),  # Gris si no está activo
                 ]
-            )
+            ),
         )
 
     def _handle_click(self, e):

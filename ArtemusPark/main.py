@@ -3,16 +3,14 @@ from view.components.Sidebar import Sidebar
 from view.pages.Dashboard import DashboardPage
 from view.pages.Placeholder_Page import PlaceholderPage
 
+
 async def main(page: ft.Page):
     page.title = "Artemus Smart Park"
     page.padding = 0
 
     # Área derecha (donde va el contenido)
     content_area = ft.Container(
-        expand=True,
-        bgcolor="#e5e7eb",
-        padding=20,
-        content=ft.Text("Iniciando...")
+        expand=True, bgcolor="#e5e7eb", padding=20, content=ft.Text("Iniciando...")
     )
 
     # Función que se ejecuta al clicar en el Sidebar
@@ -36,16 +34,11 @@ async def main(page: ft.Page):
     sidebar = Sidebar(on_nav_change=change_view)
 
     # Montamos todo
-    page.add(
-        ft.Row(
-            expand=True,
-            spacing=0,
-            controls=[sidebar, content_area]
-        )
-    )
+    page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
 
     # Forzamos la carga inicial
     change_view("dashboard")
+
 
 if __name__ == "__main__":
     # Importante: ft.app(target=main) maneja async automáticamente

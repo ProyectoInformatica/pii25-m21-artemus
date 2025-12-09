@@ -1,7 +1,9 @@
 import time
+
 # Asegúrate de que Python encuentre la carpeta ArtemusPark
 import sys
 import os
+
 sys.path.append(os.getcwd())
 
 from controller.Sensor_Controller import SensorController

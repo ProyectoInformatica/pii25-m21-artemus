@@ -6,6 +6,7 @@ from ArtemusPark.model.Humidity_Model import HumidityModel
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "humidity_measurements.json"
 
+
 def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
     return {
         "timestamp": measurement.timestamp,

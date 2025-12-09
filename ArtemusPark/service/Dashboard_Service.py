@@ -1,5 +1,6 @@
 import logging
 from typing import Dict, Any, List
+
 # Importamos los repositorios necesarios
 from ArtemusPark.repository import (
     Temperature_Repository,
@@ -7,7 +8,7 @@ from ArtemusPark.repository import (
     Wind_Repository,
     Smoke_Repository,
     Door_Repository,  # <--- NUEVO
-    Light_Repository  # <--- NUEVO
+    Light_Repository,  # <--- NUEVO
 )
 
 logger = logging.getLogger(__name__)
@@ -26,8 +27,12 @@ class DashboardService:
         return {
             "temperature": self._get_last_value(temps, "value", 0.0),
             "humidity": self._get_last_value(hums, "value", 0),
-            "wind": self._get_last_value(Wind_Repository.load_all_wind_measurements(), "speed", 0),
-            "air_quality": self._get_last_value(Smoke_Repository.load_all_smoke_measurements(), "value", 0),
+            "wind": self._get_last_value(
+                Wind_Repository.load_all_wind_measurements(), "speed", 0
+            ),
+            "air_quality": self._get_last_value(
+                Smoke_Repository.load_all_smoke_measurements(), "value", 0
+            ),
         }
 
     # NUEVO MÉTODO
@@ -41,14 +46,14 @@ class DashboardService:
         # 2. Normalizar un poco los datos para que tengan campos comunes
         combined = []
         for d in doors:
-            d['type'] = 'door'
-            d['label'] = f"Puerta: {d.get('name')}"
+            d["type"] = "door"
+            d["label"] = f"Puerta: {d.get('name')}"
             combined.append(d)
 
         for l in lights:
-            l['type'] = 'light'
-            l['label'] = "Iluminación"
-            l['status'] = "Encendido" if l.get("is_on") else "Apagado"
+            l["type"] = "light"
+            l["label"] = "Iluminación"
+            l["status"] = "Encendido" if l.get("is_on") else "Apagado"
             combined.append(l)
 
         # 3. Ordenar por fecha (timestamp) descendente (los más nuevos primero)

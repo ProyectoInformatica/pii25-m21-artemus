@@ -7,6 +7,7 @@ from ArtemusPark.model.Smoke_Model import SmokeModel
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "smoke_measurements.json"
 
+
 def _serialize(measurement: SmokeModel) -> Dict[str, Any]:
     return {
         "timestamp": measurement.timestamp,

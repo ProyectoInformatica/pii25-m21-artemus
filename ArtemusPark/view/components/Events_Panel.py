@@ -1,5 +1,13 @@
 import flet as ft
-from flet import Column, Container, Row, Icon, Text, Icons, Colors  # <--- IMPORTANTE: minúsculas
+from flet import (
+    Column,
+    Container,
+    Row,
+    Icon,
+    Text,
+    Icons,
+    Colors,
+)  # <--- IMPORTANTE: minúsculas
 from datetime import datetime
 
 
@@ -66,10 +74,15 @@ class EventsPanel(Column):
             content=Row(
                 controls=[
                     Icon(icon, color=color),
-                    Text(f"{evt_type.title()}: {val_str}", expand=True, weight=ft.FontWeight.BOLD, color=Colors.BLACK),
-                    Text(time_str, color=Colors.GREY_500, size=12)
+                    Text(
+                        f"{evt_type.title()}: {val_str}",
+                        expand=True,
+                        weight=ft.FontWeight.BOLD,
+                        color=Colors.BLACK,
+                    ),
+                    Text(time_str, color=Colors.GREY_500, size=12),
                 ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             ),
             padding=10,
             bgcolor=Colors.WHITE,
@@ -79,5 +92,5 @@ class EventsPanel(Column):
                 spread_radius=1,
                 blur_radius=3,
                 color=Colors.with_opacity(0.1, Colors.BLACK),
-            )
+            ),
         )
