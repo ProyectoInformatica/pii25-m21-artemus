@@ -3,7 +3,9 @@ from pathlib import Path
 from typing import List, Dict, Any
 from ArtemusPark.model.Smoke_Model import SmokeModel
 
-DATA_FILE = Path("smoke_measurements.json")
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "smoke_measurements.json"
 
 
 def _serialize(measurement: SmokeModel) -> Dict[str, Any]:

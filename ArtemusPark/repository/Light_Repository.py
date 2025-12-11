@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import List, Dict, Any
 from ArtemusPark.model.Light_Model import LightModel
 
-DATA_FILE = Path("light_events.json")
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "light_events.json"
 
 
 def _serialize(event: LightModel) -> Dict[str, Any]:

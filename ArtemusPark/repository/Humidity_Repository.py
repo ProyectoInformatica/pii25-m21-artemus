@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import List, Dict, Any
 from ArtemusPark.model.Humidity_Model import HumidityModel
 
-DATA_FILE = Path("humidity_measurements.json")
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "humidity_measurements.json"
 
 
 def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
