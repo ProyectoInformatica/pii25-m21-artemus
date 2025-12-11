@@ -3,7 +3,7 @@ import random
 import time
 from typing import Callable, Optional
 
-from ArtemusPark.model.Temperature_Model import TemperatureModel
+from model.Temperature_Model import TemperatureModel
 
 logging.basicConfig(
     filename="temperature_controller.log",

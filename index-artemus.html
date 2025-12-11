@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Artemus Smart Park Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-dark: #131921;
+      --bg-dark-alt: #1f2933;
+      --bg-light: #f3f4f6;
+      --card-bg: #ffffff;
+      --border-color: #e5e7eb;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --danger: #dc2626;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #e5e7eb;
+      color: var(--text-main);
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar {
+      background: var(--bg-dark);
+      color: #e5e7eb;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .app-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-item {
+      padding: 10px 12px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #d1d5db;
+      border: 1px solid transparent;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .nav-item span.icon {
+      font-size: 1.1rem;
+    }
+
+    .nav-item.active {
+      background: #111827;
+      border-color: #374151;
+      color: #f9fafb;
+    }
+
+    .nav-item:hover {
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    /* MAIN AREA */
+
+    .main {
+      background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .window-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px 4px;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #9ca3af;
+    }
+
+    .dot:nth-child(1) { background: #f97373; }
+    .dot:nth-child(2) { background: #fbbf24; }
+    .dot:nth-child(3) { background: #34d399; }
+
+    .page-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .content-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 20px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      height: calc(100vh - 70px);
+      overflow: hidden;
+    }
+
+    /* TOP ROW CARDS */
+
+    .top-row {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-header {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .capacity-main {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .capacity-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .badge-soft {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .badge-soft.danger {
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    /* SENSOR GRID */
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .sensors-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .sensor-card {
+      border-radius: 18px;
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #f9fafb;
+    }
+
+    .sensor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .sensor-icon {
+      font-size: 1.1rem;
+    }
+
+    .sensor-value {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .sensor-unit {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .sensor-footer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* SUMMARY / CHART */
+
+    .summary {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 12px;
+      height: 100%;
+    }
+
+    .chart-card, .events-card {
+      border-radius: 18px;
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chart-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .events-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .event-item {
+      font-size: 0.78rem;
+      padding: 4px 0;
+      border-bottom: 1px dashed #e5e7eb;
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+    }
+
+    .event-time {
+      color: var(--text-muted);
+      min-width: 38px;
+    }
+
+    .event-label {
+      flex: 1;
+    }
+
+    .event-pill {
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: var(--danger);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    /* OTHER SECTIONS */
+
+    .page-section {
+      display: none;
+      height: 100%;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    .placeholder {
+      height: 100%;
+      border-radius: 18px;
+      border: 1px dashed #d1d5db;
+      background: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6b7280;
+      padding: 16px;
+    }
+
+    .placeholder strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #111827;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 900px) {
+      .app-shell {
+        grid-template-columns: 70px minmax(0, 1fr);
+      }
+
+      .app-title {
+        font-size: 1.1rem;
+      }
+
+      .nav-item span.label {
+        display: none;
+      }
+
+      .top-row {
+        grid-template-columns: 1fr;
+      }
+
+      .sensors-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+      }
+      .sidebar {
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+        padding: 10px 12px;
+        overflow-x: auto;
+      }
+      .sidebar-footer {
+        display: none;
+      }
+      .content-card {
+        height: auto;
+      }
+      .main {
+        height: calc(100vh - 68px);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="app-title">ARTEMUS</div>
+
+    <nav class="nav-section">
+      <div class="nav-item active" data-target="dashboard">
+        <span class="icon">📊</span>
+        <span class="label">Dashboard</span>
+      </div>
+      <div class="nav-item" data-target="educational">
+        <span class="icon">📚</span>
+        <span class="label">Educativa</span>
+      </div>
+      <div class="nav-item" data-target="admin">
+        <span class="icon">⚙️</span>
+        <span class="label">Administración</span>
+      </div>
+      <div class="nav-item" data-target="maintenance">
+        <span class="icon">🛠</span>
+        <span class="label">Mantenimiento</span>
+      </div>
+      <div class="nav-item" data-target="history">
+        <span class="icon">🧾</span>
+        <span class="label">Historial</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      Artemus Smart Park · v0.1
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="window-bar">
+      <div class="window-controls">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="page-title" id="pageTitle">Dashboard</div>
+      <div style="width:40px;"></div>
+    </div>
+
+    <section class="content-card">
+
+      <!-- DASHBOARD SECTION -->
+      <div class="page-section active" id="dashboard">
+        <div class="top-row">
+          <!-- Capacity card -->
+          <div class="card">
+            <div class="card-header">
+              <span>Aforo actual</span>
+              <span class="badge-soft">
+                Live
+              </span>
+            </div>
+            <div class="capacity-main" id="capacityValue">1,245</div>
+            <div class="capacity-sub">
+              Max visitantes: <strong>2.000</strong> ·
+              Ocupación: <span id="capacityPercent">62%</span>
+            </div>
+          </div>
+
+          <!-- Alerts card -->
+          <div class="card">
+            <div class="card-header">
+              <span>Alertas</span>
+            </div>
+            <div class="badge-soft danger" style="margin-top:4px;">
+              ⚠ Humo detectado cerca del lago
+            </div>
+            <div style="margin-top:8px;font-size:0.8rem;color:var(--text-muted);">
+              Última actualización: <span id="alertsTime">09:15</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sensors -->
+        <div>
+          <div class="section-title">Sensores</div>
+          <div class="sensors-grid">
+            <div class="sensor-card">
+              <div class="sensor-header">
+                <span>Temperatura</span>
+                <span class="sensor-icon">🌡</span>
+              </div>
+              <div class="sensor-value">
+                <span id="tempValue">24.0</span><span class="sensor-unit">ºC</span>
+              </div>
+              <div class="sensor-footer">Zona arbolada central</div>
+            </div>
+
+            <div class="sensor-card">
+              <div class="sensor-header">
+                <span>Humedad</span>
+                <span class="sensor-icon">💧</span>
+              </div>
+              <div class="sensor-value">
+                <span id="humidityValue">48</span><span class="sensor-unit">%</span>
+              </div>
+              <div class="sensor-footer">Riego automático: activo</div>
+            </div>
+
+            <div class="sensor-card">
+              <div class="sensor-header">
+                <span>Viento</span>
+                <span class="sensor-icon">💨</span>
+              </div>
+              <div class="sensor-value">
+                <span id="windValue">10</span><span class="sensor-unit"> km/h</span>
+              </div>
+              <div class="sensor-footer">Sin riesgo para actividades</div>
+            </div>
+
+            <div class="sensor-card">
+              <div class="sensor-header">
+                <span>Aire calidad</span>
+                <span class="sensor-icon">☁️</span>
+              </div>
+              <div class="sensor-value">
+                <span id="airValue">85</span><span class="sensor-unit">%</span>
+              </div>
+              <div class="sensor-footer">MQ-2: humo bajo control</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary">
+          <div class="chart-card">
+            <div class="card-header">
+              <span>Resumen (temperatura)</span>
+              <span style="font-size:0.8rem;color:var(--text-muted);">Última hora</span>
+            </div>
+            <div class="chart-container">
+              <canvas id="tempChart"></canvas>
+            </div>
+          </div>
+
+          <div class="events-card">
+            <div class="card-header">
+              <span>Eventos recientes</span>
+            </div>
+            <div class="events-list" id="eventsList">
+              <!-- Events will be injected here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDUCATIONAL SECTION -->
+      <div class="page-section" id="educational">
+        <div class="placeholder">
+          <div>
+            <strong>Zona educativa</strong>
+            Panel para mostrar infografías, explicaciones del sistema de riego
+            inteligente, calidad del aire, juegos para niños, etc.
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN SECTION -->
+      <div class="page-section" id="admin">
+        <div class="placeholder">
+          <div>
+            <strong>Administración del parque</strong>
+            Controles para cambiar umbrales de viento, humo y luminosidad,
+            configurar horarios del parque y gestionar usuarios y permisos.
+          </div>
+        </div>
+      </div>
+
+      <!-- MAINTENANCE SECTION -->
+      <div class="page-section" id="maintenance">
+        <div class="placeholder">
+          <div>
+            <strong>Mantenimiento</strong>
+            Listado de sensores, estado de cada nodo IoT, revisiones pendientes,
+            incidencias y tareas de mantenimiento programadas.
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY SECTION -->
+      <div class="page-section" id="history">
+        <div class="placeholder">
+          <div>
+            <strong>Historial</strong>
+            Aquí podrías mostrar gráficos diarios, semanales y mensuales de
+            temperatura, humedad, aforo, consumo de agua, etc.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // Simple navigation between sections
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('.page-section');
+  const pageTitle = document.getElementById('pageTitle');
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const targetId = item.getAttribute('data-target');
+
+      navItems.forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+
+      sections.forEach(sec => {
+        sec.classList.toggle('active', sec.id === targetId);
+      });
+
+      pageTitle.textContent = item.querySelector('.label')?.textContent || 'Artemus';
+    });
+  });
+
+  // Fake sensor data update every few seconds
+  const tempSpan = document.getElementById('tempValue');
+  const humiditySpan = document.getElementById('humidityValue');
+  const windSpan = document.getElementById('windValue');
+  const airSpan = document.getElementById('airValue');
+  const capacitySpan = document.getElementById('capacityValue');
+  const capacityPercentSpan = document.getElementById('capacityPercent');
+  const alertsTimeSpan = document.getElementById('alertsTime');
+  const eventsList = document.getElementById('eventsList');
+
+  let tempHistory = [];
+
+  function randomAround(base, spread) {
+    return base + (Math.random() * spread - spread / 2);
+  }
+
+  function formatNumber(num) {
+    return num.toLocaleString('es-ES');
+  }
+
+  function addEvent(label, type) {
+    const now = new Date();
+    const time = now.toTimeString().slice(0, 5);
+
+    const div = document.createElement('div');
+    div.className = 'event-item';
+    div.innerHTML = `
+      <span class="event-time">${time}</span>
+      <span class="event-label">${label}</span>
+      ${type ? `<span class="event-pill">${type}</span>` : ''}
+    `;
+    eventsList.prepend(div);
+    // Limit number of events
+    while (eventsList.children.length > 12) {
+      eventsList.removeChild(eventsList.lastChild);
+    }
+  }
+
+  // Canvas temperature chart
+  const canvas = document.getElementById('tempChart');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    drawChart();
+  });
+
+  function drawChart() {
+    const rect = canvas.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    if (tempHistory.length < 2) return;
+
+    const values = tempHistory;
+    const min = Math.min(...values) - 1;
+    const max = Math.max(...values) + 1;
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#d1d5db';
+    ctx.beginPath();
+    ctx.moveTo(0, h - 25);
+    ctx.lineTo(w, h - 25);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+
+    values.forEach((v, i) => {
+      const x = (i / (values.length - 1)) * (w - 10) + 5;
+      const y = ((max - v) / (max - min || 1)) * (h - 30) + 5;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+  }
+
+  function updateSensors() {
+    const temp = randomAround(24, 1.5);
+    const humidity = randomAround(50, 6);
+    const wind = randomAround(9, 4);
+    const air = randomAround(87, 6);
+
+    tempSpan.textContent = temp.toFixed(1);
+    humiditySpan.textContent = Math.round(humidity);
+    windSpan.textContent = Math.round(wind);
+    airSpan.textContent = Math.round(air);
+
+    // Capacity simulation
+    const baseCapacity = 1200;
+    const variation = Math.round(randomAround(0, 80));
+    const direction = Math.random() > 0.5 ? 1 : -1;
+    let capacity = baseCapacity + variation * direction;
+    capacity = Math.min(Math.max(capacity, 300), 2000);
+    capacitySpan.textContent = formatNumber(capacity);
+    capacityPercentSpan.textContent = Math.round((capacity / 2000) * 100) + '%';
+
+    const now = new Date();
+    alertsTimeSpan.textContent = now.toTimeString().slice(0, 5);
+
+    // Temperature history for chart
+    tempHistory.push(temp);
+    if (tempHistory.length > 25) tempHistory.shift();
+    drawChart();
+
+    // Example events
+    if (wind > 18) {
+      addEvent('Viento fuerte detectado en zona norte.', 'Viento');
+    }
+    if (air < 75) {
+      addEvent('Calidad del aire reducida cerca de entrada.', 'Aire');
+    }
+  }
+
+  // Initialize
+  resizeCanvas();
+  for (let i = 0; i < 18; i++) {
+    tempHistory.push(randomAround(24, 1.5));
+  }
+  drawChart();
+  setInterval(updateSensors, 4000);
+  updateSensors();
+</script>
+</body>
+</html>

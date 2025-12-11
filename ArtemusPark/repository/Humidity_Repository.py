@@ -1,9 +1,11 @@
 import json
 from pathlib import Path
 from typing import List, Dict, Any
-from ArtemusPark.model.Humidity_Model import HumidityModel
+from model.Humidity_Model import HumidityModel
 
-DATA_FILE = Path("humidity_measurements.json")
+# --- CORRECCIÓN DE RUTA ---
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_FILE = BASE_DIR / "json" / "humidity_measurements.json"
 
 
 def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
@@ -15,9 +17,8 @@ def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
 
 
 def save_humidity_measurement(measurement: HumidityModel) -> None:
-    """
-    Append a single humidity measurement to the JSON 'database'.
-    """
+    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+
     if DATA_FILE.exists():
         try:
             data = json.loads(DATA_FILE.read_text(encoding="utf-8"))
@@ -27,17 +28,12 @@ def save_humidity_measurement(measurement: HumidityModel) -> None:
         data = []
 
     data.append(_serialize(measurement))
-
     DATA_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
 def load_all_humidity_measurements() -> List[Dict[str, Any]]:
-    """
-    Returns all stored humidity measurements as plain dicts.
-    """
     if not DATA_FILE.exists():
         return []
-
     try:
         return json.loads(DATA_FILE.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
