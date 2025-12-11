@@ -3,6 +3,7 @@ from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.view.components.Temp_Chart import TempChart
 from ArtemusPark.view.components.Sensor_Card import SensorCard
 from ArtemusPark.view.components.Events_Panel import EventsPanel
+from ArtemusPark.view.components.Capacity_Card import CapacityCard
 from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
@@ -25,8 +26,19 @@ class DashboardPage(ft.Container):
         initial_events = self.service.get_recent_events()
         self.panel_events = EventsPanel(initial_events)
 
+        self.service = DashboardService()
+
+        # 1. INSTANCIAR TARJETA DE AFORO (Capacidad 50 coches por ejemplo)
+        self.card_capacity = CapacityCard(max_capacity=50)
+
+        # 2. INSTANCIAR TARJETAS DE SENSORES
+        self.card_temp = SensorCard("Temperatura", "🌡", "--", "ºC", "Zona Central")
+
         self.content = ft.Column(
-            controls=[self._build_window_bar(), self._build_main_card()]
+            controls=[
+                self._build_window_bar(),
+                self._build_main_card()
+            ]
         )
 
     # --- LÓGICA DE ACTUALIZACIÓN ---
@@ -37,11 +49,15 @@ class DashboardPage(ft.Container):
         self.page.pubsub.unsubscribe_all()
 
     def _on_message(self, message):
+        """
+        Esta función se activa cuando main.py envía 'refresh_dashboard'.
+        Aquí es donde inyectamos los datos en las tarjetas.
+        """
         if message == "refresh_dashboard":
             # Actualizar tarjetas si estuvieran visibles
             if self.card_temp.page:
                 data = self.service.get_latest_sensor_data()
-                if data:
+                if data and self.card_temp.page:
                     self.card_temp.update_value(data.get("temperature", 0))
                     self.card_hum.update_value(data.get("humidity", 0))
                     self.card_wind.update_value(data.get("wind", 0))
@@ -59,32 +75,15 @@ class DashboardPage(ft.Container):
                 ft.Row(
                     spacing=6,
                     controls=[
-                        ft.Container(
-                            width=10,
-                            height=10,
-                            border_radius=5,
-                            bgcolor=AppColors.ERROR_LIGHT,
-                        ),
-                        ft.Container(
-                            width=10,
-                            height=10,
-                            border_radius=5,
-                            bgcolor=AppColors.WARNING,
-                        ),
-                        ft.Container(
-                            width=10,
-                            height=10,
-                            border_radius=5,
-                            bgcolor=AppColors.SUCCESS,
-                        ),
-                    ],
+                        ft.Container(width=10, height=10, border_radius=5, bgcolor=AppColors.ERROR_LIGHT),
+                        ft.Container(width=10, height=10, border_radius=5, bgcolor=AppColors.WARNING),
+                        ft.Container(width=10, height=10, border_radius=5, bgcolor=AppColors.SUCCESS),
+                    ]
                 ),
-                ft.Text(
-                    "Dashboard", weight=ft.FontWeight.W_600, color=AppColors.TEXT_MUTED
-                ),
-                ft.Container(width=40),
+                ft.Text("Dashboard", weight=ft.FontWeight.W_600, color=AppColors.TEXT_MUTED),
+                ft.Container(width=40)
             ],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
         )
 
     def _build_main_card(self):
@@ -98,13 +97,7 @@ class DashboardPage(ft.Container):
                 scroll=ft.ScrollMode.AUTO,
                 spacing=20,
                 controls=[
-                    ft.Text(
-                        "Estado de Sensores",
-                        size=16,
-                        weight=ft.FontWeight.BOLD,
-                        color=AppColors.TEXT_MAIN,
-                    ),
-                    # --- TARJETAS COMENTADAS ---
+                    ft.Text("Aforo actual", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
                     ft.Container(
                         content=ft.Row(
                             wrap=True,
@@ -112,27 +105,44 @@ class DashboardPage(ft.Container):
                             run_spacing=15,
                             run_alignment=ft.MainAxisAlignment.CENTER,
                             controls=[
-                                self.card_temp,
-                                self.card_hum,
-                                self.card_wind,
-                                self.card_air,
-                            ],
+                                self.card_capacity
+                            ]
+                        )
+                    ),
+
+
+                    ft.Divider(height=10, color=AppColors.BG_MAIN),
+
+                    ft.Text("Estado de Sensores", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
+                    ft.Container(
+                        content=ft.Row(
+                            wrap=True,
+                            spacing=15,
+                            run_spacing=15,
+                            run_alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[
+                                self.card_temp, self.card_hum, self.card_wind, self.card_air
+                            ]
                         )
                     ),
                     # ---------------------------
-                    ft.Divider(height=10, color="transparent"),
-                    ft.Text(
-                        "Resumen de Actividad",
-                        size=16,
-                        weight=ft.FontWeight.BOLD,
-                        color=AppColors.TEXT_MAIN,
-                    ),
+
+                    ft.Divider(height=10, color=AppColors.BG_MAIN),
+
+                    ft.Text("Resumen de Actividad", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
+
                     ft.Row(
                         vertical_alignment=ft.CrossAxisAlignment.START,
                         controls=[
                             # 1. Gráfica (Izquierda)
-                            ft.Container(expand=2, height=300, content=TempChart()),
+                            ft.Container(
+                                expand=2,
+                                height=300,
+                                content=TempChart()
+                            ),
+
                             ft.Container(width=15),
+
                             # 2. Contenedor de "Eventos Recientes" (Derecha)
                             ft.Container(
                                 expand=1,
@@ -142,26 +152,23 @@ class DashboardPage(ft.Container):
                                 padding=15,  # Espacio interno
                                 shadow=ft.BoxShadow(  # Sombra suave
                                     blur_radius=10,
-                                    color=ft.Colors.with_opacity(0.05, ft.Colors.BLACK),
+                                    color=ft.Colors.with_opacity(0.05, ft.Colors.BLACK)
                                 ),
                                 content=ft.Column(
                                     spacing=10,
                                     controls=[
                                         # TÍTULO DENTRO DEL CONTENEDOR
-                                        ft.Text(
-                                            "Eventos Recientes",
-                                            size=14,
-                                            weight=ft.FontWeight.BOLD,
-                                            color=AppColors.TEXT_MAIN,
-                                        ),
+                                        ft.Text("Eventos Recientes", size=14, weight=ft.FontWeight.BOLD,
+                                                color=AppColors.TEXT_MAIN),
                                         ft.Divider(height=1, color=ft.Colors.GREY_100),
+
                                         # LISTA DE EVENTOS
-                                        self.panel_events,
-                                    ],
-                                ),
-                            ),
-                        ],
-                    ),
-                ],
-            ),
+                                        self.panel_events
+                                    ]
+                                )
+                            )
+                        ]
+                    )
+                ]
+            )
         )
