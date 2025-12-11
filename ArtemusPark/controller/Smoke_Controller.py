@@ -3,7 +3,7 @@ import random
 import time
 from typing import Callable, Optional
 
-from ArtemusPark.model.Smoke_Model import SmokeModel
+from model.Smoke_Model import SmokeModel
 
 logging.basicConfig(
     filename="smoke_controller.log",

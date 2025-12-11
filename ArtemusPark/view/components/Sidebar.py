@@ -1,14 +1,17 @@
 import flet as ft
-from ArtemusPark.config.Colors import AppColors
+from config.Colors import AppColors
 
 
 class Sidebar(ft.Container):
-    def __init__(self, on_nav_change, user_role="user"):
+    # 1. AÑADIMOS 'on_logout' AL CONSTRUCTOR
+    def __init__(self, on_nav_change, on_logout, user_role="user"):
         super().__init__()
         self.on_nav_change = on_nav_change
+        self.on_logout = on_logout  # Guardamos la función de logout
         self.user_role = user_role
+
         self.width = 260
-        self.bgcolor = AppColors.BG_DARK  # Usamos tu color oscuro
+        self.bgcolor = AppColors.BG_DARK
         self.padding = ft.padding.symmetric(vertical=24, horizontal=20)
 
         self.content_column = self._build_content()
@@ -16,36 +19,69 @@ class Sidebar(ft.Container):
 
     def _build_content(self):
         controls_list = [
-            ft.Text("ARTEMUS", size=22, weight=ft.FontWeight.BOLD, color="white"),
+            ft.Text(
+                "ARTEMUS",
+                size=22,
+                weight=ft.FontWeight.BOLD,
+                color="white",
+                style=ft.TextStyle(font_family="RobotoCondensed", letter_spacing=1.5),
+            ),
             ft.Divider(height=30, color="transparent"),
             self._make_button("Dashboard", "📊", "dashboard", active=True),
         ]
 
-        # 1. Dashboard (Todos)
-
-        # 2. Historial (Admin y Cliente)
-        if self.user_role in ["admin", "client"]:
+        # Lógica de botones según rol (Igual que antes)
+        if self.user_role in ["admin", "maintenance"]:
             controls_list.append(self._make_button("Historial", "🧾", "history"))
 
-        # 3. Mantenimiento (AHORA TAMBIÉN PARA CLIENTE)
-        if self.user_role in ["admin", "client"]:
+        if self.user_role in ["admin", "maintenance"]:
             controls_list.append(self._make_button("Mantenimiento", "🛠", "maintenance"))
 
-        # 4. Administración (EXCLUSIVO ADMIN)
         if self.user_role == "admin":
             controls_list.append(self._make_button("Administración", "⚙️", "admin"))
 
+        # Espaciador para empujar el footer hacia abajo
         controls_list.append(ft.Container(expand=True))
+
+        # --- NUEVO FOOTER CON PERFIL Y LOGOUT ---
         controls_list.append(
-            ft.Text(f"Perfil: {self.user_role.upper()}", color="grey", size=12)
+            ft.Container(
+                padding=ft.padding.only(top=10),
+                # Una línea sutil para separar
+                border=ft.border.only(top=ft.border.BorderSide(1, "#374151")),
+                content=ft.Row(
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    controls=[
+                        # Info del Usuario
+                        ft.Column(
+                            spacing=2,
+                            controls=[
+                                ft.Text("Perfil:", size=10, color="#9ca3af"),
+                                ft.Text(
+                                    self.user_role.upper(),
+                                    size=12,
+                                    weight=ft.FontWeight.BOLD,
+                                    color="white",
+                                ),
+                            ],
+                        ),
+                        # Botón de Logout
+                        ft.IconButton(
+                            icon=ft.Icons.LOGOUT_ROUNDED,
+                            icon_color="#ef4444",  # Rojo suave
+                            tooltip="Cerrar Sesión",
+                            on_click=lambda e: self.on_logout(),  # Llamamos a la función
+                        ),
+                    ],
+                ),
+            )
         )
 
         return ft.Column(controls=controls_list)
 
     def _make_button(self, text, icon, key, active=False):
-        # Colores seguros usando Hex strings o AppColors
-        bg_color = "#111827" if active else "transparent"  # Color oscuro si activo
-        text_color = "white" if active else "#9ca3af"  # Blanco si activo, gris si no
+        bg_color = "#111827" if active else "transparent"
+        text_color = "white" if active else "#9ca3af"
 
         return ft.Container(
             data=key,
@@ -64,20 +100,14 @@ class Sidebar(ft.Container):
 
     def _handle_click(self, e):
         clicked_key = e.control.data
-        print(f"Sidebar: Navegando a {clicked_key}")
-
-        # 1. Llamar a la función del Main para cambiar la vista
         self.on_nav_change(clicked_key)
 
-        # 2. INTERACTIVIDAD VISUAL (Cambiar colores)
         for control in self.content_column.controls:
-            # Solo modificamos si es un Botón (Container con data)
             if isinstance(control, ft.Container) and control.data is not None:
                 if control.data == clicked_key:
-                    # ESTE ES EL BOTÓN ACTIVO
                     control.bgcolor = "#111827"
                     control.content.controls[1].color = "white"
                 else:
-                    # ESTE ES UN BOTÓN INACTIVO
                     control.bgcolor = "transparent"
                     control.content.controls[1].color = "#9ca3af"
+        self.update()
