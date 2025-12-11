@@ -13,18 +13,40 @@ class LoginPage(ft.Container):
         self.dd_role = ft.Dropdown(
             label="Selecciona tu Rol",
             width=280,
+
+            # --- SOLUCIÓN HÍBRIDA ---
             options=[
-                ft.dropdown.Option("admin", "Administrador"),  # (Total)
                 ft.dropdown.Option(
-                    "client", "Mantenimiento "
-                ),  # (Dashboard + Historial)
-                ft.dropdown.Option("user", "Cliente "),  # (Solo Dashboard)
+                    key="admin",
+                    text="Administrador",  # <--- Esto se muestra en la CAJA al seleccionar (evita que salga la key)
+                    content=ft.Text("Administrador", color=AppColors.BG_DARK, weight=ft.FontWeight.W_500)
+                    # <--- Esto se muestra en la LISTA (con tu color)
+                ),
+                ft.dropdown.Option(
+                    key="maintenance",
+                    text="Mantenimiento",
+                    content=ft.Text("Mantenimiento", color=AppColors.BG_DARK, weight=ft.FontWeight.W_500)
+                ),
+                ft.dropdown.Option(
+                    key="user",
+                    text="Cliente",
+                    content=ft.Text("Cliente", color=AppColors.BG_DARK, weight=ft.FontWeight.W_500)
+                ),
             ],
-            value="admin",
+            # ------------------------
+
             bgcolor=AppColors.BG_CARD,
             border_radius=8,
             border_color=AppColors.TEXT_LIGHT_GREY,
-            color=AppColors.TEXT_MAIN,
+
+            # Este estilo controla el texto UNA VEZ SELECCIONADO en la caja principal
+            text_style=ft.TextStyle(
+                color=AppColors.BG_DARK,
+                size=16,
+                weight=ft.FontWeight.W_500
+            ),
+
+            hover_color=AppColors.TRANSPARENT,
         )
 
         self.btn_enter = ft.ElevatedButton(
