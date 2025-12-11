@@ -1,4 +1,5 @@
 import flet as ft
+from flet import ProgressBar
 from ArtemusPark.config.Colors import AppColors
 
 
@@ -66,9 +67,11 @@ class CapacityCard(ft.Container):
         )
 
     def update_occupancy(self, current_value: int):
-        # Evitar superar el máximo visualmente
-        safe_value = min(current_value, self.max_capacity)
-        percentage = safe_value / self.max_capacity
+        if self.max_capacity <= 0:
+            percentage = 0
+        else:
+            safe_value = min(current_value, self.max_capacity)
+            percentage = safe_value / self.max_capacity
 
         # Actualizar textos
         self.txt_value.value = str(current_value)
@@ -77,10 +80,10 @@ class CapacityCard(ft.Container):
         # Actualizar barra y cambiar color si está casi lleno
         self.progress_bar.value = percentage
         if percentage > 0.9:
-            self.progress_bar.color = ft.Colors.RED
+            self.progress_bar.color = AppColors.DANGER
         elif percentage > 0.7:
-            self.progress_bar.color = ft.Colors.ORANGE
+            self.progress_bar.color = AppColors.WARNING
         else:
-            self.progress_bar.color = ft.Colors.BLUE
+            self.progress_bar.color = AppColors.ACCENT
 
         self.update()

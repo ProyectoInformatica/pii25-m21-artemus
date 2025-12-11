@@ -35,7 +35,7 @@ class DashboardPage(ft.Container):
         self.card_temp = SensorCard("Temperatura", "🌡", "--", "ºC", "Zona Central")
 
         self.content = ft.Column(
-            controls=[self._build_window_bar(), self._build_main_card()]
+            controls=[self._build_header(), self._build_main_content()]
         )
 
     # --- LÓGICA DE ACTUALIZACIÓN ---
@@ -60,136 +60,89 @@ class DashboardPage(ft.Container):
                     self.card_wind.update_value(data.get("wind", 0))
                     self.card_air.update_value(data.get("air_quality", 0))
 
-            # Actualizar lista de eventos
+                occupancy = data.get("occupancy", 25)
+                self.card_capacity.update_occupancy(occupancy)
+
+            # B. Datos de Eventos
             new_events = self.service.get_recent_events()
             self.panel_events.update_events(new_events)
 
-    # -------------------------------
-
-    def _build_window_bar(self):
+    def _build_header(self):
         return ft.Row(
             controls=[
-                ft.Row(
-                    spacing=6,
-                    controls=[
-                        ft.Container(
-                            width=10,
-                            height=10,
-                            border_radius=5,
-                            bgcolor=AppColors.ERROR_LIGHT,
-                        ),
-                        ft.Container(
-                            width=10,
-                            height=10,
-                            border_radius=5,
-                            bgcolor=AppColors.WARNING,
-                        ),
-                        ft.Container(
-                            width=10,
-                            height=10,
-                            border_radius=5,
-                            bgcolor=AppColors.SUCCESS,
-                        ),
-                    ],
-                ),
                 ft.Text(
-                    "Dashboard", weight=ft.FontWeight.W_600, color=AppColors.TEXT_MUTED
+                    "Dashboard",
+                    weight=ft.FontWeight.BOLD,
+                    size=24,
+                    color=AppColors.TEXT_MAIN,
                 ),
                 ft.Container(width=40),
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         )
 
-    def _build_main_card(self):
-        return ft.Container(
-            expand=True,
-            bgcolor=AppColors.GLASS_WHITE,
-            border_radius=24,
-            padding=20,
-            shadow=ft.BoxShadow(blur_radius=30, color=AppColors.SHADOW),
-            content=ft.Column(
-                scroll=ft.ScrollMode.AUTO,
-                spacing=20,
-                controls=[
-                    ft.Text(
-                        "Aforo actual",
-                        size=16,
-                        weight=ft.FontWeight.BOLD,
-                        color=AppColors.TEXT_MAIN,
-                    ),
-                    ft.Container(
-                        content=ft.Row(
+    def _build_main_content(self):
+        return ft.Column(
+            scroll=ft.ScrollMode.AUTO,
+            spacing=20,
+            controls=[
+                ft.Text(
+                    "Estado en Tiempo Real",
+                    size=16,
+                    weight=ft.FontWeight.BOLD,
+                    color=AppColors.TEXT_MUTED,
+                ),
+                # --- ZONA SUPERIOR: TARJETAS ---
+                ft.Row(
+                    wrap=True,
+                    vertical_alignment=ft.CrossAxisAlignment.START,
+                    spacing=20,
+                    controls=[
+                        self.card_capacity,
+                        ft.Row(
                             wrap=True,
                             spacing=15,
                             run_spacing=15,
-                            run_alignment=ft.MainAxisAlignment.CENTER,
-                            controls=[self.card_capacity],
-                        )
-                    ),
-                    ft.Divider(height=10, color=AppColors.BG_MAIN),
-                    ft.Text(
-                        "Estado de Sensores",
-                        size=16,
-                        weight=ft.FontWeight.BOLD,
-                        color=AppColors.TEXT_MAIN,
-                    ),
-                    ft.Container(
-                        content=ft.Row(
-                            wrap=True,
-                            spacing=15,
-                            run_spacing=15,
-                            run_alignment=ft.MainAxisAlignment.CENTER,
                             controls=[
                                 self.card_temp,
                                 self.card_hum,
                                 self.card_wind,
                                 self.card_air,
                             ],
-                        )
-                    ),
-                    # ---------------------------
-                    ft.Divider(height=10, color=AppColors.BG_MAIN),
-                    ft.Text(
-                        "Resumen de Actividad",
-                        size=16,
-                        weight=ft.FontWeight.BOLD,
-                        color=AppColors.TEXT_MAIN,
-                    ),
-                    ft.Row(
-                        vertical_alignment=ft.CrossAxisAlignment.START,
-                        controls=[
-                            # 1. Gráfica (Izquierda)
-                            ft.Container(expand=2, height=300, content=TempChart()),
-                            ft.Container(width=15),
-                            # 2. Contenedor de "Eventos Recientes" (Derecha)
-                            ft.Container(
-                                expand=1,
-                                height=300,
-                                bgcolor=ft.Colors.WHITE,  # Fondo blanco para resaltar
-                                border_radius=12,  # Bordes redondeados
-                                padding=15,  # Espacio interno
-                                shadow=ft.BoxShadow(  # Sombra suave
-                                    blur_radius=10,
-                                    color=ft.Colors.with_opacity(0.05, ft.Colors.BLACK),
-                                ),
-                                content=ft.Column(
-                                    spacing=10,
-                                    controls=[
-                                        # TÍTULO DENTRO DEL CONTENEDOR
-                                        ft.Text(
-                                            "Eventos Recientes",
-                                            size=14,
-                                            weight=ft.FontWeight.BOLD,
-                                            color=AppColors.TEXT_MAIN,
-                                        ),
-                                        ft.Divider(height=1, color=ft.Colors.GREY_100),
-                                        # LISTA DE EVENTOS
-                                        self.panel_events,
-                                    ],
-                                ),
+                        ),
+                    ],
+                ),
+                ft.Divider(height=20, color=AppColors.BG_MAIN),
+                # --- ZONA INFERIOR: GRÁFICAS Y EVENTOS ---
+                ft.Row(
+                    vertical_alignment=ft.CrossAxisAlignment.START,
+                    spacing=20,
+                    controls=[
+                        # Izquierda: Gráfica
+                        ft.Container(expand=2, height=350, content=TempChart()),
+                        # Derecha: Panel de Eventos (CORREGIDO EL ERROR DE COLORES AQUÍ)
+                        ft.Container(
+                            expand=1,
+                            height=350,
+                            bgcolor=AppColors.BG_CARD,  # Antes era ft.colors.WHITE (Error)
+                            border_radius=18,
+                            padding=20,
+                            shadow=ft.BoxShadow(blur_radius=10, color=AppColors.SHADOW),
+                            content=ft.Column(
+                                controls=[
+                                    ft.Text(
+                                        "Eventos Recientes",
+                                        weight=ft.FontWeight.BOLD,
+                                        color=AppColors.TEXT_MAIN,
+                                    ),
+                                    ft.Divider(
+                                        height=10, color=AppColors.TEXT_LIGHT_GREY
+                                    ),
+                                    self.panel_events,
+                                ]
                             ),
-                        ],
-                    ),
-                ],
-            ),
+                        ),
+                    ],
+                ),
+            ],
         )
