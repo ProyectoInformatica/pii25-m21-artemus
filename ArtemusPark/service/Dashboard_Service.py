@@ -4,6 +4,7 @@ import flet as ft
 from typing import Dict, Any, List
 from datetime import datetime
 from ArtemusPark.model.Door_Model import DoorModel
+
 # Importamos los repositorios
 from ArtemusPark.repository import (
     Temperature_Repository,
@@ -67,7 +68,7 @@ class DashboardService:
                 "status": "En Línea" if is_online else "Sin Señal",
                 "is_online": is_online,
                 "icon": icon,
-                "last_seen": last_seen
+                "last_seen": last_seen,
             }
 
         # Cargamos datos
@@ -100,13 +101,13 @@ class DashboardService:
         real_occupancy = self._calculate_occupancy()
 
         return {
-
             "temperature": self._get_last_value(temps, "value", 0),
             "humidity": self._get_last_value(hums, "value", 0),
             "wind": self._get_last_value(winds, "speed", 0),
             "air_quality": self._get_last_value(smokes, "value", 0),
             "occupancy": real_occupancy,  # <--- USAMOS EL VALOR CALCULADO
         }
+
     # Los datos que va a mostrar el historial
     def get_all_history_logs(self) -> List[Dict[str, Any]]:
         """
@@ -135,7 +136,9 @@ class DashboardService:
                     val = getattr(item, detail_key, "--")
                     status = getattr(item, "status", "Info")
                     if type_label == "Puerta":
-                        status = "Abierta" if getattr(item, "is_open", False) else "Cerrada"
+                        status = (
+                            "Abierta" if getattr(item, "is_open", False) else "Cerrada"
+                        )
                     elif type_label == "Luz":
                         status = "ON" if getattr(item, "is_on", False) else "OFF"
 
@@ -145,21 +148,33 @@ class DashboardService:
                 except:
                     time_str = "Error fecha"
 
-                history.append({
-                    "timestamp": ts,  # Para ordenar
-                    "time_str": time_str,
-                    "type": type_label,
-                    "location": "Zona Parque",  # Podrías sacarlo del modelo si existiera
-                    "detail": f"{val}",
-                    "status": str(status)
-                })
+                history.append(
+                    {
+                        "timestamp": ts,  # Para ordenar
+                        "time_str": time_str,
+                        "type": type_label,
+                        "location": "Zona Parque",  # Podrías sacarlo del modelo si existiera
+                        "detail": f"{val}",
+                        "status": str(status),
+                    }
+                )
 
         # 2. Cargar datos de los repos
-        add_records(Temperature_Repository.load_all_temperature_measurements(), "Temperatura", "value")
-        add_records(Humidity_Repository.load_all_humidity_measurements(), "Humedad", "value")
+        add_records(
+            Temperature_Repository.load_all_temperature_measurements(),
+            "Temperatura",
+            "value",
+        )
+        add_records(
+            Humidity_Repository.load_all_humidity_measurements(), "Humedad", "value"
+        )
         add_records(Wind_Repository.load_all_wind_measurements(), "Viento", "speed")
-        add_records(Smoke_Repository.load_all_smoke_measurements(), "Calidad Aire", "value")
-        add_records(Door_Repository.load_all_door_events(), "Puerta", "name")  # En puerta el detalle es el nombre
+        add_records(
+            Smoke_Repository.load_all_smoke_measurements(), "Calidad Aire", "value"
+        )
+        add_records(
+            Door_Repository.load_all_door_events(), "Puerta", "name"
+        )  # En puerta el detalle es el nombre
         add_records(Light_Repository.load_all_light_events(), "Luz", "value")
 
         # 3. Ordenar por fecha (el más nuevo primero)
