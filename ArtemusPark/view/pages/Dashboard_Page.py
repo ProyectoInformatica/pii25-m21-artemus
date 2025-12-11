@@ -9,11 +9,12 @@ from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class DashboardPage(ft.Container):
-    def __init__(self):
+    def __init__(self, user_role="user"):
         super().__init__()
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
         self.padding = 18
+        self.user_role = user_role
 
         self.service = DashboardService()
 
@@ -71,13 +72,17 @@ class DashboardPage(ft.Container):
                     )
 
             new_events = self.service.get_recent_events()
-            self.panel_events.update_events(new_events)
+            # self.panel_events.update_events(new_events)
 
     # -------------------------------
 
     def _build_window_bar(self):
         return ft.Row(
             controls=[
+                ft.Text(
+                    "Bienvenido/a " + self.user_role, weight=ft.FontWeight.W_600, color=AppColors.TEXT_MUTED
+                ),
+                ft.Container(width=40),
                 ft.Text(
                     "Dashboard", weight=ft.FontWeight.W_600, color=AppColors.TEXT_MUTED
                 ),
@@ -93,10 +98,11 @@ class DashboardPage(ft.Container):
             border_radius=12,
             padding=20,
             content=ft.Column(
+                # Quitamos el scroll general de aquí para que la página no se mueva
                 scroll=ft.ScrollMode.AUTO,
-                # spacing=20,
+                spacing=20,
                 controls=[
-                    # --- ZONA SUPERIOR ---
+                    # --- ZONA SUPERIOR (Igual que antes) ---
                     ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         vertical_alignment=ft.CrossAxisAlignment.START,
@@ -110,9 +116,7 @@ class DashboardPage(ft.Container):
                         weight=ft.FontWeight.BOLD,
                         color=AppColors.TEXT_MAIN,
                     ),
-                    # --- ZONA SENSORES CORREGIDA ---
-                    # Quitamos wrap=True y alignment=CENTER.
-                    # Al tener expand=1 (definido en __init__), llenarán todo el ancho.
+                    # --- ZONA SENSORES (Igual que antes) ---
                     ft.Row(
                         spacing=15,
                         controls=[
@@ -122,21 +126,30 @@ class DashboardPage(ft.Container):
                             self.card_air,
                         ],
                     ),
-                    # -------------------------------
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
-                    # --- GRÁFICA + EVENTOS ---
+
+                    # --- GRÁFICA + EVENTOS (CORREGIDO) ---
                     ft.Row(
-                        vertical_alignment=ft.CrossAxisAlignment.START,
+                        # IMPORTANTE: Altura fija para esta sección.
+                        # Esto "cierra la jaula" y obliga al scroll interno.
+                        height=450,
                         controls=[
-                            ft.Container(expand=2, content=TempChart()),
-                            ft.Container(width=15),
+                            # Contenedor Gráfica
                             ft.Container(
-                                expand=1,
-                                # height=400,
+                                expand=2,  # 2/3 del ancho
+                                content=TempChart()
+                            ),
+
+                            ft.Container(width=15),
+
+                            # Contenedor Eventos
+                            ft.Container(
+                                expand=1,  # 1/3 del ancho
                                 bgcolor=ft.Colors.WHITE,
                                 border_radius=12,
                                 border=ft.border.all(1, ft.Colors.GREY_300),
                                 padding=15,
+                                # Usamos Column para poner Título arriba y Lista abajo
                                 content=ft.Column(
                                     spacing=10,
                                     controls=[
@@ -147,10 +160,8 @@ class DashboardPage(ft.Container):
                                             color=AppColors.TEXT_MAIN,
                                         ),
                                         ft.Divider(height=1, color=ft.Colors.GREY_100),
-                                        ft.Container(
-                                            content=self.panel_events,
-                                            expand=True,
-                                        ),
+                                        # La lista se expande para llenar los 500px - (título)
+                                        self.panel_events,
                                     ],
                                 ),
                             ),

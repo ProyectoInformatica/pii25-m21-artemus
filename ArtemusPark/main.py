@@ -80,7 +80,7 @@ async def main(page: ft.Page):
         content_area.content = None
 
         if page_name == "dashboard":
-            content_area.content = DashboardPage()
+            content_area.content = DashboardPage(user_role=current_role)
         elif page_name == "admin":
             content_area.content = PlaceholderPage(
                 "Administración", "Configuración de sistema..."
