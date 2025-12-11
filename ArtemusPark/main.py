@@ -31,6 +31,10 @@ async def main(page: ft.Page):
     page.title = "Artemus Smart Park"
     page.padding = 0
     page.bgcolor = "#e5e7eb"
+    page.fonts = {
+        "RobotoCondensed": "/fonts/RobotoCondensed.ttf"
+    }
+    page.window.icon = "/img/logo_pequenio.png"
 
     session = {"role": None}
     content_area = ft.Container(expand=True, padding=0)
@@ -168,4 +172,7 @@ async def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    ft.app(
+        target=main,
+        assets_dir="assets",
+    )
