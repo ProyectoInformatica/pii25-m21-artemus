@@ -17,10 +17,7 @@ async def main(page: ft.Page):
 
     # Área derecha (donde va el contenido)
     content_area = ft.Container(
-        expand=True,
-        bgcolor="#e5e7eb",
-        padding=20,
-        content=ft.Text("Iniciando...")
+        expand=True, bgcolor="#e5e7eb", padding=20, content=ft.Text("Iniciando...")
     )
 
     # --- AQUÍ ESTÁ LA CLAVE: Bucle de simulación ---
@@ -34,7 +31,7 @@ async def main(page: ft.Page):
             dummy_temp = TemperatureModel(
                 timestamp=time.time(),
                 value=int(random.randint(20, 30)),  # Simulamos 20-30 ºC
-                status="OK"
+                status="OK",
             )
 
             # 2. Guardamos en el JSON (Base de datos)
@@ -70,13 +67,7 @@ async def main(page: ft.Page):
     sidebar = Sidebar(on_nav_change=change_view)
 
     # Montamos la estructura visual
-    page.add(
-        ft.Row(
-            expand=True,
-            spacing=0,
-            controls=[sidebar, content_area]
-        )
-    )
+    page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
 
     # ARRANCAMOS EL BUCLE DE SIMULACIÓN
     page.run_task(sensor_simulation_loop)

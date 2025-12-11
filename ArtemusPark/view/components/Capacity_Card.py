@@ -14,9 +14,13 @@ class CapacityCard(ft.Container):
         # self.shadow = ft.BoxShadow(blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK))
 
         # --- CONTROLES QUE SE ACTUALIZARÁN ---
-        self.txt_value = ft.Text("0", size=30, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN)
+        self.txt_value = ft.Text(
+            "0", size=30, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN
+        )
         self.txt_percent = ft.Text("0%", size=12, color=AppColors.TEXT_MUTED)
-        self.progress_bar = ft.ProgressBar(value=0, color=ft.Colors.BLUE, bgcolor=ft.Colors.GREY_200, height=8)
+        self.progress_bar = ft.ProgressBar(
+            value=0, color=ft.Colors.BLUE, bgcolor=ft.Colors.GREY_200, height=8
+        )
 
         # --- ESTRUCTURA VISUAL ---
         self.content = ft.Column(
@@ -26,20 +30,27 @@ class CapacityCard(ft.Container):
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        ft.Text("Aforo Actual", size=14, color=AppColors.TEXT_MUTED, weight=ft.FontWeight.W_500),
+                        ft.Text(
+                            "Aforo Actual",
+                            size=14,
+                            color=AppColors.TEXT_MUTED,
+                            weight=ft.FontWeight.W_500,
+                        ),
                         ft.Icon(ft.Icons.PEOPLE, size=20, color=ft.Colors.BLUE),
-                    ]
+                    ],
                 ),
-
                 # Dato Central
                 ft.Row(
                     vertical_alignment=ft.CrossAxisAlignment.START,
                     controls=[
                         self.txt_value,
-                        ft.Text(f"/ {self.max_capacity}", size=14, color=AppColors.TEXT_LIGHT_GREY),
-                    ]
+                        ft.Text(
+                            f"/ {self.max_capacity}",
+                            size=14,
+                            color=AppColors.TEXT_LIGHT_GREY,
+                        ),
+                    ],
                 ),
-
                 # Barra de Progreso y Porcentaje
                 ft.Column(
                     spacing=5,
@@ -47,11 +58,11 @@ class CapacityCard(ft.Container):
                         self.progress_bar,
                         ft.Row(
                             alignment=ft.MainAxisAlignment.END,
-                            controls=[self.txt_percent]
-                        )
-                    ]
-                )
-            ]
+                            controls=[self.txt_percent],
+                        ),
+                    ],
+                ),
+            ],
         )
 
     def update_occupancy(self, current_value: int):
