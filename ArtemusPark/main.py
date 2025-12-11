@@ -56,7 +56,7 @@ async def main(page: ft.Page):
         current_role = session["role"]
         print(f"Navegando a {page_name} como {current_role}")
 
-        # --- PROTECCIÓN DE SEGURIDAD ---
+        # --- PROTECCIÓN DE SEGURIDAD --
 
         # 1. Admin: Solo para admin (Sin cambios)
         if page_name == "admin" and current_role != "admin":
