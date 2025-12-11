@@ -1,64 +1,81 @@
 import flet as ft
+from ArtemusPark.config.Colors import AppColors
 
 
 class Sidebar(ft.Container):
-    def __init__(self, on_nav_change):
+    def __init__(self, on_nav_change, user_role="user"):
         super().__init__()
-        self.on_nav_change = on_nav_change  # La función que viene del Main
+        self.on_nav_change = on_nav_change
+        self.user_role = user_role
         self.width = 260
-        self.bgcolor = "#131921"
+        self.bgcolor = AppColors.BG_DARK  # Usamos tu color oscuro
         self.padding = ft.padding.symmetric(vertical=24, horizontal=20)
-        self.content = self._build_content()
+
+        self.content_column = self._build_content()
+        self.content = self.content_column
 
     def _build_content(self):
-        return ft.Column(
-            controls=[
-                ft.Text("ARTEMUS", size=22, weight=ft.FontWeight.BOLD, color="white"),
-                ft.Divider(height=30, color="transparent"),
-                # Botones creados directamente
-                self._make_button("Dashboard", "📊", "dashboard", active=True),
-                self._make_button("Administración", "⚙️", "admin"),
-                self._make_button("Mantenimiento", "🛠", "maintenance"),
-                self._make_button("Historial", "🧾", "history"),
-                ft.Container(expand=True),
-                ft.Text("v0.1", color="grey"),
-            ]
+        controls_list = [ft.Text("ARTEMUS", size=22, weight=ft.FontWeight.BOLD, color="white"),
+                         ft.Divider(height=30, color="transparent"),
+                         self._make_button("Dashboard", "📊", "dashboard", active=True)]
+
+        # 1. Dashboard (Todos)
+
+        # 2. Historial (Admin y Cliente)
+        if self.user_role in ["admin", "client"]:
+            controls_list.append(self._make_button("Historial", "🧾", "history"))
+
+        # 3. Mantenimiento (AHORA TAMBIÉN PARA CLIENTE)
+        if self.user_role in ["admin", "client"]:
+            controls_list.append(self._make_button("Mantenimiento", "🛠", "maintenance"))
+
+        # 4. Administración (EXCLUSIVO ADMIN)
+        if self.user_role == "admin":
+            controls_list.append(self._make_button("Administración", "⚙️", "admin"))
+
+        controls_list.append(ft.Container(expand=True))
+        controls_list.append(
+            ft.Text(f"Perfil: {self.user_role.upper()}", color="grey", size=12)
         )
 
+        return ft.Column(controls=controls_list)
+
     def _make_button(self, text, icon, key, active=False):
-        # Esta es la misma estructura que tu prueba_click.py
+        # Colores seguros usando Hex strings o AppColors
+        bg_color = "#111827" if active else "transparent"  # Color oscuro si activo
+        text_color = "white" if active else "#9ca3af"  # Blanco si activo, gris si no
+
         return ft.Container(
-            data=key,  # La clave para saber qué botón es
+            data=key,
             padding=10,
             border_radius=10,
-            bgcolor="#111827" if active else "transparent",
-            # LAS DOS CLAVES QUE HICIERON FUNCIONAR TU PRUEBA:
+            bgcolor=bg_color,
             ink=True,
             on_click=self._handle_click,
             content=ft.Row(
                 controls=[
                     ft.Text(icon, size=16),
-                    ft.Text(
-                        text, size=14, color="white" if active else "#9ca3af"
-                    ),  # Gris si no está activo
+                    ft.Text(text, size=14, color=text_color),
                 ]
             ),
         )
 
     def _handle_click(self, e):
-        # 1. Notificar al Main qué botón se pulsó
         clicked_key = e.control.data
-        print(f"Sidebar: Click en {clicked_key}")
+        print(f"Sidebar: Navegando a {clicked_key}")
+
+        # 1. Llamar a la función del Main para cambiar la vista
         self.on_nav_change(clicked_key)
 
-        # 2. Actualizar visualmente la Sidebar (Reseteamos todos a transparente y marcamos el nuevo)
-        # Recorremos los hijos de la columna (saltamos el título y divider, indices 0 y 1)
-        # for item in self.content.Control[2:7]:
-        #     # Si el item es el que hemos clicado
-        #     if item.data == clicked_key:
-        #         item.bgcolor = "#111827"
-        #         item.content.controls[1].color = "white"  # Texto blanco
-        #     else:
-        #         item.bgcolor = "transparent"
-        #         item.content.controls[1].color = "#9ca3af"  # Texto gris
-        #     item.update()
+        # 2. INTERACTIVIDAD VISUAL (Cambiar colores)
+        for control in self.content_column.controls:
+            # Solo modificamos si es un Botón (Container con data)
+            if isinstance(control, ft.Container) and control.data is not None:
+                if control.data == clicked_key:
+                    # ESTE ES EL BOTÓN ACTIVO
+                    control.bgcolor = "#111827"
+                    control.content.controls[1].color = "white"
+                else:
+                    # ESTE ES UN BOTÓN INACTIVO
+                    control.bgcolor = "transparent"
+                    control.content.controls[1].color = "#9ca3af"

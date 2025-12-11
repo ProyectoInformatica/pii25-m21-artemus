@@ -12,7 +12,9 @@ class DashboardPage(ft.Container):
         super().__init__()
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
+
         self.padding = 18
+        # self.margin = 2
 
         self.service = DashboardService()
 
@@ -138,7 +140,7 @@ class DashboardPage(ft.Container):
                             wrap=True,
                             spacing=15,
                             run_spacing=15,
-                            run_alignment=ft.MainAxisAlignment.CENTER,
+                            run_alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                             controls=[
                                 self.card_temp,
                                 self.card_hum,
