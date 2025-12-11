@@ -31,9 +31,7 @@ async def main(page: ft.Page):
     page.title = "Artemus Smart Park"
     page.padding = 0
     page.bgcolor = "#e5e7eb"
-    page.fonts = {
-        "RobotoCondensed": "/fonts/RobotoCondensed.ttf"
-    }
+    page.fonts = {"RobotoCondensed": "/fonts/RobotoCondensed.ttf"}
     page.window.icon = "/img/logo_pequenio.png"
 
     session = {"role": None}

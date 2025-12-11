@@ -19,8 +19,13 @@ class Sidebar(ft.Container):
 
     def _build_content(self):
         controls_list = [
-            ft.Text("ARTEMUS", size=22, weight=ft.FontWeight.BOLD, color="white",
-                    style=ft.TextStyle(font_family="RobotoCondensed", letter_spacing=1.5)),
+            ft.Text(
+                "ARTEMUS",
+                size=22,
+                weight=ft.FontWeight.BOLD,
+                color="white",
+                style=ft.TextStyle(font_family="RobotoCondensed", letter_spacing=1.5),
+            ),
             ft.Divider(height=30, color="transparent"),
             self._make_button("Dashboard", "📊", "dashboard", active=True),
         ]

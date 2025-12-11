@@ -51,7 +51,7 @@ class LoginPage(ft.Container):
             ),
             hover_color=AppColors.TRANSPARENT,
             # --- NUEVO: Limpiar error al seleccionar ---
-            on_change=self._reset_error_state
+            on_change=self._reset_error_state,
         )
 
         self.btn_enter = ft.ElevatedButton(
@@ -87,7 +87,9 @@ class LoginPage(ft.Container):
                         weight=ft.FontWeight.BOLD,
                         color=AppColors.BG_DARK,
                         text_align=ft.TextAlign.CENTER,
-                        style=ft.TextStyle(font_family="RobotoCondensed", letter_spacing=1.5)
+                        style=ft.TextStyle(
+                            font_family="RobotoCondensed", letter_spacing=1.5
+                        ),
                     ),
                     ft.Text(
                         "Identifícate para acceder", size=14, color=AppColors.TEXT_MUTED
@@ -116,7 +118,9 @@ class LoginPage(ft.Container):
             # 2. Mostrar AVISO (SnackBar)
             e.page.open(
                 ft.SnackBar(
-                    content=ft.Text("⚠️ Por favor, selecciona un rol primero", color="white"),
+                    content=ft.Text(
+                        "⚠️ Por favor, selecciona un rol primero", color="white"
+                    ),
                     bgcolor=ft.Colors.RED_700,
                 )
             )
