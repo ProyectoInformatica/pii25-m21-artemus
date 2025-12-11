@@ -1,0 +1,1484 @@
+[
+  {
+    "timestamp": 1765490846.9093664,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765490849.9155169,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765490852.931042,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765490868.0009465,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765490877.0391886,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765490889.0688202,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765490907.115097,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765490925.1947145,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491204.3676858,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491219.423929,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491222.438651,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491231.4689307,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491249.5313454,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491270.5941703,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491324.8395963,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491327.8564532,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491330.8649137,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491345.923423,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491568.6349494,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491571.6467047,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491598.7667308,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491601.7852726,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491604.7941396,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491607.8088672,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491613.8497932,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491646.9795103,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491671.0614038,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491677.0984135,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491683.1190097,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491710.224721,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491719.251398,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491755.421158,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491767.4683318,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491770.4771485,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491779.5190167,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765491806.630762,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492166.4261792,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492175.4757893,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492187.5360272,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492199.5973144,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492211.653826,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492220.682835,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492250.810464,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492280.9214458,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492308.0181687,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492311.028085,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492332.1239102,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492356.2100446,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492359.2287157,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492389.3299372,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492398.356512,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492410.4035404,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492413.425235,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492422.4736342,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492452.5944316,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492455.6005676,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492461.6328986,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492503.8105595,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492515.8755248,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492521.9070377,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492533.981733,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492558.0865703,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492567.1212354,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492594.207502,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492600.2389972,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492615.2834456,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492675.5415542,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492687.5858955,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492690.5998282,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492705.6971269,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492714.7356296,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492720.7670963,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492726.79232,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492729.8012133,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492732.8229394,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492744.8652384,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492747.8752313,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492780.97502,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492799.0312183,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492814.0809417,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492820.1167116,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492856.2490232,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492929.0362113,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492950.0994115,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492965.174585,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492983.2407272,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765492995.299413,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493001.3229752,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493010.3584354,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493028.78971,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493031.8197167,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493086.0879273,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493089.0999913,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493101.1500714,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493116.2168572,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493125.2537832,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493137.2979457,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493140.3071694,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493143.321367,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493197.650174,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493200.6591785,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493218.7629547,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493230.8226244,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493233.8323407,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493239.8522742,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493257.9407418,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493282.0444696,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493291.0855603,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493297.1171782,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493342.4201593,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493351.4787638,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493357.5027692,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493366.5611787,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493372.5829213,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493508.538953,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493517.6014907,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493544.738862,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493559.8154905,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493571.8791378,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493577.8991425,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493583.9352982,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493586.9463732,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493596.0011246,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493637.399321,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493643.4334629,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493646.448288,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493652.4810438,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493655.492256,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493691.7255676,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493697.7678554,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493700.7948759,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493709.8455648,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493863.7328823,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493866.7506344,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493869.7875397,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493887.9133034,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765493975.9968543,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494000.1278558,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494009.180924,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494015.2264585,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494024.2954333,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494063.512039,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494081.6218696,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494099.7351336,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494132.9070647,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494144.979831,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494151.016852,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494187.74549,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494196.8045945,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494202.852484,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494218.293003,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494247.5570061,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494271.72083,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494289.8376346,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494292.8534544,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494301.909086,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494307.9476533,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494323.0712082,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494329.1169736,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494347.2257972,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494350.2493033,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494374.398509,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494380.441629,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494395.5350728,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494407.6150382,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494422.7072055,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494425.7218835,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494437.7845888,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494452.8830392,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494455.8993936,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494516.3540633,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494525.405512,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494537.4928718,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494546.547061,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494560.1832776,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494587.3716686,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494596.4233608,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494617.5537336,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494629.6327055,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494635.677856,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494647.7589278,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494677.0885708,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494698.2101889,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494701.2310207,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494728.4125326,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494737.469605,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494767.657914,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494831.1049798,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494837.1513193,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494856.7568202,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494865.8293686,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494868.8529193,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494874.8928826,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494880.9365315,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494886.9656606,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494938.3198626,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494965.4839265,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494980.5938668,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494983.6190548,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765494995.7075617,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495047.0391512,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495056.1078618,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495646.332699,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495655.3885033,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495700.6744757,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495742.9295874,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495745.943705,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495764.0695765,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495773.1363897,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495791.281128,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495800.339722,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495815.4243374,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495818.4423378,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495833.5241096,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495845.6048255,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495848.627497,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495857.673385,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495860.687235,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495884.8877912,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495890.934335,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495924.3016734,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495942.451229,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495955.102054,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495961.1422336,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495967.189701,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495970.2408042,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495973.2646651,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495979.299988,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495982.3189988,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495994.4050505,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765495997.4239826,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496012.5073898,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496032.3077998,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496044.3864174,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496056.460518,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496068.571648,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496086.6907744,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496104.794538,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496110.8461092,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496134.996709,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496138.0122452,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496141.037351,
+    "is_on": false,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496180.3352885,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496186.3718061,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496210.557887,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496213.5806434,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  },
+  {
+    "timestamp": 1765496240.8009267,
+    "is_on": true,
+    "status": "OK",
+    "value": 100
+  }
+]
