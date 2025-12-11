@@ -9,7 +9,9 @@ class EventsPanel(ft.ListView):
         super().__init__()
         self.expand = True  # Ocupar todo el espacio disponible
         self.spacing = 10
-        self.padding = ft.padding.only(right=10, bottom=10) # Un poco de aire para el scrollbar
+        self.padding = ft.padding.only(
+            right=10, bottom=10
+        )  # Un poco de aire para el scrollbar
 
         # CAMBIO 2: Eliminamos self.constraints y self.scroll manual.
         # ListView ya hace scroll automáticamente.
@@ -71,9 +73,18 @@ class EventsPanel(ft.ListView):
                         spacing=0,
                         expand=True,
                         controls=[
-                            Text(val_str, weight=ft.FontWeight.BOLD, color=Colors.BLACK87, size=13),
-                            Text(status_str, size=11, color=Colors.GREY_600) if status_str else ft.Container()
-                        ]
+                            Text(
+                                val_str,
+                                weight=ft.FontWeight.BOLD,
+                                color=Colors.BLACK87,
+                                size=13,
+                            ),
+                            (
+                                Text(status_str, size=11, color=Colors.GREY_600)
+                                if status_str
+                                else ft.Container()
+                            ),
+                        ],
                     ),
                     Text(time_str, color=Colors.GREY_500, size=12),
                 ],

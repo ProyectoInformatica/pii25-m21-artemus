@@ -80,7 +80,9 @@ class DashboardPage(ft.Container):
         return ft.Row(
             controls=[
                 ft.Text(
-                    "Bienvenido/a " + self.user_role, weight=ft.FontWeight.W_600, color=AppColors.TEXT_MUTED
+                    "Bienvenido/a " + self.user_role,
+                    weight=ft.FontWeight.W_600,
+                    color=AppColors.TEXT_MUTED,
                 ),
                 ft.Container(width=40),
                 ft.Text(
@@ -127,7 +129,6 @@ class DashboardPage(ft.Container):
                         ],
                     ),
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
-
                     # --- GRÁFICA + EVENTOS (CORREGIDO) ---
                     ft.Row(
                         # IMPORTANTE: Altura fija para esta sección.
@@ -136,12 +137,9 @@ class DashboardPage(ft.Container):
                         controls=[
                             # Contenedor Gráfica
                             ft.Container(
-                                expand=2,  # 2/3 del ancho
-                                content=TempChart()
+                                expand=2, content=TempChart()  # 2/3 del ancho
                             ),
-
                             ft.Container(width=15),
-
                             # Contenedor Eventos
                             ft.Container(
                                 expand=1,  # 1/3 del ancho
