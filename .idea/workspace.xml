@@ -6,9 +6,34 @@
   <component name="ChangeListManager">
     <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="logs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Door_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Door_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Humidity_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Humidity_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Light_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Light_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Sensor_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Sensor_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Smoke_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Smoke_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Temperature_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Temperature_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/controller/Wind_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/controller/Wind_Controller.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ArtemusPark/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/components/Events_Panel.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/components/Events_Panel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/repository/Door_Repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/repository/Door_Repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/repository/Humidity_Repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/repository/Humidity_Repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/repository/Light_Repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/repository/Light_Repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/repository/Smoke_Repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/repository/Smoke_Repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/repository/Temperature_Repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/repository/Temperature_Repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/repository/Wind_Repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/repository/Wind_Repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/service/Dashboard_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/service/Dashboard_Service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/service/Door_Status_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/service/Door_Status_Service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/service/Humidity_Metrics_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/service/Humidity_Metrics_Service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/service/Light_Metrics_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/service/Light_Metrics_Service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/service/Smoke_Risk_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/service/Smoke_Risk_Service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/service/Temperature_Metrics_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/service/Temperature_Metrics_Service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/service/Wind_Risk_Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/service/Wind_Risk_Service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/components/Alert_Card.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/components/Alert_Card.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/components/Capacity_Card.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/components/Capacity_Card.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/components/Sensor_Card.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/components/Sensor_Card.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/components/Sidebar.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/components/Sidebar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/init.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/init.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ArtemusPark/view/pages/Dashboard_Page.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/pages/Dashboard_Page.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/pages/Login_Page.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/pages/Login_Page.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +75,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/ProyectoInformatica/pii25-m21-artemus.git&quot;,
-    &quot;accountId&quot;: &quot;6f7b6a08-1de6-4174-840f-a62f63cf254f&quot;
+    &quot;accountId&quot;: &quot;b136e2ce-356a-4089-8b39-72f96395fd84&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -64,30 +89,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python tests.Python tests for ArtemusPark.Test.Schedule_Test.ScheduleTest.test_park_opening_transition.executor": "Run",
-    "Python tests.Python tests in Schedule_Test.py.executor": "Run",
-    "Python.DoorModel.executor": "Run",
-    "Python.Sensor_Card.executor": "Run",
-    "Python.init.executor": "Run",
-    "Python.main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/issue__8__igomez__data__loading",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python tests.Python tests for ArtemusPark.Test.Schedule_Test.ScheduleTest.test_park_opening_transition.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in Schedule_Test.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.DoorModel.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Sensor_Card.executor&quot;: &quot;Run&quot;,
+    &quot;Python.init.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/issue__8__igomez__data__loading&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/WSPhyton/pii25-m21-artemus/ArtemusPark/assets/img&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\WSPhyton\pii25-m21-artemus\ArtemusPark\assets\img" />
+      <recent name="C:\WSPhyton\pii25-m21-artemus\ArtemusPark\assets\fonts" />
+      <recent name="C:\WSPhyton\pii25-m21-artemus\ArtemusPark\assets" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\WSPhyton\pii25-m21-artemus\ArtemusPark\assets\img" />
       <recent name="C:\Users\ppiqu\PycharmProjects\pii25-m21-artemus\ArtemusPark\model" />
     </key>
   </component>
@@ -157,7 +190,7 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests in Schedule_Test.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests in C:/WSPhyton/pii25-m21-artemus/ArtemusPark/Test/Schedule_Test.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="pii25-m21-artemus" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -175,15 +208,15 @@
     </configuration>
     <list>
       <item itemvalue="JavaScript Debug.index-artemus.html" />
-      <item itemvalue="Python.prueba_click" />
       <item itemvalue="Python.main" />
+      <item itemvalue="Python.prueba_click" />
       <item itemvalue="Python tests.Python tests for ArtemusPark.Test.Schedule_Test.ScheduleTest.test_park_opening_transition" />
-      <item itemvalue="Python tests.Python tests in Schedule_Test.py" />
+      <item itemvalue="Python tests.Python tests in C:/WSPhyton/pii25-m21-artemus/ArtemusPark/Test/Schedule_Test.py" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
-        <item itemvalue="Python tests.Python tests in Schedule_Test.py" />
+        <item itemvalue="Python tests.Python tests in C:/WSPhyton/pii25-m21-artemus/ArtemusPark/Test/Schedule_Test.py" />
         <item itemvalue="Python tests.Python tests for ArtemusPark.Test.Schedule_Test.ScheduleTest.test_park_opening_transition" />
         <item itemvalue="Python.prueba_click" />
         <item itemvalue="JavaScript Debug.index-artemus.html" />
@@ -193,8 +226,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-PY-252.25557.178" />
-        <option value="bundled-python-sdk-ce6832f46686-7b97d883f26b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.25557.178" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.26830.99" />
+        <option value="bundled-python-sdk-164cda30dcd9-0af03a5fa574-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26830.99" />
       </set>
     </attachedChunks>
   </component>
@@ -217,6 +250,7 @@
       <workItem from="1763142035546" duration="7000" />
       <workItem from="1763379421318" duration="3323000" />
       <workItem from="1763818803231" duration="467000" />
+      <workItem from="1765482861871" duration="294000" />
     </task>
     <task id="LOCAL-00001" summary="logs">
       <option name="closed" value="true" />
@@ -279,7 +313,7 @@
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$init.coverage" NAME="main Coverage Results" MODIFIED="1765467740456" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$prueba_click.coverage" NAME="prueba_click Coverage Results" MODIFIED="1764612988976" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$Sensor_Card.coverage" NAME="Sensor_Card Coverage Results" MODIFIED="1765461311789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view/components" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1765473010033" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1765482576543" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$run_simulation.coverage" NAME="run_simulation Coverage Results" MODIFIED="1765297920084" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$DoorModel.coverage" NAME="DoorModel Coverage Results" MODIFIED="1763379820576" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/model" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$Dashboard.coverage" NAME="Dashboard Coverage Results" MODIFIED="1764348832749" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view/pages" />
