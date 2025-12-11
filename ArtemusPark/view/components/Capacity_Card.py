@@ -2,6 +2,7 @@ import flet as ft
 from flet import ProgressBar
 from ArtemusPark.config.Colors import AppColors
 
+
 class CapacityCard(ft.Container):
     def __init__(self, max_capacity: int = 100):
         super().__init__()
@@ -14,14 +15,13 @@ class CapacityCard(ft.Container):
         self.padding = 20
         self.shadow = ft.BoxShadow(blur_radius=10, color=AppColors.SHADOW)
 
-        self.txt_value = ft.Text("0", size=30, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN)
+        self.txt_value = ft.Text(
+            "0", size=30, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN
+        )
         self.txt_percent = ft.Text("0%", size=12, color=AppColors.TEXT_MUTED)
 
         self.progress_bar = ProgressBar(
-            value=0,
-            color=AppColors.ACCENT,
-            bgcolor=AppColors.BG_MAIN,
-            height=8
+            value=0, color=AppColors.ACCENT, bgcolor=AppColors.BG_MAIN, height=8
         )
 
         self.content = ft.Column(
@@ -30,31 +30,40 @@ class CapacityCard(ft.Container):
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        ft.Text("Aforo Actual", size=14, color=AppColors.TEXT_MUTED, weight=ft.FontWeight.W_500),
+                        ft.Text(
+                            "Aforo Actual",
+                            size=14,
+                            color=AppColors.TEXT_MUTED,
+                            weight=ft.FontWeight.W_500,
+                        ),
                         # CORREGIDO: ft.Icons (Mayúscula)
-                        ft.Icon(ft.Icons.DIRECTIONS_CAR, size=20, color=AppColors.ACCENT),
-                    ]
+                        ft.Icon(
+                            ft.Icons.DIRECTIONS_CAR, size=20, color=AppColors.ACCENT
+                        ),
+                    ],
                 ),
-
                 ft.Row(
                     vertical_alignment=ft.CrossAxisAlignment.END,
                     controls=[
                         self.txt_value,
-                        ft.Text(f"/ {self.max_capacity}", size=14, color=AppColors.TEXT_LIGHT_GREY),
-                    ]
+                        ft.Text(
+                            f"/ {self.max_capacity}",
+                            size=14,
+                            color=AppColors.TEXT_LIGHT_GREY,
+                        ),
+                    ],
                 ),
-
                 ft.Column(
                     spacing=5,
                     controls=[
                         self.progress_bar,
                         ft.Row(
                             alignment=ft.MainAxisAlignment.END,
-                            controls=[self.txt_percent]
-                        )
-                    ]
-                )
-            ]
+                            controls=[self.txt_percent],
+                        ),
+                    ],
+                ),
+            ],
         )
 
     def update_occupancy(self, current_value: int):

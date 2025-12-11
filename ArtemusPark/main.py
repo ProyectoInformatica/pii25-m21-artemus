@@ -24,10 +24,7 @@ async def main(page: ft.Page):
 
     # 2. CONTENEDOR PRINCIPAL (Se usará después del login)
     content_area = ft.Container(
-        expand=True,
-        bgcolor="#e5e7eb",
-        padding=20,
-        content=ft.Text("Cargando...")
+        expand=True, bgcolor="#e5e7eb", padding=20, content=ft.Text("Cargando...")
     )
 
     # ---------------------------------------------------------
@@ -38,9 +35,7 @@ async def main(page: ft.Page):
         while True:
             # Simular temperatura (20-30 ºC)
             dummy = TemperatureModel(
-                timestamp=time.time(),
-                value=float(random.randint(20, 30)),
-                status="OK"
+                timestamp=time.time(), value=float(random.randint(20, 30)), status="OK"
             )
             save_temperature_measurement(dummy)
 
@@ -80,11 +75,17 @@ async def main(page: ft.Page):
         if page_name == "dashboard":
             content_area.content = DashboardPage()
         elif page_name == "admin":
-            content_area.content = PlaceholderPage("Administración", "Configuración de sistema...")
+            content_area.content = PlaceholderPage(
+                "Administración", "Configuración de sistema..."
+            )
         elif page_name == "maintenance":
-            content_area.content = PlaceholderPage("Mantenimiento", "Estado de sensores...")
+            content_area.content = PlaceholderPage(
+                "Mantenimiento", "Estado de sensores..."
+            )
         elif page_name == "history":
-            content_area.content = PlaceholderPage("Historial", "Gráficos detallados...")
+            content_area.content = PlaceholderPage(
+                "Historial", "Gráficos detallados..."
+            )
 
         content_area.update()
 

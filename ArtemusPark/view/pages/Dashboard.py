@@ -32,10 +32,7 @@ class DashboardPage(ft.Container):
 
         # 3. Construir la UI
         self.content = ft.Column(
-            controls=[
-                self._build_header(),
-                self._build_main_content()
-            ]
+            controls=[self._build_header(), self._build_main_content()]
         )
 
     def did_mount(self):
@@ -67,10 +64,15 @@ class DashboardPage(ft.Container):
     def _build_header(self):
         return ft.Row(
             controls=[
-                ft.Text("Dashboard", weight=ft.FontWeight.BOLD, size=24, color=AppColors.TEXT_MAIN),
-                ft.Container(width=40)
+                ft.Text(
+                    "Dashboard",
+                    weight=ft.FontWeight.BOLD,
+                    size=24,
+                    color=AppColors.TEXT_MAIN,
+                ),
+                ft.Container(width=40),
             ],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         )
 
     def _build_main_content(self):
@@ -78,8 +80,12 @@ class DashboardPage(ft.Container):
             scroll=ft.ScrollMode.AUTO,
             spacing=20,
             controls=[
-                ft.Text("Estado en Tiempo Real", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED),
-
+                ft.Text(
+                    "Estado en Tiempo Real",
+                    size=16,
+                    weight=ft.FontWeight.BOLD,
+                    color=AppColors.TEXT_MUTED,
+                ),
                 # --- ZONA SUPERIOR: TARJETAS ---
                 ft.Row(
                     wrap=True,
@@ -95,25 +101,19 @@ class DashboardPage(ft.Container):
                                 self.card_temp,
                                 self.card_hum,
                                 self.card_wind,
-                                self.card_air
-                            ]
-                        )
-                    ]
+                                self.card_air,
+                            ],
+                        ),
+                    ],
                 ),
-
                 ft.Divider(height=20, color="transparent"),
-
                 # --- ZONA INFERIOR: GRÁFICAS Y EVENTOS ---
                 ft.Row(
                     vertical_alignment=ft.CrossAxisAlignment.START,
                     spacing=20,
                     controls=[
                         # Izquierda: Gráfica
-                        ft.Container(
-                            expand=2,
-                            height=350,
-                            content=TempChart()
-                        ),
+                        ft.Container(expand=2, height=350, content=TempChart()),
                         # Derecha: Panel de Eventos (CORREGIDO EL ERROR DE COLORES AQUÍ)
                         ft.Container(
                             expand=1,
@@ -124,13 +124,19 @@ class DashboardPage(ft.Container):
                             shadow=ft.BoxShadow(blur_radius=10, color=AppColors.SHADOW),
                             content=ft.Column(
                                 controls=[
-                                    ft.Text("Eventos Recientes", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
-                                    ft.Divider(height=10, color=AppColors.TEXT_LIGHT_GREY),
-                                    self.panel_events
+                                    ft.Text(
+                                        "Eventos Recientes",
+                                        weight=ft.FontWeight.BOLD,
+                                        color=AppColors.TEXT_MAIN,
+                                    ),
+                                    ft.Divider(
+                                        height=10, color=AppColors.TEXT_LIGHT_GREY
+                                    ),
+                                    self.panel_events,
                                 ]
-                            )
-                        )
-                    ]
-                )
-            ]
+                            ),
+                        ),
+                    ],
+                ),
+            ],
         )

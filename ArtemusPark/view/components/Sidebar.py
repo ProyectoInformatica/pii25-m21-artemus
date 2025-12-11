@@ -21,11 +21,13 @@ class Sidebar(ft.Container):
         ]
 
         # 1. Dashboard (Todos)
-        controls_list.append(self._make_button("Dashboard", "📊", "dashboard", active=True))
+        controls_list.append(
+            self._make_button("Dashboard", "📊", "dashboard", active=True)
+        )
 
         # 2. Historial (Admin y Cliente)
         if self.user_role in ["admin", "client"]:
-             controls_list.append(self._make_button("Historial", "🧾", "history"))
+            controls_list.append(self._make_button("Historial", "🧾", "history"))
 
         # 3. Mantenimiento (AHORA TAMBIÉN PARA CLIENTE)
         if self.user_role in ["admin", "client"]:
@@ -36,7 +38,9 @@ class Sidebar(ft.Container):
             controls_list.append(self._make_button("Administración", "⚙️", "admin"))
 
         controls_list.append(ft.Container(expand=True))
-        controls_list.append(ft.Text(f"Perfil: {self.user_role.upper()}", color="grey", size=12))
+        controls_list.append(
+            ft.Text(f"Perfil: {self.user_role.upper()}", color="grey", size=12)
+        )
 
         return ft.Column(controls=controls_list)
 
