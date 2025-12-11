@@ -6,13 +6,16 @@ class SensorCard(ft.Container):
     def __init__(self, title: str, icon: str, value: str, unit: str, footer_text: str):
         super().__init__()
         self.width = 180
-        self.height = 110
+        # self.expand = True
+        self.height = 120
         self.bgcolor = AppColors.BG_CARD
         self.border_radius = 12
+        self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.padding = 15
 
         # Sombra suave opcional (puedes descomentarla si quieres efecto 3D)
-        self.shadow = ft.BoxShadow(spread_radius=1, blur_radius=5, color="#1A000000")
+        # self.shadow = ft.BoxShadow(spread_radius=1, blur_radius=5, color="#1A000000")
+
 
         # 1. Variable para el texto del valor (se actualizará después)
         self.value_text = ft.Text(

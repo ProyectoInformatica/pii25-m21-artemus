@@ -4,14 +4,18 @@ import flet as ft
 class TempChart(ft.Container):
     def __init__(self):
         super().__init__()
-        self.height = 300  # Le damos un poco más de altura para que respire
+        # self.height = 400  # Le damos un poco más de altura para que respire
+
+        self.expand = True
+        self.constraints = ft.BoxConstraints(min_height=400) # Altura mínima obligatoria
+
         self.bgcolor = "#ffffff"
-        self.border_radius = 18
-        self.border = ft.border.all(1, "#e5e7eb")
+        self.border_radius = 12
+        self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.padding = 20
-        self.shadow = ft.BoxShadow(
-            blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
-        )
+        # self.shadow = ft.BoxShadow(
+        #     blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
+        # )
 
         # Datos de ejemplo
         self.data_points = [

@@ -6,14 +6,16 @@ class CapacityCard(ft.Container):
     def __init__(self, max_capacity: int = 100):
         super().__init__()
         self.max_capacity = max_capacity
-        self.width = 300  # Un poco más ancha que las de sensores
+       # self.width = 300  # Un poco más ancha que las de sensores
+        self.expand = True
         self.height = 140
         self.bgcolor = AppColors.BG_CARD
         self.border_radius = 12
+        self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.padding = 20
-        self.shadow = ft.BoxShadow(
-            blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
-        )
+        # self.shadow = ft.BoxShadow(
+        #     blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
+        # )
 
         # --- CONTROLES QUE SE ACTUALIZARÁN ---
         self.txt_value = ft.Text(
@@ -38,7 +40,13 @@ class CapacityCard(ft.Container):
                             color=AppColors.TEXT_MUTED,
                             weight=ft.FontWeight.W_500,
                         ),
-                        ft.Icon(ft.Icons.PEOPLE, size=20, color=ft.Colors.BLUE),
+                        # Chip "Live" simulado o icono
+                        ft.Container(
+                            content=ft.Text("Live", size=10, color=ft.Colors.BLUE),
+                            bgcolor=ft.Colors.BLUE_50,
+                            padding=ft.padding.symmetric(horizontal=8, vertical=2),
+                            border_radius=10
+                        )
                     ],
                 ),
                 # Dato Central
@@ -47,8 +55,8 @@ class CapacityCard(ft.Container):
                     controls=[
                         self.txt_value,
                         ft.Text(
-                            f"/ {self.max_capacity}",
-                            size=14,
+                            f"Max visitantes: {self.max_capacity}",
+                            size=12,
                             color=AppColors.TEXT_LIGHT_GREY,
                         ),
                     ],
@@ -58,10 +66,7 @@ class CapacityCard(ft.Container):
                     spacing=5,
                     controls=[
                         self.progress_bar,
-                        ft.Row(
-                            alignment=ft.MainAxisAlignment.END,
-                            controls=[self.txt_percent],
-                        ),
+                        # ft.Row([self.txt_percent], alignment=ft.MainAxisAlignment.END), # Opcional
                     ],
                 ),
             ],
