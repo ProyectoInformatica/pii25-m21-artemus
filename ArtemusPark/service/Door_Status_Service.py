@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from model.Door_Model import DoorModel
+from ArtemusPark.model.Door_Model import DoorModel
 
 
 @dataclass

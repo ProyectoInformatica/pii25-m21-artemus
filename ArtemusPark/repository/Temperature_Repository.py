@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import List, Dict, Any
-from model.Temperature_Model import TemperatureModel
+from ArtemusPark.model.Temperature_Model import TemperatureModel
 
 # --- CORRECCIÓN DE RUTA ---
 BASE_DIR = Path(__file__).resolve().parent.parent

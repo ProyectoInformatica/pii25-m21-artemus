@@ -1,6 +1,6 @@
 import flet as ft
 from datetime import datetime
-from config.Colors import AppColors
+from ArtemusPark.config.Colors import AppColors
 
 
 class AlertCard(ft.Container):

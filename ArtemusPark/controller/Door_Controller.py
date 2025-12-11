@@ -3,7 +3,7 @@ import random
 import time
 from typing import Callable, Optional
 
-from model.Door_Model import DoorModel
+from ArtemusPark.model.Door_Model import DoorModel
 
 logging.basicConfig(
     filename="door_controller.log",

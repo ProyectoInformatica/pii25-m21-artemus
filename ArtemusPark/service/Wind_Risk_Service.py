@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from config.Wind_Config import RISK_THRESHOLD_KMH
-from model.Wind_Model import WindModel
+from ArtemusPark.config.Wind_Config import RISK_THRESHOLD_KMH
+from ArtemusPark.model.Wind_Model import WindModel
 
 
 @dataclass

@@ -1,11 +1,11 @@
 import flet as ft
-from config.Colors import AppColors
-from view.components.Temp_Chart import TempChart
-from view.components.Sensor_Card import SensorCard
-from view.components.Events_Panel import EventsPanel
-from view.components.Capacity_Card import CapacityCard
-from view.components.Alert_Card import AlertCard
-from service.Dashboard_Service import DashboardService
+from ArtemusPark.config.Colors import AppColors
+from ArtemusPark.view.components.Temp_Chart import TempChart
+from ArtemusPark.view.components.Sensor_Card import SensorCard
+from ArtemusPark.view.components.Events_Panel import EventsPanel
+from ArtemusPark.view.components.Capacity_Card import CapacityCard
+from ArtemusPark.view.components.Alert_Card import AlertCard
+from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class DashboardPage(ft.Container):

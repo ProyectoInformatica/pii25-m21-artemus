@@ -4,32 +4,32 @@ import time
 from typing import List, Optional
 
 # --- Imports de Controladores ---
-from controller.Humidity_Controller import HumidityController
-from controller.Temperature_Controller import TemperatureController
-from controller.Wind_Controller import WindController
-from controller.Door_Controller import DoorController
-from controller.Light_Controller import LightController
-from controller.Smoke_Controller import SmokeController
+from ArtemusPark.controller.Humidity_Controller import HumidityController
+from ArtemusPark.controller.Temperature_Controller import TemperatureController
+from ArtemusPark.controller.Wind_Controller import WindController
+from ArtemusPark.controller.Door_Controller import DoorController
+from ArtemusPark.controller.Light_Controller import LightController
+from ArtemusPark.controller.Smoke_Controller import SmokeController
 
 # --- Imports de Modelos ---
-from model.Humidity_Model import HumidityModel
-from model.Temperature_Model import TemperatureModel
-from model.Wind_Model import WindModel
-from model.Door_Model import DoorModel
-from model.Light_Model import LightModel
-from model.Smoke_Model import SmokeModel
+from ArtemusPark.model.Humidity_Model import HumidityModel
+from ArtemusPark.model.Temperature_Model import TemperatureModel
+from ArtemusPark.model.Wind_Model import WindModel
+from ArtemusPark.model.Door_Model import DoorModel
+from ArtemusPark.model.Light_Model import LightModel
+from ArtemusPark.model.Smoke_Model import SmokeModel
 
 # --- Imports de Repositorios ---
-from repository.Wind_Repository import save_wind_measurement
-from repository.Humidity_Repository import save_humidity_measurement
-from repository.Temperature_Repository import save_temperature_measurement
-from repository.Door_Repository import save_door_event
-from repository.Light_Repository import save_light_event
-from repository.Smoke_Repository import save_smoke_measurement  # <--- NUEVO
+from ArtemusPark.repository.Wind_Repository import save_wind_measurement
+from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
+from ArtemusPark.repository.Temperature_Repository import save_temperature_measurement
+from ArtemusPark.repository.Door_Repository import save_door_event
+from ArtemusPark.repository.Light_Repository import save_light_event
+from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement  # <--- NUEVO
 
 # --- Imports de Servicios ---
-from service.Wind_Risk_Service import check_wind_risk
-from service.Smoke_Risk_Service import check_smoke_risk  # <--- NUEVO
+from ArtemusPark.service.Wind_Risk_Service import check_wind_risk
+from ArtemusPark.service.Smoke_Risk_Service import check_smoke_risk  # <--- NUEVO
 
 logger = logging.getLogger(__name__)
 
