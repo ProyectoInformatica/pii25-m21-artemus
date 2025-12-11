@@ -100,10 +100,11 @@ async def main(page: ft.Page):
     # NAVEGACIÓN Y LOGIN
     # ---------------------------------------------------------
     def change_view(page_name):
+        # ... (Tu código de change_view se mantiene igual) ...
         current_role = session.get("role")
 
         if page_name == "admin" and current_role != "admin":
-            return  # Bloqueo simple
+            return
 
         content_area.content = None
 
@@ -118,19 +119,35 @@ async def main(page: ft.Page):
 
         content_area.update()
 
+    # --- NUEVA FUNCIÓN LOGOUT ---
+    def logout():
+        print("Cerrando sesión...")
+        session["role"] = None  # Borramos el rol
+        page.clean()  # Limpiamos toda la interfaz
+        # Volvemos a mostrar el Login
+        page.add(LoginPage(on_login_success=login_success))
+
     def login_success(role):
         session["role"] = role
         page.clean()
 
-        # Iniciamos la simulación al entrar
-        page.run_task(sensor_simulation_loop)
+        # Nota: La tarea de simulación sigue corriendo en segundo plano,
+        # lo cual está bien para este prototipo.
+        if not hasattr(page, "simulation_started"):
+            page.run_task(sensor_simulation_loop)
+            page.simulation_started = True
 
-        sidebar = Sidebar(on_nav_change=change_view, user_role=role)
+        # --- AQUÍ CONECTAMOS EL LOGOUT ---
+        sidebar = Sidebar(
+            on_nav_change=change_view,
+            on_logout=logout,  # <--- Pasamos la función nueva
+            user_role=role
+        )
+
         page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
         change_view("dashboard")
 
     page.add(LoginPage(on_login_success=login_success))
-
 
 if __name__ == "__main__":
     ft.app(target=main)

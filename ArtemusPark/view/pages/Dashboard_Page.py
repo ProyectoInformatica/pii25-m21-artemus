@@ -108,7 +108,7 @@ class DashboardPage(ft.Container):
                                 content=ft.Column(
                                     controls=[
                                         ft.Text("Eventos Recientes", weight=ft.FontWeight.BOLD, color="#6b7280"),
-                                        ft.Divider(height=1),
+                                        ft.Divider(height=1, color=AppColors.BG_MAIN),
                                         self.panel_events  # ListView expandible
                                     ]
                                 )
