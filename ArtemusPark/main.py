@@ -5,26 +5,28 @@ import flet as ft
 
 # Asegúrate de ajustar los imports según tu estructura de carpetas real
 # Si "ArtemusPark" es tu carpeta raíz, mantén el prefijo.
-from ArtemusPark.view.pages.Login_Page import LoginPage
-from ArtemusPark.view.components.Sidebar import Sidebar
-from ArtemusPark.view.pages.Dashboard_Page import DashboardPage
-from ArtemusPark.view.pages.Placeholder_Page import PlaceholderPage
+from view.pages.Login_Page import LoginPage
+from view.components.Sidebar import Sidebar
+from view.pages.Dashboard_Page import DashboardPage
+from view.pages.Placeholder_Page import PlaceholderPage
 
 # --- IMPORTS DE MODELOS ---
-from ArtemusPark.model.Temperature_Model import TemperatureModel
-from ArtemusPark.model.Humidity_Model import HumidityModel
-from ArtemusPark.model.Wind_Model import WindModel
-from ArtemusPark.model.Smoke_Model import SmokeModel
-from ArtemusPark.model.Door_Model import DoorModel
-from ArtemusPark.model.Light_Model import LightModel
+from model.Temperature_Model import TemperatureModel
+from model.Humidity_Model import HumidityModel
+from model.Wind_Model import WindModel
+from model.Smoke_Model import SmokeModel
+from model.Door_Model import DoorModel
+from model.Light_Model import LightModel
 
 # --- IMPORTS DE REPOSITORIOS ---
-from ArtemusPark.repository.Temperature_Repository import save_temperature_measurement
-from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
-from ArtemusPark.repository.Wind_Repository import save_wind_measurement
-from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement
-from ArtemusPark.repository.Door_Repository import save_door_event
-from ArtemusPark.repository.Light_Repository import save_light_event
+from repository.Temperature_Repository import save_temperature_measurement
+from repository.Humidity_Repository import save_humidity_measurement
+from repository.Wind_Repository import save_wind_measurement
+from repository.Smoke_Repository import save_smoke_measurement
+from repository.Door_Repository import save_door_event
+from repository.Light_Repository import save_light_event
+
+import multiprocessing
 
 
 async def main(page: ft.Page):
@@ -170,7 +172,5 @@ async def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    ft.app(
-        target=main,
-        assets_dir="assets",
-    )
+    multiprocessing.freeze_support()
+    ft.app(target=main,assets_dir="assets")

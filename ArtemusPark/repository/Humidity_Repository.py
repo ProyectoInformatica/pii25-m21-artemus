@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import List, Dict, Any
-from ArtemusPark.model.Humidity_Model import HumidityModel
+from model.Humidity_Model import HumidityModel
 
 # --- CORRECCIÓN DE RUTA ---
 BASE_DIR = Path(__file__).resolve().parent.parent

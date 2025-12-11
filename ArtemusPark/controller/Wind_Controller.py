@@ -3,8 +3,8 @@ import random
 import time
 from typing import Callable, Optional
 
-from ArtemusPark.model.Wind_Model import WindModel
-from ArtemusPark.config.Wind_Config import RISK_THRESHOLD_KMH, WARNING_THRESHOLD_KMH
+from model.Wind_Model import WindModel
+from config.Wind_Config import RISK_THRESHOLD_KMH, WARNING_THRESHOLD_KMH
 
 logging.basicConfig(
     filename="wind_controller.log",

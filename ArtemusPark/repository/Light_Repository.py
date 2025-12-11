@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import List, Dict, Any
-from ArtemusPark.model.Light_Model import LightModel
+from model.Light_Model import LightModel
 
 # --- CORRECCIÓN DE RUTA ---
 BASE_DIR = Path(__file__).resolve().parent.parent

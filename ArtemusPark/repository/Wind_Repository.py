@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import List, Dict, Any
-from ArtemusPark.model.Wind_Model import WindModel
+from model.Wind_Model import WindModel
 
 # --- CORRECCIÓN DE RUTA ---
 BASE_DIR = Path(__file__).resolve().parent.parent

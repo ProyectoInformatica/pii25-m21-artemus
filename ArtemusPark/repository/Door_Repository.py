@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import List, Dict, Any
-from ArtemusPark.model.Door_Model import DoorModel
+from model.Door_Model import DoorModel
 
 # --- RUTA ---
 BASE_DIR = Path(__file__).resolve().parent.parent

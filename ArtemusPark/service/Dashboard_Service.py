@@ -3,7 +3,7 @@ from typing import Dict, Any, List
 from datetime import datetime
 
 # Importamos los repositorios
-from ArtemusPark.repository import (
+from repository import (
     Temperature_Repository,
     Humidity_Repository,
     Wind_Repository,
