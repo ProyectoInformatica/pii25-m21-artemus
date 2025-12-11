@@ -11,7 +11,9 @@ class CapacityCard(ft.Container):
         self.bgcolor = AppColors.BG_CARD
         self.border_radius = 12
         self.padding = 20
-        self.shadow = ft.BoxShadow(blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK))
+        self.shadow = ft.BoxShadow(
+            blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
+        )
 
         # --- CONTROLES QUE SE ACTUALIZARÁN ---
         self.txt_value = ft.Text(

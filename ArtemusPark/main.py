@@ -51,7 +51,7 @@ async def main(page: ft.Page):
             await asyncio.sleep(3)
 
     # -----------------------------------------------
-# ---------------------------------------------------------
+    # ---------------------------------------------------------
     # B. LÓGICA DE NAVEGACIÓN Y PERMISOS
     # ---------------------------------------------------------
     def change_view(page_name):
@@ -129,6 +129,7 @@ async def main(page: ft.Page):
 
     # 2. Mostrar SOLAMENTE la pantalla de Login al principio
     page.add(LoginPage(on_login_success=login_success))
+
 
 if __name__ == "__main__":
     ft.app(target=main)

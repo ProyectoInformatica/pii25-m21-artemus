@@ -9,7 +9,9 @@ class TempChart(ft.Container):
         self.border_radius = 18
         self.border = ft.border.all(1, "#e5e7eb")
         self.padding = 20
-        self.shadow = ft.BoxShadow(blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK))
+        self.shadow = ft.BoxShadow(
+            blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
+        )
 
         # Datos de ejemplo
         self.data_points = [
