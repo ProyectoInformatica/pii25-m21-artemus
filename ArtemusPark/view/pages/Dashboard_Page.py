@@ -66,7 +66,9 @@ class DashboardPage(ft.Container):
                 self.card_capacity.update_occupancy(occupancy)
 
                 if data.get("air_quality", 0) > 100:
-                    self.card_alerts.show_alert("Calidad de aire peligrosa", is_critical=True)
+                    self.card_alerts.show_alert(
+                        "Calidad de aire peligrosa", is_critical=True
+                    )
 
             new_events = self.service.get_recent_events()
             self.panel_events.update_events(new_events)
@@ -76,7 +78,9 @@ class DashboardPage(ft.Container):
     def _build_window_bar(self):
         return ft.Row(
             controls=[
-                ft.Text("Dashboard", weight=ft.FontWeight.W_600, color=AppColors.TEXT_MUTED),
+                ft.Text(
+                    "Dashboard", weight=ft.FontWeight.W_600, color=AppColors.TEXT_MUTED
+                ),
                 ft.Container(width=40),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
@@ -97,16 +101,15 @@ class DashboardPage(ft.Container):
                         alignment=ft.MainAxisAlignment.START,
                         vertical_alignment=ft.CrossAxisAlignment.START,
                         spacing=20,
-                        controls=[
-                            self.card_capacity,
-                            self.card_alerts
-                        ]
+                        controls=[self.card_capacity, self.card_alerts],
                     ),
-
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
-
-                    ft.Text("Sensores", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
-
+                    ft.Text(
+                        "Sensores",
+                        size=16,
+                        weight=ft.FontWeight.BOLD,
+                        color=AppColors.TEXT_MAIN,
+                    ),
                     # --- ZONA SENSORES CORREGIDA ---
                     # Quitamos wrap=True y alignment=CENTER.
                     # Al tener expand=1 (definido en __init__), llenarán todo el ancho.
@@ -120,9 +123,7 @@ class DashboardPage(ft.Container):
                         ],
                     ),
                     # -------------------------------
-
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
-
                     # --- GRÁFICA + EVENTOS ---
                     ft.Row(
                         vertical_alignment=ft.CrossAxisAlignment.START,

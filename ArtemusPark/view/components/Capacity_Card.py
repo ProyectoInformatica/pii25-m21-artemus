@@ -6,7 +6,7 @@ class CapacityCard(ft.Container):
     def __init__(self, max_capacity: int = 100):
         super().__init__()
         self.max_capacity = max_capacity
-       # self.width = 300  # Un poco más ancha que las de sensores
+        # self.width = 300  # Un poco más ancha que las de sensores
         self.expand = True
         self.height = 140
         self.bgcolor = AppColors.BG_CARD
@@ -45,8 +45,8 @@ class CapacityCard(ft.Container):
                             content=ft.Text("Live", size=10, color=ft.Colors.BLUE),
                             bgcolor=ft.Colors.BLUE_50,
                             padding=ft.padding.symmetric(horizontal=8, vertical=2),
-                            border_radius=10
-                        )
+                            border_radius=10,
+                        ),
                     ],
                 ),
                 # Dato Central

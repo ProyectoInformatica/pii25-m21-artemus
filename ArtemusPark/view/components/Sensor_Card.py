@@ -16,7 +16,6 @@ class SensorCard(ft.Container):
         # Sombra suave opcional (puedes descomentarla si quieres efecto 3D)
         # self.shadow = ft.BoxShadow(spread_radius=1, blur_radius=5, color="#1A000000")
 
-
         # 1. Variable para el texto del valor (se actualizará después)
         self.value_text = ft.Text(
             value, size=22, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN

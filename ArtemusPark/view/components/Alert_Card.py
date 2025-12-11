@@ -15,32 +15,32 @@ class AlertCard(ft.Container):
         # self.shadow = ft.BoxShadow(blur_radius=10, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK))
 
         # --- Elementos internos ---
-        self.title = ft.Text("Alertas", size=14, weight=ft.FontWeight.W_500, color=AppColors.TEXT_MUTED)
+        self.title = ft.Text(
+            "Alertas", size=14, weight=ft.FontWeight.W_500, color=AppColors.TEXT_MUTED
+        )
 
         # Contenedor del mensaje de alerta (La caja roja o verde)
         self.status_container = ft.Container(
             content=ft.Row(
                 controls=[
                     ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.GREEN),
-                    ft.Text("Sin incidencias activas", color=ft.Colors.GREEN_700)
+                    ft.Text("Sin incidencias activas", color=ft.Colors.GREEN_700),
                 ]
             ),
             bgcolor=ft.Colors.GREEN_50,
             border_radius=8,
             padding=10,
             expand=True,
-            alignment=ft.alignment.center_left
+            alignment=ft.alignment.center_left,
         )
 
-        self.last_update_text = ft.Text("Última actualización: --:--", size=12, color=AppColors.TEXT_LIGHT_GREY)
+        self.last_update_text = ft.Text(
+            "Última actualización: --:--", size=12, color=AppColors.TEXT_LIGHT_GREY
+        )
 
         self.content = ft.Column(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[
-                self.title,
-                self.status_container,
-                self.last_update_text
-            ]
+            controls=[self.title, self.status_container, self.last_update_text],
         )
 
     def show_alert(self, message: str, is_critical: bool = True):
@@ -55,14 +55,14 @@ class AlertCard(ft.Container):
             self.status_container.bgcolor = ft.Colors.RED_50
             self.status_container.content.controls = [
                 ft.Icon(ft.Icons.WARNING_AMBER_ROUNDED, color=ft.Colors.RED),
-                ft.Text(message, color=ft.Colors.RED_700, weight=ft.FontWeight.BOLD)
+                ft.Text(message, color=ft.Colors.RED_700, weight=ft.FontWeight.BOLD),
             ]
         else:
             # Estilo NORMAL (Verde)
             self.status_container.bgcolor = ft.Colors.GREEN_50
             self.status_container.content.controls = [
                 ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.GREEN),
-                ft.Text(message, color=ft.Colors.GREEN_700)
+                ft.Text(message, color=ft.Colors.GREEN_700),
             ]
 
         self.update()

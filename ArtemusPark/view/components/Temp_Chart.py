@@ -7,7 +7,9 @@ class TempChart(ft.Container):
         # self.height = 400  # Le damos un poco más de altura para que respire
 
         self.expand = True
-        self.constraints = ft.BoxConstraints(min_height=400) # Altura mínima obligatoria
+        self.constraints = ft.BoxConstraints(
+            min_height=400
+        )  # Altura mínima obligatoria
 
         self.bgcolor = "#ffffff"
         self.border_radius = 12
