@@ -5,7 +5,8 @@ from ArtemusPark.model.Wind_Model import WindModel
 
 # --- CORRECCIÓN DE RUTA ---
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_FILE = BASE_DIR / "json" / "wind_measurements.json" # Corregido typo 'Swind'
+DATA_FILE = BASE_DIR / "json" / "wind_measurements.json"  # Corregido typo 'Swind'
+
 
 def _serialize_measurement(measurement: WindModel) -> Dict[str, Any]:
     return {
@@ -14,6 +15,7 @@ def _serialize_measurement(measurement: WindModel) -> Dict[str, Any]:
         "state": measurement.state,
         "label": measurement.label,
     }
+
 
 def save_wind_measurement(measurement: WindModel) -> None:
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -28,6 +30,7 @@ def save_wind_measurement(measurement: WindModel) -> None:
 
     data.append(_serialize_measurement(measurement))
     DATA_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
 
 def load_all_wind_measurements() -> List[Dict[str, Any]]:
     if not DATA_FILE.exists():

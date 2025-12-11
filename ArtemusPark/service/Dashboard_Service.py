@@ -31,7 +31,6 @@ class DashboardService:
     #         "occupancy": 1201  # Valor simulado fijo o aleatorio
     #     }
 
-
     def get_latest_sensor_data(self) -> Dict[str, Any]:
         temps = Temperature_Repository.load_all_temperature_measurements()
         hums = Humidity_Repository.load_all_humidity_measurements()
@@ -46,7 +45,7 @@ class DashboardService:
             "humidity": self._get_last_value(hums, "value", 0),
             "wind": self._get_last_value(winds, "speed", 0),
             "air_quality": self._get_last_value(smokes, "value", 0),
-            "occupancy": real_occupancy  # <--- USAMOS EL VALOR CALCULADO
+            "occupancy": real_occupancy,  # <--- USAMOS EL VALOR CALCULADO
         }
 
     def _calculate_occupancy(self) -> int:
@@ -72,7 +71,6 @@ class DashboardService:
         # Evitar números negativos
         return max(0, count)
 
-
     def get_temp_chart_data(self) -> List[Dict[str, Any]]:
         """
         Prepara los datos para la gráfica de temperatura (últimos 10 registros).
@@ -94,11 +92,13 @@ class DashboardService:
             except:
                 time_label = ""
 
-            chart_data.append({
-                "x": i,  # Usamos índice 0,1,2... para simplificar el eje X
-                "y": float(item.get("value", 0)),
-                "tooltip": time_label
-            })
+            chart_data.append(
+                {
+                    "x": i,  # Usamos índice 0,1,2... para simplificar el eje X
+                    "y": float(item.get("value", 0)),
+                    "tooltip": time_label,
+                }
+            )
         return chart_data
 
     def get_recent_events(self) -> List[Dict[str, Any]]:
@@ -109,20 +109,24 @@ class DashboardService:
         combined = []
         # Normalizar Puertas
         for d in doors:
-            combined.append({
-                "type": "door",
-                "label": f"Puerta: {d.get('name')}",
-                "status": "Abierta" if d.get("is_open") else "Cerrada",
-                "timestamp": d.get("timestamp"),
-            })
+            combined.append(
+                {
+                    "type": "door",
+                    "label": f"Puerta: {d.get('name')}",
+                    "status": "Abierta" if d.get("is_open") else "Cerrada",
+                    "timestamp": d.get("timestamp"),
+                }
+            )
         # Normalizar Luces
         for l in lights:
-            combined.append({
-                "type": "light",
-                "label": "Iluminación",
-                "status": "Encendido" if l.get("is_on") else "Apagado",
-                "timestamp": l.get("timestamp"),
-            })
+            combined.append(
+                {
+                    "type": "light",
+                    "label": "Iluminación",
+                    "status": "Encendido" if l.get("is_on") else "Apagado",
+                    "timestamp": l.get("timestamp"),
+                }
+            )
 
         # Ordenar por timestamp descendente
         combined.sort(key=lambda x: str(x.get("timestamp", "")), reverse=True)

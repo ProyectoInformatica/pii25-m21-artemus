@@ -1,9 +1,10 @@
 from dataclasses import dataclass, field
 import time
 
+
 @dataclass
 class DoorModel:
     is_open: bool  # True = Abierta, False = Cerrada
-    name: str      # Nombre del sensor (ej. "Acceso Principal")
-    direction: str # <--- NUEVO CAMPO: "IN" | "OUT" | "BOTH"
+    name: str  # Nombre del sensor (ej. "Acceso Principal")
+    direction: str  # <--- NUEVO CAMPO: "IN" | "OUT" | "BOTH"
     timestamp: float = field(default_factory=time.time)

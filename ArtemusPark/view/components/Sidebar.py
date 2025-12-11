@@ -55,19 +55,19 @@ class Sidebar(ft.Container):
                                     self.user_role.upper(),
                                     size=12,
                                     weight=ft.FontWeight.BOLD,
-                                    color="white"
+                                    color="white",
                                 ),
-                            ]
+                            ],
                         ),
                         # Botón de Logout
                         ft.IconButton(
                             icon=ft.Icons.LOGOUT_ROUNDED,
                             icon_color="#ef4444",  # Rojo suave
                             tooltip="Cerrar Sesión",
-                            on_click=lambda e: self.on_logout()  # Llamamos a la función
-                        )
-                    ]
-                )
+                            on_click=lambda e: self.on_logout(),  # Llamamos a la función
+                        ),
+                    ],
+                ),
             )
         )
 

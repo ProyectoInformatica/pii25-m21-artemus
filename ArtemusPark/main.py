@@ -47,24 +47,34 @@ async def main(page: ft.Page):
             # Modelo: value (int), status (str), timestamp (float)
             temp_val = int(random.uniform(20, 32))
             temp_status = "HOT" if temp_val > 30 else "MILD"
-            save_temperature_measurement(TemperatureModel(value=temp_val, status=temp_status, timestamp=now))
+            save_temperature_measurement(
+                TemperatureModel(value=temp_val, status=temp_status, timestamp=now)
+            )
 
             # 2. Humedad
             # Modelo: value (int), status (str), timestamp
             hum_val = int(random.uniform(30, 60))
-            save_humidity_measurement(HumidityModel(value=hum_val, status="NORMAL", timestamp=now))
+            save_humidity_measurement(
+                HumidityModel(value=hum_val, status="NORMAL", timestamp=now)
+            )
 
             # 3. Viento
             # Modelo: speed (int), state (str), label (str), timestamp
             wind_speed = int(random.uniform(0, 25))
             wind_state = "WARNING" if wind_speed > 20 else "SAFE"
-            save_wind_measurement(WindModel(speed=wind_speed, state=wind_state, label="Norte", timestamp=now))
+            save_wind_measurement(
+                WindModel(
+                    speed=wind_speed, state=wind_state, label="Norte", timestamp=now
+                )
+            )
 
             # 4. Calidad Aire (Smoke)
             # Modelo: value (int), status (str), timestamp
             smoke_val = int(random.uniform(0, 50))
             smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
-            save_smoke_measurement(SmokeModel(value=smoke_val, status=smoke_status, timestamp=now))
+            save_smoke_measurement(
+                SmokeModel(value=smoke_val, status=smoke_status, timestamp=now)
+            )
 
             # 5. Eventos Aleatorios (Aumentamos probabilidad para ver movimiento)
             if random.random() < 0.4:
@@ -76,17 +86,20 @@ async def main(page: ft.Page):
                     # Damos más peso a entrar (60%) para que el aforo suba poco a poco
                     direction = "IN" if random.random() < 0.6 else "OUT"
 
-                    save_door_event(DoorModel(
-                        is_open=is_open,
-                        name="Torniquete Principal",
-                        direction=direction,  # <--- Pasamos la dirección
-                        timestamp=now
-                    ))
+                    save_door_event(
+                        DoorModel(
+                            is_open=is_open,
+                            name="Torniquete Principal",
+                            direction=direction,  # <--- Pasamos la dirección
+                            timestamp=now,
+                        )
+                    )
                 else:
                     # Luces (Sin cambios)
                     is_on = random.choice([True, False])
-                    save_light_event(LightModel(value=100, status="OK", is_on=is_on, timestamp=now))
-
+                    save_light_event(
+                        LightModel(value=100, status="OK", is_on=is_on, timestamp=now)
+                    )
 
             # ¡Avisar al Dashboard!
             try:
@@ -111,9 +124,13 @@ async def main(page: ft.Page):
         if page_name == "dashboard":
             content_area.content = DashboardPage(user_role=current_role)
         elif page_name == "admin":
-            content_area.content = PlaceholderPage("Administración", "Configuración del sistema")
+            content_area.content = PlaceholderPage(
+                "Administración", "Configuración del sistema"
+            )
         elif page_name == "maintenance":
-            content_area.content = PlaceholderPage("Mantenimiento", "Estado de sensores")
+            content_area.content = PlaceholderPage(
+                "Mantenimiento", "Estado de sensores"
+            )
         elif page_name == "history":
             content_area.content = PlaceholderPage("Historial", "Gráficas detalladas")
 
@@ -141,13 +158,14 @@ async def main(page: ft.Page):
         sidebar = Sidebar(
             on_nav_change=change_view,
             on_logout=logout,  # <--- Pasamos la función nueva
-            user_role=role
+            user_role=role,
         )
 
         page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
         change_view("dashboard")
 
     page.add(LoginPage(on_login_success=login_success))
+
 
 if __name__ == "__main__":
     ft.app(target=main)

@@ -7,12 +7,14 @@ from ArtemusPark.model.Humidity_Model import HumidityModel
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_FILE = BASE_DIR / "json" / "humidity_measurements.json"
 
+
 def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
     return {
         "timestamp": measurement.timestamp,
         "value": measurement.value,
         "status": measurement.status,
     }
+
 
 def save_humidity_measurement(measurement: HumidityModel) -> None:
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -27,6 +29,7 @@ def save_humidity_measurement(measurement: HumidityModel) -> None:
 
     data.append(_serialize(measurement))
     DATA_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
 
 def load_all_humidity_measurements() -> List[Dict[str, Any]]:
     if not DATA_FILE.exists():

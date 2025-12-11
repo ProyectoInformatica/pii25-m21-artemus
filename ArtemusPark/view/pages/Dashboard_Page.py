@@ -40,10 +40,7 @@ class DashboardPage(ft.Container):
 
         self.content = ft.Column(
             scroll=ft.ScrollMode.AUTO,  # Scroll de página principal
-            controls=[
-                self._build_window_bar(),
-                self._build_main_card()
-            ]
+            controls=[self._build_window_bar(), self._build_main_card()],
         )
 
     def did_mount(self):
@@ -74,8 +71,14 @@ class DashboardPage(ft.Container):
     def _build_window_bar(self):
         return ft.Row(
             controls=[
-                ft.Text(f"Bienvenido/a {self.user_role}", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED),
-                ft.Text("Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED),
+                ft.Text(
+                    f"Bienvenido/a {self.user_role}",
+                    weight=ft.FontWeight.BOLD,
+                    color=AppColors.TEXT_MUTED,
+                ),
+                ft.Text(
+                    "Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED
+                ),
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         )
@@ -91,10 +94,22 @@ class DashboardPage(ft.Container):
                 controls=[
                     ft.Row(controls=[self.card_capacity, self.card_alerts]),
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
-                    ft.Text("Sensores", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
-                    ft.Row(spacing=15, controls=[self.card_temp, self.card_hum, self.card_wind, self.card_air]),
+                    ft.Text(
+                        "Sensores",
+                        size=16,
+                        weight=ft.FontWeight.BOLD,
+                        color=AppColors.TEXT_MAIN,
+                    ),
+                    ft.Row(
+                        spacing=15,
+                        controls=[
+                            self.card_temp,
+                            self.card_hum,
+                            self.card_wind,
+                            self.card_air,
+                        ],
+                    ),
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
-
                     # Fila Inferior (Gráfica + Eventos)
                     ft.Row(
                         height=450,  # Altura fija para evitar scroll infinito
@@ -103,18 +118,24 @@ class DashboardPage(ft.Container):
                             ft.Container(width=15),
                             ft.Container(
                                 expand=1,
-                                bgcolor="white", border_radius=12,
-                                border=ft.border.all(1, ft.Colors.GREY_300), padding=15,
+                                bgcolor="white",
+                                border_radius=12,
+                                border=ft.border.all(1, ft.Colors.GREY_300),
+                                padding=15,
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text("Eventos Recientes", weight=ft.FontWeight.BOLD, color="#6b7280"),
+                                        ft.Text(
+                                            "Eventos Recientes",
+                                            weight=ft.FontWeight.BOLD,
+                                            color="#6b7280",
+                                        ),
                                         ft.Divider(height=1, color=AppColors.BG_MAIN),
-                                        self.panel_events  # ListView expandible
+                                        self.panel_events,  # ListView expandible
                                     ]
-                                )
-                            )
-                        ]
-                    )
-                ]
-            )
+                                ),
+                            ),
+                        ],
+                    ),
+                ],
+            ),
         )

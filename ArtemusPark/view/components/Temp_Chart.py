@@ -53,7 +53,12 @@ class TempChart(ft.Container):
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        ft.Text("Resumen (temperatura)", size=14, weight=ft.FontWeight.BOLD, color="#6b7280"),
+                        ft.Text(
+                            "Resumen (temperatura)",
+                            size=14,
+                            weight=ft.FontWeight.BOLD,
+                            color="#6b7280",
+                        ),
                         ft.Text("Última hora", size=12, color="#9ca3af"),
                     ],
                 ),
@@ -71,9 +76,7 @@ class TempChart(ft.Container):
         for p in chart_data:
             new_points.append(
                 ft.LineChartDataPoint(
-                    x=p["x"],
-                    y=p["y"],
-                    tooltip=f"{p['y']}°C\n{p.get('tooltip', '')}"
+                    x=p["x"], y=p["y"], tooltip=f"{p['y']}°C\n{p.get('tooltip', '')}"
                 )
             )
 
