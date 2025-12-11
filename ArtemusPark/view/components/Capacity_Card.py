@@ -46,25 +46,26 @@ class CapacityCard(ft.Container):
                         ),
                     ],
                 ),
-
                 # Dato Central y Detalles
                 ft.Row(
                     vertical_alignment=ft.CrossAxisAlignment.END,  # Alineado abajo queda mejor
                     controls=[
                         self.txt_value,
                         ft.Container(width=10),  # Separador pequeño
-
                         # Columna pequeña para Max y %
                         ft.Column(
                             spacing=0,
                             controls=[
-                                ft.Text(f"Max: {self.max_capacity}", size=12, color=AppColors.TEXT_LIGHT_GREY),
-                                self.txt_percent  # He movido aquí el porcentaje para que se vea
-                            ]
-                        )
+                                ft.Text(
+                                    f"Max: {self.max_capacity}",
+                                    size=12,
+                                    color=AppColors.TEXT_LIGHT_GREY,
+                                ),
+                                self.txt_percent,  # He movido aquí el porcentaje para que se vea
+                            ],
+                        ),
                     ],
                 ),
-
                 # Barra de Progreso
                 ft.Column(
                     spacing=5,
