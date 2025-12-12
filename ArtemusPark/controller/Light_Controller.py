@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 from typing import Callable, Optional
 
-from model.Light_Model import LightModel
+from ArtemusPark.model.Light_Model import LightModel
 
 logging.basicConfig(
     filename="light_controller.log",

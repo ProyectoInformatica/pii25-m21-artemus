@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Any
 
-from repository.Temperature_Repository import (
+from ArtemusPark.repository.Temperature_Repository import (
     load_all_temperature_measurements,
 )
 

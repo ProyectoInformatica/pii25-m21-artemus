@@ -3,7 +3,7 @@ import random
 import time
 from typing import Callable, Optional
 
-from model.Humidity_Model import HumidityModel
+from ArtemusPark.model.Humidity_Model import HumidityModel
 
 logging.basicConfig(
     filename="humidity_controller.log",

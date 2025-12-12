@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from model.Smoke_Model import SmokeModel
+from ArtemusPark.model.Smoke_Model import SmokeModel
 
 
 @dataclass

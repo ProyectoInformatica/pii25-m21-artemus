@@ -9,6 +9,9 @@ from view.pages.Login_Page import LoginPage
 from view.components.Sidebar import Sidebar
 from view.pages.Dashboard_Page import DashboardPage
 from view.pages.Placeholder_Page import PlaceholderPage
+from view.pages.History_Page import HistoryPage
+from view.pages.Maintenance_Page import MaintenancePage
+from view.pages.Admin_Page import AdminPage
 
 # --- IMPORTS DE MODELOS ---
 from model.Temperature_Model import TemperatureModel
@@ -117,26 +120,31 @@ async def main(page: ft.Page):
     # NAVEGACIÓN Y LOGIN
     # ---------------------------------------------------------
     def change_view(page_name):
-        # ... (Tu código de change_view se mantiene igual) ...
         current_role = session.get("role")
 
+        # Lógica de protección de admin
         if page_name == "admin" and current_role != "admin":
+            # Opcional: Mostrar snackbar de error
+            page.snack_bar = ft.SnackBar(ft.Text("Acceso denegado"))
+            page.snack_bar.open = True
+            page.update()
             return
 
         content_area.content = None
 
         if page_name == "dashboard":
             content_area.content = DashboardPage(user_role=current_role)
-        elif page_name == "admin":
-            content_area.content = PlaceholderPage(
-                "Administración", "Configuración del sistema"
-            )
-        elif page_name == "maintenance":
-            content_area.content = PlaceholderPage(
-                "Mantenimiento", "Estado de sensores"
-            )
+
+        # --- NUEVAS RUTAS ---
         elif page_name == "history":
-            content_area.content = PlaceholderPage("Historial", "Gráficas detalladas")
+            content_area.content = HistoryPage()
+
+        elif page_name == "maintenance":
+            content_area.content = MaintenancePage()
+
+        elif page_name == "admin":
+            content_area.content = AdminPage(user_role=current_role)
+        # --------------------
 
         content_area.update()
 

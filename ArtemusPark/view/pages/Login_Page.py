@@ -1,5 +1,5 @@
 import flet as ft
-from config.Colors import AppColors
+from ArtemusPark.config.Colors import AppColors
 
 
 class LoginPage(ft.Container):
@@ -76,7 +76,7 @@ class LoginPage(ft.Container):
                 spacing=10,
                 controls=[
                     ft.Image(
-                        src="/img/logo_pequenio_transparente.png",
+                        src="/img/artemusLogo2Negro.png",
                         width=200,
                         height=200,
                         fit=ft.ImageFit.CONTAIN,

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Any
 
-from repository.Light_Repository import load_all_light_events
+from ArtemusPark.repository.Light_Repository import load_all_light_events
 
 
 @dataclass

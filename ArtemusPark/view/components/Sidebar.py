@@ -1,5 +1,5 @@
 import flet as ft
-from config.Colors import AppColors
+from ArtemusPark.config.Colors import AppColors
 
 
 class Sidebar(ft.Container):
