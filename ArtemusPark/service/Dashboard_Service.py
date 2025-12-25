@@ -17,22 +17,18 @@ from ArtemusPark.repository import (
 
 logger = logging.getLogger(__name__)
 
-
 class DashboardService:
-    # def get_latest_sensor_data(self) -> Dict[str, Any]:
-    #     """Obtiene el último valor de cada sensor para las tarjetas."""
-    #     temps = Temperature_Repository.load_all_temperature_measurements()
-    #     hums = Humidity_Repository.load_all_humidity_measurements()
-    #     winds = Wind_Repository.load_all_wind_measurements()
-    #     smokes = Smoke_Repository.load_all_smoke_measurements()
-    #
-    #     return {
-    #         "temperature": self._get_last_value(temps, "value", 0.0),
-    #         "humidity": self._get_last_value(hums, "value", 0),
-    #         "wind": self._get_last_value(winds, "speed", 0),
-    #         "air_quality": self._get_last_value(smokes, "value", 0),
-    #         "occupancy": 1201  # Valor simulado fijo o aleatorio
-    #     }
+    # Variable de clase (COMPARTIDA por todas las instancias)
+    _catastrophe_active = False
+
+    # --- NUEVOS MÉTODOS PARA GESTIONAR LA ALERTA ---
+    def set_catastrophe_mode(self, active: bool):
+        """Activa o desactiva la alarma globalmente"""
+        DashboardService._catastrophe_active = active
+
+    def is_catastrophe_mode(self) -> bool:
+        """Consulta si la alarma está activa"""
+        return DashboardService._catastrophe_active
     def get_sensors_health_status(self) -> List[Dict[str, Any]]:
         """
         Verifica si los sensores están "vivos" basándose en la última lectura.
