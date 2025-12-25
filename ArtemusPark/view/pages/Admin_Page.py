@@ -10,7 +10,7 @@ from ArtemusPark.service.Dashboard_Service import DashboardService
 from ArtemusPark.repository import (
     Light_Repository,
     Temperature_Repository,
-    Door_Repository
+    Door_Repository,
 )
 
 
@@ -25,7 +25,9 @@ class AdminPage(ft.Container):
 
         # --- SEGURIDAD ---
         if user_role != "admin":
-            self.content = ft.Center(ft.Text("Acceso Restringido", size=30, color=ft.Colors.BLACK))
+            self.content = ft.Center(
+                ft.Text("Acceso Restringido", size=30, color=ft.Colors.BLACK)
+            )
             return
 
         # --- ESTADO INTERNO PARA LA GRÁFICA ---
@@ -50,7 +52,7 @@ class AdminPage(ft.Container):
                 padding=20,
             ),
             width=400,
-            on_click=self._trigger_catastrophe
+            on_click=self._trigger_catastrophe,
         )
 
         # Textos
@@ -58,12 +60,10 @@ class AdminPage(ft.Container):
             "Iniciando...",
             size=40,
             weight=ft.FontWeight.BOLD,
-            color=ft.Colors.BLUE_GREY_800
+            color=ft.Colors.BLUE_GREY_800,
         )
         self.txt_energy_detail = ft.Text(
-            "Sincronizando con sensores...",
-            size=12,
-            color=ft.Colors.GREY
+            "Sincronizando con sensores...", size=12, color=ft.Colors.GREY
         )
 
         # GRÁFICA EN TIEMPO REAL
@@ -106,56 +106,86 @@ class AdminPage(ft.Container):
         self.content = ft.ListView(
             spacing=20,
             controls=[
-                ft.Text("Panel de Administración", size=24, weight="bold", color=ft.Colors.BLACK),
-
+                ft.Text(
+                    "Panel de Administración",
+                    size=24,
+                    weight="bold",
+                    color=ft.Colors.BLACK,
+                ),
                 # SECCIÓN 1: PERFIL
                 self._build_section_container(
                     "Perfil de Administrador",
-                    ft.Row([
-                        ft.CircleAvatar(
-                            foreground_image_src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff",
-                            radius=30
-                        ),
-                        ft.Column([
-                            ft.Text("Super Admin", weight="bold", size=16, color=ft.Colors.BLACK),
-                            ft.Text("admin@artemus.park", color=ft.Colors.GREY_700, size=12)
-                        ])
-                    ])
+                    ft.Row(
+                        [
+                            ft.CircleAvatar(
+                                foreground_image_src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff",
+                                radius=30,
+                            ),
+                            ft.Column(
+                                [
+                                    ft.Text(
+                                        "Super Admin",
+                                        weight="bold",
+                                        size=16,
+                                        color=ft.Colors.BLACK,
+                                    ),
+                                    ft.Text(
+                                        "admin@artemus.park",
+                                        color=ft.Colors.GREY_700,
+                                        size=12,
+                                    ),
+                                ]
+                            ),
+                        ]
+                    ),
                 ),
-
                 # SECCIÓN 2: CONTROL DE EMERGENCIA
                 self._build_section_container(
                     "Control de Emergencia",
                     ft.Column(
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         controls=[
-                            ft.Text("Zona de peligro. Pulse solo en caso de emergencia real.", color=ft.Colors.RED,
-                                    size=12),
+                            ft.Text(
+                                "Zona de peligro. Pulse solo en caso de emergencia real.",
+                                color=ft.Colors.RED,
+                                size=12,
+                            ),
                             ft.Container(height=10),
-                            self.btn_catastrophe
-                        ]
-                    )
+                            self.btn_catastrophe,
+                        ],
+                    ),
                 ),
-
                 # SECCIÓN 3: MONITOR ENERGÉTICO
                 self._build_section_container(
                     "Monitor de Consumo Eléctrico (Tiempo Real)",
                     ft.Container(
                         height=350,  # Un poco más alto para que quepa la hora
-                        content=ft.Column([
-                            ft.Row([
-                                ft.Icon(ft.Icons.ELECTRIC_BOLT, color=ft.Colors.AMBER, size=30),
-                                ft.Column([
-                                    self.txt_energy_value,
-                                    self.txt_energy_detail
-                                ], spacing=0)
-                            ], alignment=ft.MainAxisAlignment.CENTER),
-                            ft.Divider(color="transparent"),
-                            self.chart
-                        ])
-                    )
+                        content=ft.Column(
+                            [
+                                ft.Row(
+                                    [
+                                        ft.Icon(
+                                            ft.Icons.ELECTRIC_BOLT,
+                                            color=ft.Colors.AMBER,
+                                            size=30,
+                                        ),
+                                        ft.Column(
+                                            [
+                                                self.txt_energy_value,
+                                                self.txt_energy_detail,
+                                            ],
+                                            spacing=0,
+                                        ),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                ),
+                                ft.Divider(color="transparent"),
+                                self.chart,
+                            ]
+                        ),
+                    ),
                 ),
-            ]
+            ],
         )
 
     # --- CICLO DE VIDA ---
@@ -176,7 +206,11 @@ class AdminPage(ft.Container):
         lights = Light_Repository.load_all_light_events()
         if lights:
             last_light = lights[-1]
-            is_on = last_light.get("is_on") if isinstance(last_light, dict) else getattr(last_light, "is_on", False)
+            is_on = (
+                last_light.get("is_on")
+                if isinstance(last_light, dict)
+                else getattr(last_light, "is_on", False)
+            )
             if is_on:
                 base_load += 150.0
                 reasons.append("Luces ON")
@@ -185,7 +219,11 @@ class AdminPage(ft.Container):
         temps = Temperature_Repository.load_all_temperature_measurements()
         if temps:
             last_temp = temps[-1]
-            val = last_temp.get("value") if isinstance(last_temp, dict) else getattr(last_temp, "value", 22)
+            val = (
+                last_temp.get("value")
+                if isinstance(last_temp, dict)
+                else getattr(last_temp, "value", 22)
+            )
             if val > 28:
                 base_load += 200.0
                 reasons.append(f"AC Máximo ({val}ºC)")
@@ -200,7 +238,11 @@ class AdminPage(ft.Container):
         doors = Door_Repository.load_all_door_events()
         if doors:
             last_door = doors[-1]
-            ts = last_door.get("timestamp") if isinstance(last_door, dict) else getattr(last_door, "timestamp", 0)
+            ts = (
+                last_door.get("timestamp")
+                if isinstance(last_door, dict)
+                else getattr(last_door, "timestamp", 0)
+            )
             if (time.time() - ts) < 5:
                 base_load += 80.0
                 reasons.append("Motor Puerta")
@@ -217,7 +259,11 @@ class AdminPage(ft.Container):
 
             # 2. Actualizar Textos
             self.txt_energy_value.value = f"{current_kw:.1f} kW"
-            self.txt_energy_detail.value = load_data["details"] if load_data["details"] else "Consumo Base (Standby)"
+            self.txt_energy_detail.value = (
+                load_data["details"]
+                if load_data["details"]
+                else "Consumo Base (Standby)"
+            )
 
             # 3. ACTUALIZAR DATOS DE LA GRÁFICA (Desplazamiento)
 
@@ -238,7 +284,12 @@ class AdminPage(ft.Container):
                 new_labels.append(
                     ft.ChartAxisLabel(
                         value=i,
-                        label=ft.Text(self.time_labels[i], size=10, weight=ft.FontWeight.BOLD, color=ft.Colors.GREY)
+                        label=ft.Text(
+                            self.time_labels[i],
+                            size=10,
+                            weight=ft.FontWeight.BOLD,
+                            color=ft.Colors.GREY,
+                        ),
                     )
                 )
             self.chart.bottom_axis.labels = new_labels
@@ -246,7 +297,9 @@ class AdminPage(ft.Container):
             # Color alerta
             color = ft.Colors.RED if current_kw > 500 else ft.Colors.BLUE
             self.chart.data_series[0].color = color
-            self.chart.data_series[0].below_line_bgcolor = ft.Colors.with_opacity(0.2, color)
+            self.chart.data_series[0].below_line_bgcolor = ft.Colors.with_opacity(
+                0.2, color
+            )
 
             # 5. Refrescar UI
             self.chart.update()
@@ -296,9 +349,11 @@ class AdminPage(ft.Container):
             padding=20,
             border_radius=12,
             border=ft.border.all(1, ft.Colors.GREY_200),
-            content=ft.Column([
-                ft.Text(title, weight="bold", size=16, color=ft.Colors.BLACK),
-                ft.Divider(height=20, color="transparent"),
-                content_control
-            ])
+            content=ft.Column(
+                [
+                    ft.Text(title, weight="bold", size=16, color=ft.Colors.BLACK),
+                    ft.Divider(height=20, color="transparent"),
+                    content_control,
+                ]
+            ),
         )

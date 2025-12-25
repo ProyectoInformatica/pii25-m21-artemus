@@ -17,6 +17,7 @@ from ArtemusPark.repository import (
 
 logger = logging.getLogger(__name__)
 
+
 class DashboardService:
     # Variable de clase (COMPARTIDA por todas las instancias)
     _catastrophe_active = False
@@ -29,6 +30,7 @@ class DashboardService:
     def is_catastrophe_mode(self) -> bool:
         """Consulta si la alarma está activa"""
         return DashboardService._catastrophe_active
+
     def get_sensors_health_status(self) -> List[Dict[str, Any]]:
         """
         Verifica si los sensores están "vivos" basándose en la última lectura.

@@ -17,23 +17,32 @@ class HistoryPage(ft.Container):
         header = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                ft.Row([
-                    ft.Text("Historial de Eventos Reales", size=24, weight="bold", color=ft.Colors.BLACK),
-                    # Chip indicador de "En vivo"
-                    ft.Container(
-                        content=ft.Text("LIVE", size=10, color=ft.Colors.WHITE, weight="bold"),
-                        bgcolor=ft.Colors.RED_400,
-                        padding=ft.padding.symmetric(horizontal=6, vertical=2),
-                        border_radius=4,
-                        margin=ft.margin.only(left=10)
-                    )
-                ]),
+                ft.Row(
+                    [
+                        ft.Text(
+                            "Historial de Eventos Reales",
+                            size=24,
+                            weight="bold",
+                            color=ft.Colors.BLACK,
+                        ),
+                        # Chip indicador de "En vivo"
+                        ft.Container(
+                            content=ft.Text(
+                                "LIVE", size=10, color=ft.Colors.WHITE, weight="bold"
+                            ),
+                            bgcolor=ft.Colors.RED_400,
+                            padding=ft.padding.symmetric(horizontal=6, vertical=2),
+                            border_radius=4,
+                            margin=ft.margin.only(left=10),
+                        ),
+                    ]
+                ),
                 ft.OutlinedButton(
                     "Exportar CSV",
                     icon=ft.Icons.DOWNLOAD,
-                    style=ft.ButtonStyle(color=ft.Colors.BLUE)
-                )
-            ]
+                    style=ft.ButtonStyle(color=ft.Colors.BLUE),
+                ),
+            ],
         )
 
         # --- TABLA DE DATOS ---
@@ -45,13 +54,19 @@ class HistoryPage(ft.Container):
             heading_row_color=ft.Colors.GREY_100,
             # Encabezados en negro
             columns=[
-                ft.DataColumn(ft.Text("Fecha/Hora", color=ft.Colors.BLACK, weight="bold")),
+                ft.DataColumn(
+                    ft.Text("Fecha/Hora", color=ft.Colors.BLACK, weight="bold")
+                ),
                 ft.DataColumn(ft.Text("Tipo", color=ft.Colors.BLACK, weight="bold")),
-                ft.DataColumn(ft.Text("Ubicación", color=ft.Colors.BLACK, weight="bold")),
-                ft.DataColumn(ft.Text("Valor/Detalle", color=ft.Colors.BLACK, weight="bold")),
+                ft.DataColumn(
+                    ft.Text("Ubicación", color=ft.Colors.BLACK, weight="bold")
+                ),
+                ft.DataColumn(
+                    ft.Text("Valor/Detalle", color=ft.Colors.BLACK, weight="bold")
+                ),
                 ft.DataColumn(ft.Text("Estado", color=ft.Colors.BLACK, weight="bold")),
             ],
-            rows=[]  # Se llenará dinámicamente
+            rows=[],  # Se llenará dinámicamente
         )
 
         self.content = ft.Column(
@@ -64,9 +79,12 @@ class HistoryPage(ft.Container):
                     padding=10,
                     bgcolor=ft.Colors.WHITE,
                     border_radius=12,
-                    shadow=ft.BoxShadow(blur_radius=5, color=ft.Colors.with_opacity(0.05, ft.Colors.BLACK))
-                )
-            ]
+                    shadow=ft.BoxShadow(
+                        blur_radius=5,
+                        color=ft.Colors.with_opacity(0.05, ft.Colors.BLACK),
+                    ),
+                ),
+            ],
         )
 
     # --- LÓGICA DE ACTUALIZACIÓN AUTOMÁTICA ---
@@ -101,7 +119,7 @@ class HistoryPage(ft.Container):
                 log["type"],
                 log["location"],
                 str(log["detail"]),
-                log["status"]
+                log["status"],
             )
             self.data_table.rows.append(row)
 
@@ -114,7 +132,15 @@ class HistoryPage(ft.Container):
         if status_upper in ["ALERTA", "WARNING", "HOT", "OFFLINE", "CERRADA"]:
             color_bg = ft.Colors.RED_50
             color_txt = ft.Colors.RED
-        elif status_upper in ["NORMAL", "SAFE", "CLEAR", "SUCCESS", "OK", "ON", "ABIERTA"]:
+        elif status_upper in [
+            "NORMAL",
+            "SAFE",
+            "CLEAR",
+            "SUCCESS",
+            "OK",
+            "ON",
+            "ABIERTA",
+        ]:
             color_bg = ft.Colors.GREEN_50
             color_txt = ft.Colors.GREEN
         else:
@@ -124,18 +150,24 @@ class HistoryPage(ft.Container):
         return ft.DataRow(
             cells=[
                 ft.DataCell(ft.Text(time, size=12, color=ft.Colors.BLACK)),
-                ft.DataCell(ft.Row([
-                    ft.Icon(ft.Icons.CIRCLE, size=8, color=color_txt),
-                    ft.Text(type_e, color=ft.Colors.BLACK)
-                ])),
+                ft.DataCell(
+                    ft.Row(
+                        [
+                            ft.Icon(ft.Icons.CIRCLE, size=8, color=color_txt),
+                            ft.Text(type_e, color=ft.Colors.BLACK),
+                        ]
+                    )
+                ),
                 ft.DataCell(ft.Text(loc, color=ft.Colors.BLACK)),
                 ft.DataCell(ft.Text(detail, color=ft.Colors.BLACK)),
                 ft.DataCell(
                     ft.Container(
-                        content=ft.Text(status, size=10, color=color_txt, weight="bold"),
+                        content=ft.Text(
+                            status, size=10, color=color_txt, weight="bold"
+                        ),
                         bgcolor=color_bg,
                         padding=ft.padding.symmetric(horizontal=8, vertical=4),
-                        border_radius=10
+                        border_radius=10,
                     )
                 ),
             ]

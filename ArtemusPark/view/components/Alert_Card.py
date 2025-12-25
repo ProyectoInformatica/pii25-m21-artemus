@@ -2,6 +2,7 @@ import flet as ft
 from datetime import datetime
 from ArtemusPark.config.Colors import AppColors
 
+
 class AlertCard(ft.Container):
     def __init__(self):
         super().__init__()
@@ -12,17 +13,17 @@ class AlertCard(ft.Container):
 
         # Icono y Texto por defecto
         self.icon_alert = ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.GREEN, size=40)
-        self.title_alert = ft.Text("Sistema Normal", size=16, weight="bold", color=AppColors.TEXT_MAIN)
-        self.desc_alert = ft.Text("No hay incidencias activas.", size=12, color=AppColors.TEXT_MUTED)
+        self.title_alert = ft.Text(
+            "Sistema Normal", size=16, weight="bold", color=AppColors.TEXT_MAIN
+        )
+        self.desc_alert = ft.Text(
+            "No hay incidencias activas.", size=12, color=AppColors.TEXT_MUTED
+        )
 
         self.content = ft.Column(
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[
-                self.icon_alert,
-                self.title_alert,
-                self.desc_alert
-            ]
+            controls=[self.icon_alert, self.title_alert, self.desc_alert],
         )
 
     def show_alert(self, title, description, is_critical=False):
