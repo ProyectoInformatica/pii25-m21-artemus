@@ -19,7 +19,7 @@ class MaintenancePage(ft.Container):
             child_aspect_ratio=1.2,
             spacing=20,
             run_spacing=20,
-            controls=[]  # Se llenará dinámicamente
+            controls=[],  # Se llenará dinámicamente
         )
 
         self.content = ft.Column(
@@ -42,12 +42,12 @@ class MaintenancePage(ft.Container):
                         ft.IconButton(
                             icon=ft.Icons.REFRESH,
                             icon_color=ft.Colors.BLUE,
-                            on_click=lambda e: self.update_data()
-                        )
-                    ]
+                            on_click=lambda e: self.update_data(),
+                        ),
+                    ],
                 ),
                 ft.Divider(height=20, color="transparent"),
-                self.grid_devices
+                self.grid_devices,
             ]
         )
 
@@ -77,7 +77,7 @@ class MaintenancePage(ft.Container):
                 status_text=device["status"],
                 icon=device["icon"],
                 is_online=device["is_online"],
-                last_seen=device["last_seen"]
+                last_seen=device["last_seen"],
             )
             self.grid_devices.controls.append(card)
 
@@ -101,8 +101,7 @@ class MaintenancePage(ft.Container):
             # Borde sutil del color del estado
             border=ft.border.all(1, border_color),
             shadow=ft.BoxShadow(
-                blur_radius=5,
-                color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
+                blur_radius=5, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
             ),
             content=ft.Column(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -121,7 +120,7 @@ class MaintenancePage(ft.Container):
                             ft.Icon(
                                 ft.Icons.FIBER_MANUAL_RECORD,
                                 color=status_color,
-                                size=20
+                                size=20,
                             ),
                         ],
                     ),
@@ -129,8 +128,12 @@ class MaintenancePage(ft.Container):
                     ft.Column(
                         spacing=2,
                         controls=[
-                            ft.Text(name, weight="bold", size=16, color=ft.Colors.BLACK),
-                            ft.Text(status_text, color=status_color, weight="bold", size=12),
+                            ft.Text(
+                                name, weight="bold", size=16, color=ft.Colors.BLACK
+                            ),
+                            ft.Text(
+                                status_text, color=status_color, weight="bold", size=12
+                            ),
                         ],
                     ),
                     # Pie de tarjeta: Última conexión
@@ -139,11 +142,17 @@ class MaintenancePage(ft.Container):
                         padding=ft.padding.only(top=10),
                         content=ft.Row(
                             controls=[
-                                ft.Icon(ft.Icons.ACCESS_TIME, size=12, color=ft.Colors.GREY),
-                                ft.Text(f"Último dato: {last_seen}", size=10, color=ft.Colors.GREY_700)
+                                ft.Icon(
+                                    ft.Icons.ACCESS_TIME, size=12, color=ft.Colors.GREY
+                                ),
+                                ft.Text(
+                                    f"Último dato: {last_seen}",
+                                    size=10,
+                                    color=ft.Colors.GREY_700,
+                                ),
                             ]
-                        )
-                    )
+                        ),
+                    ),
                 ],
             ),
         )
