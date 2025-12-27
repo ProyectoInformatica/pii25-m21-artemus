@@ -39,7 +39,7 @@ class DashboardPage(ft.Container):
         # Eventos
         self.panel_events = EventsPanel(self.service.get_recent_events())
 
-        # Guardamos referencia al contenedor principal para cambiar su color
+        # Guardamos referencia al contenedor para cambiarle el color luego
         self.main_card_container = self._build_main_card()
 
         self.content = ft.Column(
@@ -51,11 +51,11 @@ class DashboardPage(ft.Container):
         )
 
     def did_mount(self):
-        # 1. Suscribirse al PubSub
+        # 1. Suscribirse
         self.page.pubsub.subscribe(self._on_message)
 
-        # 2. COMPROBAR ESTADO AL NACER
-        # Si venimos de Admin y pulsaste el botón, el servicio lo recuerda.
+        # 2. Comprobar memoria al nacer
+        # Si vienes de Admin y la alarma sigue puesta, ponte rojo inmediatamente.
         if self.service.is_catastrophe_mode():
             self._activate_catastrophe_protocol()
 
@@ -63,12 +63,11 @@ class DashboardPage(ft.Container):
         self.page.pubsub.unsubscribe_all()
 
     def _on_message(self, message):
-        """Manejo completo de mensajes sin 'pass'"""
+        """Gestor de mensajes centralizado"""
 
-        # --- CASO 1: RECIBIMOS ORDEN DE REFRESCO (Cada 3 seg) ---
+        # CASO 1: Refresco habitual (cada 3s)
         if message == "refresh_dashboard":
-
-            # A. Siempre actualizamos los datos numéricos (es vital verlos en emergencia)
+            # Actualizamos datos numéricos siempre
             data = self.service.get_latest_sensor_data()
             if data:
                 self.card_temp.update_value(data.get("temperature", 0))
@@ -77,50 +76,49 @@ class DashboardPage(ft.Container):
                 self.card_air.update_value(data.get("air_quality", 0))
                 self.card_capacity.update_occupancy(data.get("occupancy", 0))
 
-            # B. Actualizamos gráficas y tablas
             chart_data = self.service.get_temp_chart_data()
             self.chart_component.update_data(chart_data)
 
             new_events = self.service.get_recent_events()
             self.panel_events.update_events(new_events)
 
-            # C. CONTROL DE LA TARJETA DE ALERTAS
-            # Solo si NO estamos en catástrofe, dejamos que el sistema muestre alertas normales.
-            # Si estamos en catástrofe, BLOQUEAMOS cualquier otro mensaje para que se quede en rojo.
+            # Si NO hay catástrofe, mostramos estado normal en la tarjeta de alertas
             if not self.service.is_catastrophe_mode():
-                # Aquí podrías poner lógica de alertas normales de sensores
-                # Por ahora, restauramos el estado "Normal" si no hay emergencia
-                self.card_alerts.show_alert(
-                    "Sistema Normal",
-                    "No hay incidencias activas.",
-                    is_critical=False
-                )
-                # Restauramos colores de fondo por si acaso
-                self.bgcolor = AppColors.BG_MAIN
-                self.main_card_container.bgcolor = AppColors.GLASS_WHITE
-                self.update()
+                # Opcional: Podrías poner lógica de alertas de sensores aquí
+                pass
 
-        # --- CASO 2: RECIBIMOS LA ALERTA DE CATÁSTROFE ---
+        # CASO 2: ¡ACTIVAR EMERGENCIA!
         elif message == "catastrophe_mode":
             self._activate_catastrophe_protocol()
 
+        # CASO 3: ¡DESACTIVAR EMERGENCIA! (Esto es lo que te faltaba)
+        elif message == "normal_mode":
+            self._deactivate_catastrophe_protocol()
+
     def _activate_catastrophe_protocol(self):
-        """Pone toda la interfaz en modo emergencia"""
-
-        # 1. Fondo Rojo Sangre
+        """Pone todo ROJO"""
         self.bgcolor = ft.Colors.RED_900
-
-        # 2. Fondo de tarjetas Rojo Claro (para leer bien el texto)
         self.main_card_container.bgcolor = ft.Colors.RED_50
 
-        # 3. Tarjeta de Alerta en modo CRÍTICO
         if self.card_alerts:
             self.card_alerts.show_alert(
-                title="PROTOCOLO DE EMERGENCIA",
-                description="¡CATÁSTROFE DETECTADA! EVACUACIÓN INMEDIATA.",
+                "PROTOCOLO DE EMERGENCIA",
+                "¡EVACUACIÓN! Siga las luces de emergencia.",
                 is_critical=True
             )
+        self.update()
 
+    def _deactivate_catastrophe_protocol(self):
+        """Pone todo VERDE/AZUL (Normal)"""
+        self.bgcolor = AppColors.BG_MAIN
+        self.main_card_container.bgcolor = AppColors.GLASS_WHITE
+
+        if self.card_alerts:
+            self.card_alerts.show_alert(
+                "Sistema Normal",
+                "El protocolo ha sido desactivado.",
+                is_critical=False
+            )
         self.update()
 
     def _build_window_bar(self):
@@ -135,7 +133,7 @@ class DashboardPage(ft.Container):
     def _build_main_card(self):
         return ft.Container(
             expand=True,
-            bgcolor=AppColors.GLASS_WHITE,
+            bgcolor=AppColors.GLASS_WHITE,  # Color por defecto
             border_radius=12,
             padding=20,
             content=ft.Column(
