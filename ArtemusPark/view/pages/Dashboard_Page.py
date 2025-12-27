@@ -44,10 +44,7 @@ class DashboardPage(ft.Container):
 
         self.content = ft.Column(
             scroll=ft.ScrollMode.AUTO,
-            controls=[
-                self._build_window_bar(),
-                self.main_card_container
-            ],
+            controls=[self._build_window_bar(), self.main_card_container],
         )
 
     def did_mount(self):
@@ -104,7 +101,7 @@ class DashboardPage(ft.Container):
             self.card_alerts.show_alert(
                 "PROTOCOLO DE EMERGENCIA",
                 "¡EVACUACIÓN! Siga las luces de emergencia.",
-                is_critical=True
+                is_critical=True,
             )
         self.update()
 
@@ -115,17 +112,21 @@ class DashboardPage(ft.Container):
 
         if self.card_alerts:
             self.card_alerts.show_alert(
-                "Sistema Normal",
-                "El protocolo ha sido desactivado.",
-                is_critical=False
+                "Sistema Normal", "El protocolo ha sido desactivado.", is_critical=False
             )
         self.update()
 
     def _build_window_bar(self):
         return ft.Row(
             controls=[
-                ft.Text(f"Bienvenido/a {self.user_role}", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED),
-                ft.Text("Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED),
+                ft.Text(
+                    f"Bienvenido/a {self.user_role}",
+                    weight=ft.FontWeight.BOLD,
+                    color=AppColors.TEXT_MUTED,
+                ),
+                ft.Text(
+                    "Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED
+                ),
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         )
@@ -141,10 +142,20 @@ class DashboardPage(ft.Container):
                 controls=[
                     ft.Row(controls=[self.card_capacity, self.card_alerts]),
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
-                    ft.Text("Sensores", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN),
+                    ft.Text(
+                        "Sensores",
+                        size=16,
+                        weight=ft.FontWeight.BOLD,
+                        color=AppColors.TEXT_MAIN,
+                    ),
                     ft.Row(
                         spacing=15,
-                        controls=[self.card_temp, self.card_hum, self.card_wind, self.card_air],
+                        controls=[
+                            self.card_temp,
+                            self.card_hum,
+                            self.card_wind,
+                            self.card_air,
+                        ],
                     ),
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
                     ft.Row(
@@ -160,7 +171,11 @@ class DashboardPage(ft.Container):
                                 padding=15,
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text("Eventos Recientes", weight=ft.FontWeight.BOLD, color="#6b7280"),
+                                        ft.Text(
+                                            "Eventos Recientes",
+                                            weight=ft.FontWeight.BOLD,
+                                            color="#6b7280",
+                                        ),
                                         ft.Divider(height=1, color=AppColors.BG_MAIN),
                                         self.panel_events,
                                     ]
