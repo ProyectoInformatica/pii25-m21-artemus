@@ -10,7 +10,7 @@ class LoginPage(ft.Container):
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
         self.alignment = ft.alignment.center
-        
+
         self.auth_repo = AuthRepository()
 
         self.tf_username = ft.TextField(
@@ -83,7 +83,7 @@ class LoginPage(ft.Container):
                     ),
                     self.tf_username,
                     self.tf_password,
-                    ft.Container(height=10), # Spacer
+                    ft.Container(height=10),  # Spacer
                     self.btn_enter,
                 ],
             ),
