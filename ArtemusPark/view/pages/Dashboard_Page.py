@@ -97,6 +97,12 @@ class DashboardPage(ft.Container):
         self.bgcolor = ft.Colors.RED_900
         self.main_card_container.bgcolor = ft.Colors.RED_50
 
+        # Cambiar colores de textos para catástrofe
+        self.txt_welcome.color = ft.Colors.WHITE
+        self.txt_dashboard.color = ft.Colors.WHITE
+        self.txt_sensors_title.color = ft.Colors.RED_900
+        self.txt_events_title.color = ft.Colors.RED_900
+
         if self.card_alerts:
             self.card_alerts.show_alert(
                 "PROTOCOLO DE EMERGENCIA",
@@ -110,6 +116,12 @@ class DashboardPage(ft.Container):
         self.bgcolor = AppColors.BG_MAIN
         self.main_card_container.bgcolor = AppColors.GLASS_WHITE
 
+        # Restaurar colores de textos
+        self.txt_welcome.color = AppColors.TEXT_MUTED
+        self.txt_dashboard.color = AppColors.TEXT_MUTED
+        self.txt_sensors_title.color = AppColors.TEXT_MAIN
+        self.txt_events_title.color = "#6b7280"
+
         if self.card_alerts:
             self.card_alerts.show_alert(
                 "Sistema Normal", "El protocolo ha sido desactivado.", is_critical=False
@@ -117,21 +129,35 @@ class DashboardPage(ft.Container):
         self.update()
 
     def _build_window_bar(self):
+        self.txt_welcome = ft.Text(
+            f"Bienvenido/a {self.user_role}",
+            weight=ft.FontWeight.BOLD,
+            color=AppColors.TEXT_MUTED,
+        )
+        self.txt_dashboard = ft.Text(
+            "Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED
+        )
         return ft.Row(
             controls=[
-                ft.Text(
-                    f"Bienvenido/a {self.user_role}",
-                    weight=ft.FontWeight.BOLD,
-                    color=AppColors.TEXT_MUTED,
-                ),
-                ft.Text(
-                    "Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED
-                ),
+                self.txt_welcome,
+                self.txt_dashboard,
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         )
 
     def _build_main_card(self):
+        self.txt_sensors_title = ft.Text(
+            "Sensores",
+            size=16,
+            weight=ft.FontWeight.BOLD,
+            color=AppColors.TEXT_MAIN,
+        )
+        self.txt_events_title = ft.Text(
+            "Eventos Recientes",
+            weight=ft.FontWeight.BOLD,
+            color="#6b7280",
+        )
+
         return ft.Container(
             expand=True,
             bgcolor=AppColors.GLASS_WHITE,  # Color por defecto
@@ -142,12 +168,7 @@ class DashboardPage(ft.Container):
                 controls=[
                     ft.Row(controls=[self.card_capacity, self.card_alerts]),
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
-                    ft.Text(
-                        "Sensores",
-                        size=16,
-                        weight=ft.FontWeight.BOLD,
-                        color=AppColors.TEXT_MAIN,
-                    ),
+                    self.txt_sensors_title,
                     ft.Row(
                         spacing=15,
                         controls=[
@@ -171,11 +192,7 @@ class DashboardPage(ft.Container):
                                 padding=15,
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text(
-                                            "Eventos Recientes",
-                                            weight=ft.FontWeight.BOLD,
-                                            color="#6b7280",
-                                        ),
+                                        self.txt_events_title,
                                         ft.Divider(height=1, color=AppColors.BG_MAIN),
                                         self.panel_events,
                                     ]
