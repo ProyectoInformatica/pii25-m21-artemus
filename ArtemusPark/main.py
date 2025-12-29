@@ -102,7 +102,7 @@ async def main(page: ft.Page):
                 is_on = random.choice([True, False])
                 # Consumo: 0.5W en standby, entre 100W y 250W si están encendidas
                 watts = round(random.uniform(100, 250), 2) if is_on else 0.5
-                
+
                 save_light_event(
                     LightModel(value=watts, status="OK", is_on=is_on, timestamp=now)
                 )
@@ -132,7 +132,9 @@ async def main(page: ft.Page):
         content_area.content = None
 
         if page_name == "dashboard":
-            content_area.content = DashboardPage(user_role=current_role, on_navigate=change_view)
+            content_area.content = DashboardPage(
+                user_role=current_role, on_navigate=change_view
+            )
 
         # --- NUEVAS RUTAS ---
         elif page_name == "history":
