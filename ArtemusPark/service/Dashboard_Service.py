@@ -35,6 +35,7 @@ class DashboardService:
         hums = Humidity_Repository.load_all_humidity_measurements()
         winds = Wind_Repository.load_all_wind_measurements()
         smokes = Smoke_Repository.load_all_smoke_measurements()
+        lights = Light_Repository.load_all_light_events() # Cargar eventos de luz
 
         real_occupancy = self._calculate_occupancy()
 
@@ -44,6 +45,8 @@ class DashboardService:
             "wind": self._get_last_value(winds, "speed", 0),
             "air_quality": self._get_last_value(smokes, "value", 0),
             "occupancy": real_occupancy,
+            "light_is_on": self._get_last_value(lights, "is_on", False), # Estado ON/OFF de la luz
+            "light_consumption": self._get_last_value(lights, "value", 0), # Consumo de la luz
         }
 
     def _calculate_occupancy(self) -> int:
