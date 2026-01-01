@@ -444,15 +444,19 @@ class AdminPage(ft.Container):
 
                 self.page.close(dialog)
                 self._load_users()
-                self.page.snack_bar = ft.SnackBar(
-                    ft.Text("Usuario guardado correctamente")
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text("Usuario guardado correctamente", color="white"),
+                        bgcolor=ft.Colors.GREEN_700,
+                    )
                 )
-                self.page.snack_bar.open = True
-                self.page.update()
             except Exception as ex:
-                self.page.snack_bar = ft.SnackBar(ft.Text(f"Error: {str(ex)}"))
-                self.page.snack_bar.open = True
-                self.page.update()
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text(f"Error: {str(ex)}", color="white"),
+                        bgcolor=ft.Colors.RED_700,
+                    )
+                )
 
         dialog = ft.AlertDialog(
             title=ft.Text("Editar Usuario" if is_edit else "Nuevo Usuario"),
@@ -516,9 +520,14 @@ class AdminPage(ft.Container):
             self.auth_repo.delete_user(username)
             self.page.close(dialog)
             self._load_users()
-            self.page.snack_bar = ft.SnackBar(ft.Text(f"Usuario {username} eliminado"))
-            self.page.snack_bar.open = True
-            self.page.update()
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text(
+                        f"Usuario {username} eliminado", color="white"
+                    ),
+                    bgcolor=ft.Colors.RED_700,
+                )
+            )
 
         dialog = ft.AlertDialog(
             title=ft.Text("Confirmar eliminación"),
@@ -618,6 +627,13 @@ class AdminPage(ft.Container):
             for i, p in enumerate(self.energy_data_points):
                 p.x = i
             self.energy_data_points.append(ft.LineChartDataPoint(19, current_kw))
+            values = [p.y for p in self.energy_data_points]
+            if values:
+                min_val = min(values)
+                max_val = max(values)
+                padding = 50
+                self.chart.min_y = max(0, min_val - padding)
+                self.chart.max_y = max_val + padding
             self.time_labels.pop(0)
             self.time_labels.append(current_time_str)
             new_labels = []

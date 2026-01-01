@@ -26,8 +26,8 @@ class LoginPage(ft.Container):
             cursor_color=AppColors.BG_DARK,
             on_change=self._reset_error_state,
             on_submit=self._handle_submit,
-            height=40, # Añadido
-            content_padding=10 # Añadido
+            height=40,
+            content_padding=10
         )
 
         self.tf_password = ft.TextField(
@@ -44,8 +44,8 @@ class LoginPage(ft.Container):
             cursor_color=AppColors.BG_DARK,
             on_change=self._reset_error_state,
             on_submit=self._handle_submit,
-            height=40, # Añadido
-            content_padding=10 # Añadido
+            height=40,
+            content_padding=10
         )
 
         common_tf_props = {
@@ -59,7 +59,7 @@ class LoginPage(ft.Container):
             "cursor_color": AppColors.BG_DARK,
             "height": 40,
             "content_padding": 10,
-            "visible": False # Por defecto no visible hasta que se active el registro
+            "visible": False
         }
         
         self.tf_full_name = ft.TextField(
@@ -115,7 +115,7 @@ class LoginPage(ft.Container):
                 self.tf_password,
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=10, # Cambiado de 15 a 10
+            spacing=10,
         )
 
         self.input_fields_container = ft.Container(
@@ -131,7 +131,7 @@ class LoginPage(ft.Container):
                 switch_out_curve=ft.AnimationCurve.EASE_OUT,
             ),
         )
-        self.animated_switcher = self.input_fields_container.content # Referencia al AnimatedSwitcher
+        self.animated_switcher = self.input_fields_container.content
 
         self.input_fields_block = ft.Container(
             expand=True,
@@ -140,8 +140,8 @@ class LoginPage(ft.Container):
         )
 
         self.content = ft.Container(
-            width=650, # Ancho fijo para acomodar el registro
-            height=650, # Altura fija para acomodar el registro
+            width=650,
+            height=650,
             padding=40,
             bgcolor=AppColors.BG_CARD,
             border_radius=15,
@@ -180,7 +180,7 @@ class LoginPage(ft.Container):
         for field in fields_to_check:
             if field.border_color == ft.Colors.RED:
                 field.border_color = AppColors.TEXT_LIGHT_GREY
-                if field.page: # Solo actualizar si el control está en la página
+                if field.page:
                     field.update()
 
     def _toggle_mode(self, e):
@@ -251,8 +251,8 @@ class LoginPage(ft.Container):
 
             self.animated_switcher.content = self.login_controls
             
-        self.animated_switcher.update() # Actualizar el AnimatedSwitcher
-        self.content.update() # Actualizar el contenedor principal
+        self.animated_switcher.update()
+        self.content.update()
         self.update()
     def _handle_submit(self, e):
         """Maneja el envío del formulario (login o registro)."""
@@ -269,13 +269,40 @@ class LoginPage(ft.Container):
             phone = self.tf_phone.value
             address = self.tf_address.value
             
-            if not full_name or not dni or not phone or not address:
-                self._show_error("Por favor, completa todos los campos de registro.")
+            if not full_name.strip():
+                self._show_error(
+                    "El nombre completo no puede estar vacío.",
+                    fields_to_highlight=[self.tf_full_name],
+                )
+                return
+            if not dni.strip():
+                self._show_error(
+                    "El DNI no puede estar vacío.",
+                    fields_to_highlight=[self.tf_dni],
+                )
                 return
             if not self._is_valid_dni(dni):
                 self._show_error(
                     "DNI inválido. Debe tener 8 números y letra correcta.",
                     fields_to_highlight=[self.tf_dni],
+                )
+                return
+            if not phone.strip():
+                self._show_error(
+                    "El teléfono no puede estar vacío.",
+                    fields_to_highlight=[self.tf_phone],
+                )
+                return
+            if not phone.strip().isdigit() or len(phone.strip()) != 9:
+                self._show_error(
+                    "Teléfono inválido. Debe contener 9 dígitos numéricos.",
+                    fields_to_highlight=[self.tf_phone],
+                )
+                return
+            if not address.strip():
+                self._show_error(
+                    "La dirección no puede estar vacía.",
+                    fields_to_highlight=[self.tf_address],
                 )
                 return
 
@@ -314,7 +341,7 @@ class LoginPage(ft.Container):
         for field in fields_to_highlight:
             field.border_color = ft.Colors.RED
         
-        self.input_fields_container.update() # Actualizar el contenedor que contiene los campos
+        self.input_fields_container.update()
         
         if self.page:
             self.page.open(

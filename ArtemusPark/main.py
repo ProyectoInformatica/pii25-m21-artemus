@@ -164,7 +164,14 @@ async def main(page: ft.Page):
         )
 
         page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
-        change_view("dashboard")
+        if role == "admin":
+            target_view = "admin"
+        elif role == "maintenance":
+            target_view = "maintenance"
+        else:
+            target_view = "dashboard"
+        sidebar.set_active(target_view)
+        change_view(target_view)
 
     page.add(LoginPage(on_login_success=login_success))
 
