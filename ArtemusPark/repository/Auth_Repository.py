@@ -18,12 +18,19 @@ class AuthRepository:
                 "admin1": {"password": "admin123", "role": "admin"},
                 "admin_super": {"password": "root2025", "role": "admin"},
                 "boss_artemus": {"password": "masterkey", "role": "admin"},
+                "admin_alpha": {"password": "alpha_pass", "role": "admin"},
                 "maint_joe": {"password": "fixitnow", "role": "maintenance"},
                 "tech_sarah": {"password": "cables99", "role": "maintenance"},
                 "eng_mike": {"password": "wrench77", "role": "maintenance"},
                 "client_ana": {"password": "guest001", "role": "user"},
                 "visit_tom": {"password": "parkfun2", "role": "user"},
                 "user_demo": {"password": "testpass", "role": "user"},
+                "user_sofia": {"password": "sofia_pass", "role": "user"},
+                "user_pedro": {"password": "pedro_pass", "role": "user"},
+                "user_maria": {"password": "maria_pass", "role": "user"},
+                "user_luis": {"password": "luis_pass", "role": "user"},
+                "user_laura": {"password": "laura_pass", "role": "user"},
+                "user_carlos": {"password": "carlos_pass", "role": "user"},
             }
             self._save_users(default_users)
 
