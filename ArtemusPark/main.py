@@ -116,9 +116,9 @@ async def main(page: ft.Page):
 
             await asyncio.sleep(3)
 
-    
-    
-    
+    """Iniciar simulación al empezar para tener siempre datos disponibles"""
+    page.run_task(sensor_simulation_loop)
+
     def change_view(page_name, data=None):
         """Cambia la vista actual en el área de contenido principal."""
         current_role = session.get("role")
@@ -163,12 +163,6 @@ async def main(page: ft.Page):
         """Maneja el inicio de sesión exitoso y configura la interfaz principal."""
         session["role"] = role
         page.clean()
-
-        
-        
-        if not hasattr(page, "simulation_started"):
-            page.run_task(sensor_simulation_loop)
-            page.simulation_started = True
 
         
         sidebar = Sidebar(

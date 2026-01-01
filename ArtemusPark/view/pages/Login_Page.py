@@ -24,6 +24,7 @@ class LoginPage(ft.Container):
             ),
             cursor_color=AppColors.BG_DARK,
             on_change=self._reset_error_state,
+            on_submit=self._handle_login,
         )
 
         self.tf_password = ft.TextField(
@@ -39,6 +40,7 @@ class LoginPage(ft.Container):
             ),
             cursor_color=AppColors.BG_DARK,
             on_change=self._reset_error_state,
+            on_submit=self._handle_login,
         )
 
         self.btn_enter = ft.ElevatedButton(

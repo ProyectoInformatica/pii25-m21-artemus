@@ -162,6 +162,7 @@ class DashboardPage(ft.Container):
     def did_mount(self):
         """Suscribe a eventos y verifica estado inicial."""
         self.page.pubsub.subscribe(self._on_message)
+        self._on_message("refresh_dashboard")
 
         
         if self.service.is_catastrophe_mode():
