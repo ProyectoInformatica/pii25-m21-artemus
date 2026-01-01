@@ -59,8 +59,8 @@ class AuthRepository:
         users[username] = {"password": password, "role": role}
         self._save_users(users)
 
-    def update_user(self, username, password=None, role=None):
-        """Actualiza la contraseña o rol de un usuario existente."""
+    def update_user(self, username, password=None, role=None, assigned_sensors=None):
+        """Actualiza la contraseña, rol o sensores asignados de un usuario existente."""
         users = self._load_users()
         if username not in users:
             raise ValueError("El usuario no existe.")
@@ -69,6 +69,8 @@ class AuthRepository:
             users[username]["password"] = password
         if role:
             users[username]["role"] = role
+        if assigned_sensors is not None:
+            users[username]["assigned_sensors"] = assigned_sensors
 
         self._save_users(users)
 

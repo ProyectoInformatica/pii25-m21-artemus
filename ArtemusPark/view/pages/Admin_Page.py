@@ -13,6 +13,7 @@ from ArtemusPark.repository import (
     Door_Repository,
 )
 from ArtemusPark.repository.Auth_Repository import AuthRepository
+from ArtemusPark.repository.Requests_Repository import RequestsRepository
 
 
 class AdminPage(ft.Container):
@@ -24,6 +25,7 @@ class AdminPage(ft.Container):
 
         self.service = DashboardService()
         self.auth_repo = AuthRepository()
+        self.req_repo = RequestsRepository()
         self.simulation_running = False
         self.current_username = current_username
 
@@ -314,13 +316,35 @@ class AdminPage(ft.Container):
             ],
             value=user_data.get("role", "user"),
         )
+        
+        # Sensor assignment section
+        assigned = user_data.get("assigned_sensors", [])
+        sensor_options = ["temperature", "humidity", "wind", "smoke", "light", "door"]
+        sensor_checks = []
+        for s in sensor_options:
+            sensor_checks.append(
+                ft.Checkbox(label=s.capitalize(), value=(s in assigned))
+            )
 
         def save(e):
             try:
+                selected_sensors = [c.label.lower() for c in sensor_checks if c.value]
                 if is_edit:
-                    self.auth_repo.update_user(username, tf_pass.value, dd_role.value)
+                    self.auth_repo.update_user(
+                        username, 
+                        tf_pass.value, 
+                        dd_role.value,
+                        assigned_sensors=selected_sensors
+                    )
                 else:
                     self.auth_repo.add_user(tf_user.value, tf_pass.value, dd_role.value)
+                    # For new user, we might want to update sensors too, but add_user currently doesn't support it.
+                    # We can call update_user immediately after.
+                    self.auth_repo.update_user(
+                        tf_user.value,
+                        assigned_sensors=selected_sensors
+                    )
+                    
                 self.page.close(dialog)
                 self._load_users()
                 self.page.snack_bar = ft.SnackBar(
@@ -335,7 +359,19 @@ class AdminPage(ft.Container):
 
         dialog = ft.AlertDialog(
             title=ft.Text("Editar Usuario" if is_edit else "Nuevo Usuario"),
-            content=ft.Column([tf_user, tf_pass, dd_role], height=200, width=300),
+            content=ft.Column(
+                [
+                    tf_user, 
+                    tf_pass, 
+                    dd_role,
+                    ft.Divider(),
+                    ft.Text("Sensores Asignados:", weight="bold"),
+                    ft.Column(sensor_checks, spacing=0)
+                ], 
+                height=400, 
+                width=300,
+                scroll=ft.ScrollMode.AUTO
+            ),
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
                 ft.ElevatedButton("Guardar", on_click=save),

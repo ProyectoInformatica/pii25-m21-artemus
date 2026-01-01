@@ -36,6 +36,9 @@ class Sidebar(ft.Container):
             controls_list.append(self._make_button("Historial", "🧾", "history"))
 
         if self.user_role in ["admin", "maintenance"]:
+            controls_list.append(self._make_button("Solicitudes", "📩", "requests"))
+
+        if self.user_role in ["admin", "maintenance"]:
             controls_list.append(self._make_button("Mantenimiento", "🛠", "maintenance"))
 
         if self.user_role == "admin":

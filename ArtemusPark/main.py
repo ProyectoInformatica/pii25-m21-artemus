@@ -10,6 +10,7 @@ from view.pages.Dashboard_Page import DashboardPage
 from view.pages.Placeholder_Page import PlaceholderPage
 from view.pages.History_Page import HistoryPage
 from view.pages.Maintenance_Page import MaintenancePage
+from view.pages.Requests_Page import RequestsPage
 from view.pages.Admin_Page import AdminPage
 
 
@@ -127,6 +128,11 @@ async def main(page: ft.Page):
 
         elif page_name == "maintenance":
             content_area.content = MaintenancePage(current_username=current_username)
+
+        elif page_name == "requests":
+            content_area.content = RequestsPage(
+                user_role=current_role, current_username=current_username
+            )
 
         elif page_name == "admin":
             content_area.content = AdminPage(
