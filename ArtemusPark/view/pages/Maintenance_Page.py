@@ -16,13 +16,13 @@ class MaintenancePage(ft.Container):
         self.auth_repo = AuthRepository()
         self.req_repo = RequestsRepository()
 
-        # Obtener sensores asignados al usuario
         self.assigned_sensors = []
+        self.current_role = None
         if self.current_username:
             user_data = self.auth_repo.get_all_users().get(self.current_username, {})
             self.assigned_sensors = user_data.get("assigned_sensors", [])
+            self.current_role = user_data.get("role")
 
-        # Contenedor para "Mis Sensores Asignados"
         self.my_sensors_row = ft.Row(spacing=20, scroll=ft.ScrollMode.AUTO)
         self.my_sensors_container = ft.Column(
             visible=bool(self.assigned_sensors),
@@ -54,14 +54,13 @@ class MaintenancePage(ft.Container):
             controls=[],
         )
         
-        # Boton de solicitud de cambio
         self.btn_request_change = ft.ElevatedButton(
             "Solicitar Cambio de Sensores",
             icon=ft.Icons.EDIT_NOTE,
             bgcolor=ft.Colors.BLUE_GREY_100,
             color=ft.Colors.BLUE_GREY_900,
             on_click=self._open_request_dialog,
-            visible=bool(self.current_username)
+            visible=bool(self.current_username) and self.current_role != "admin"
         )
 
         self.content = ft.Column(
@@ -156,15 +155,12 @@ class MaintenancePage(ft.Container):
         """Consulta el estado de salud y regenera las tarjetas"""
         health_data = self.service.get_sensors_health_status()
 
-        # 1. Actualizar Grid Global
         self.grid_devices.controls.clear()
         
-        # 2. Actualizar Mis Sensores (si existen)
         if self.assigned_sensors:
             self.my_sensors_row.controls.clear()
 
         for device in health_data:
-            # Crear tarjeta
             card = self._build_device_card(
                 name=device["name"],
                 status_text=device["status"],
@@ -173,7 +169,6 @@ class MaintenancePage(ft.Container):
                 last_seen=device["last_seen"],
             )
 
-            # Mapeo corregido para coincidir con DashboardService.get_sensors_health_status
             device_type_map = {
                 "Sensor Temperatura": "temperature",
                 "Sensor Humedad": "humidity",
@@ -185,9 +180,7 @@ class MaintenancePage(ft.Container):
             
             sensor_key = device_type_map.get(device["name"])
             
-            # Agregamos a la seccion personal si coincide
             if sensor_key and sensor_key in self.assigned_sensors:
-                # Clonar la tarjeta o crear una version destacada
                 highlighted_card = self._build_device_card(
                      name=device["name"],
                      status_text=device["status"],
@@ -198,7 +191,6 @@ class MaintenancePage(ft.Container):
                 )
                 self.my_sensors_row.controls.append(highlighted_card)
 
-            # Siempre agregar al grid global
             self.grid_devices.controls.append(card)
 
         self.update()

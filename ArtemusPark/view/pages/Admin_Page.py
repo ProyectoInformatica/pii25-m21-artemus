@@ -272,6 +272,14 @@ class AdminPage(ft.Container):
                             ft.Row(
                                 [
                                     ft.IconButton(
+                                        icon=ft.Icons.INFO_OUTLINE,
+                                        icon_color=ft.Colors.BLUE_GREY,
+                                        tooltip="Ver datos",
+                                        on_click=lambda e, u=username: self._open_user_details_dialog(
+                                            u
+                                        ),
+                                    ),
+                                    ft.IconButton(
                                         icon=ft.Icons.EDIT,
                                         icon_color=ft.Colors.BLUE,
                                         tooltip="Editar",
@@ -289,6 +297,32 @@ class AdminPage(ft.Container):
                 )
             )
         self.users_table.update()
+
+    def _open_user_details_dialog(self, username):
+        users = self.auth_repo.get_all_users()
+        user_data = users.get(username, {})
+        assigned = user_data.get("assigned_sensors", [])
+        assigned_text = ", ".join(assigned) if assigned else "Sin asignaciones"
+
+        dialog = ft.AlertDialog(
+            title=ft.Text(f"Datos de {username}"),
+            content=ft.Column(
+                [
+                    ft.Text(f"Rol: {user_data.get('role', '-') }"),
+                    ft.Text(f"Nombre completo: {user_data.get('full_name', '-') }"),
+                    ft.Text(f"DNI: {user_data.get('dni', '-') }"),
+                    ft.Text(f"Telefono: {user_data.get('phone', '-') }"),
+                    ft.Text(f"Direccion: {user_data.get('address', '-') }"),
+                    ft.Text(f"Sensores asignados: {assigned_text}"),
+                ],
+                width=360,
+                tight=True,
+            ),
+            actions=[
+                ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dialog)),
+            ],
+        )
+        self.page.open(dialog)
 
     def _open_user_dialog(self, username=None):
         users = self.auth_repo.get_all_users()
@@ -317,7 +351,6 @@ class AdminPage(ft.Container):
             value=user_data.get("role", "user"),
         )
         
-        # Sensor assignment section
         assigned = user_data.get("assigned_sensors", [])
         sensor_options = ["temperature", "humidity", "wind", "smoke", "light", "door"]
         sensor_checks = []
@@ -338,8 +371,6 @@ class AdminPage(ft.Container):
                     )
                 else:
                     self.auth_repo.add_user(tf_user.value, tf_pass.value, dd_role.value)
-                    # For new user, we might want to update sensors too, but add_user currently doesn't support it.
-                    # We can call update_user immediately after.
                     self.auth_repo.update_user(
                         tf_user.value,
                         assigned_sensors=selected_sensors
