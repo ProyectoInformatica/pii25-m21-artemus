@@ -13,8 +13,7 @@ class WindRiskResult:
 
 def check_wind_risk(measurement: WindModel) -> WindRiskResult:
     """
-    Compare the current measurement with the risk threshold and
-    return a small result object.
+    Compara la medición actual con el umbral de riesgo.
     """
     speed = measurement.speed
     threshold = RISK_THRESHOLD_KMH

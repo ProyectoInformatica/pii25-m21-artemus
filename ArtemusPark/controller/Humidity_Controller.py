@@ -17,6 +17,7 @@ class HumidityController:
         self.on_new_data = on_new_data
 
     def run(self, name):
+        """Simula el sensor de humedad."""
         while True:
             value = random.randint(0, 100)
 

@@ -10,10 +10,10 @@ class HistoryPage(ft.Container):
         self.padding = 20
         self.bgcolor = AppColors.BG_MAIN
 
-        # Instanciamos el servicio
+        
         self.service = DashboardService()
 
-        # --- TÍTULO ---
+        
         header = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
@@ -25,7 +25,7 @@ class HistoryPage(ft.Container):
                             weight="bold",
                             color=ft.Colors.BLACK,
                         ),
-                        # Chip indicador de "En vivo"
+                        
                         ft.Container(
                             content=ft.Text(
                                 "LIVE", size=10, color=ft.Colors.WHITE, weight="bold"
@@ -45,14 +45,14 @@ class HistoryPage(ft.Container):
             ],
         )
 
-        # --- TABLA DE DATOS ---
+        
         self.data_table = ft.DataTable(
             width=float("inf"),
             bgcolor=ft.Colors.WHITE,
             border_radius=10,
             border=ft.border.all(1, ft.Colors.GREY_200),
             heading_row_color=ft.Colors.GREY_100,
-            # Encabezados en negro
+            
             columns=[
                 ft.DataColumn(
                     ft.Text("Fecha/Hora", color=ft.Colors.BLACK, weight="bold")
@@ -66,7 +66,7 @@ class HistoryPage(ft.Container):
                 ),
                 ft.DataColumn(ft.Text("Estado", color=ft.Colors.BLACK, weight="bold")),
             ],
-            rows=[],  # Se llenará dinámicamente
+            rows=[],  
         )
 
         self.content = ft.Column(
@@ -87,7 +87,7 @@ class HistoryPage(ft.Container):
             ],
         )
 
-    # --- LÓGICA DE ACTUALIZACIÓN AUTOMÁTICA ---
+    
 
     def did_mount(self):
         """1. Se ejecuta al entrar: Nos suscribimos a los avisos."""
@@ -103,16 +103,16 @@ class HistoryPage(ft.Container):
         if message == "refresh_dashboard":
             self.load_data()
 
-    # ------------------------------------------
+    
 
     def load_data(self):
         """Pide el historial al servicio y rellena la tabla"""
-        # Obtenemos todos los logs mezclados y ordenados
+        
         logs = self.service.get_all_history_logs()
 
         self.data_table.rows.clear()
 
-        # Mostramos los últimos 30 para que la app vaya fluida
+        
         for log in logs[:30]:
             row = self._create_row(
                 log["time_str"],
@@ -126,9 +126,10 @@ class HistoryPage(ft.Container):
         self.update()
 
     def _create_row(self, time, type_e, loc, detail, status):
+        """Crea una fila de datos para la tabla."""
         status_upper = str(status).upper()
 
-        # Colores según el estado (Texto negro, badges de color)
+        
         if status_upper in ["ALERTA", "WARNING", "HOT", "OFFLINE", "CERRADA"]:
             color_bg = ft.Colors.RED_50
             color_txt = ft.Colors.RED

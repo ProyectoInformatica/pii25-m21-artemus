@@ -83,13 +83,14 @@ class LoginPage(ft.Container):
                     ),
                     self.tf_username,
                     self.tf_password,
-                    ft.Container(height=10),  # Spacer
+                    ft.Container(height=10),  
                     self.btn_enter,
                 ],
             ),
         )
 
     def _reset_error_state(self, e):
+        """Limpia los estados de error en los campos de texto."""
         if self.tf_username.border_color == ft.Colors.RED:
             self.tf_username.border_color = AppColors.TEXT_LIGHT_GREY
             self.tf_username.update()
@@ -98,6 +99,7 @@ class LoginPage(ft.Container):
             self.tf_password.update()
 
     def _handle_login(self, e):
+        """Valida credenciales y notifica éxito o error."""
         username = self.tf_username.value
         password = self.tf_password.value
 
@@ -114,6 +116,7 @@ class LoginPage(ft.Container):
             self._show_error("Usuario o contraseña incorrectos")
 
     def _show_error(self, message):
+        """Muestra un mensaje de error visual."""
         self.tf_username.border_color = ft.Colors.RED
         self.tf_password.border_color = ft.Colors.RED
         self.tf_username.update()

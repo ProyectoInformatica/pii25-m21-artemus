@@ -3,11 +3,11 @@ from ArtemusPark.config.Colors import AppColors
 
 
 class Sidebar(ft.Container):
-    # 1. AÑADIMOS 'on_logout' AL CONSTRUCTOR
+    
     def __init__(self, on_nav_change, on_logout, user_role="user"):
         super().__init__()
         self.on_nav_change = on_nav_change
-        self.on_logout = on_logout  # Guardamos la función de logout
+        self.on_logout = on_logout  
         self.user_role = user_role
 
         self.width = 260
@@ -18,6 +18,7 @@ class Sidebar(ft.Container):
         self.content = self.content_column
 
     def _build_content(self):
+        """Construye el contenido vertical de la barra lateral."""
         controls_list = [
             ft.Text(
                 "ARTEMUS",
@@ -30,7 +31,7 @@ class Sidebar(ft.Container):
             self._make_button("Dashboard", "📊", "dashboard", active=True),
         ]
 
-        # Lógica de botones según rol (Igual que antes)
+        
         if self.user_role in ["admin", "maintenance"]:
             controls_list.append(self._make_button("Historial", "🧾", "history"))
 
@@ -40,19 +41,19 @@ class Sidebar(ft.Container):
         if self.user_role == "admin":
             controls_list.append(self._make_button("Administración", "⚙️", "admin"))
 
-        # Espaciador para empujar el footer hacia abajo
+        
         controls_list.append(ft.Container(expand=True))
 
-        # --- NUEVO FOOTER CON PERFIL Y LOGOUT ---
+        
         controls_list.append(
             ft.Container(
                 padding=ft.padding.only(top=10),
-                # Una línea sutil para separar
+                
                 border=ft.border.only(top=ft.border.BorderSide(1, "#374151")),
                 content=ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        # Info del Usuario
+                        
                         ft.Column(
                             spacing=2,
                             controls=[
@@ -65,12 +66,12 @@ class Sidebar(ft.Container):
                                 ),
                             ],
                         ),
-                        # Botón de Logout
+                        
                         ft.IconButton(
                             icon=ft.Icons.LOGOUT_ROUNDED,
-                            icon_color="#ef4444",  # Rojo suave
+                            icon_color="#ef4444",  
                             tooltip="Cerrar Sesión",
-                            on_click=lambda e: self.on_logout(),  # Llamamos a la función
+                            on_click=lambda e: self.on_logout(),  
                         ),
                     ],
                 ),
@@ -80,6 +81,7 @@ class Sidebar(ft.Container):
         return ft.Column(controls=controls_list)
 
     def _make_button(self, text, icon, key, active=False):
+        """Crea un botón de navegación personalizado."""
         bg_color = "#111827" if active else "transparent"
         text_color = "white" if active else "#9ca3af"
 
@@ -99,6 +101,7 @@ class Sidebar(ft.Container):
         )
 
     def _handle_click(self, e):
+        """Maneja el evento de clic en un botón de navegación."""
         clicked_key = e.control.data
         self.on_nav_change(clicked_key)
 

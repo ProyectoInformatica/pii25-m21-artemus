@@ -22,13 +22,13 @@ class SmokeController:
         self.on_new_data = on_new_data
 
     def run(self, name: str):
-        # Validation to ensure we can access the running flag
+        """Simula el detector de humo."""
         if not self.controller_ref:
             logging.error("SmokeController needs controller_ref to run.")
             return
 
         while self.controller_ref.running:
-            # Simulate smoke density (0-100)
+            
             value = random.randint(0, 100)
 
             if value > 95:

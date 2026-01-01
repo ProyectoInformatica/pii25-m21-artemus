@@ -10,12 +10,12 @@ class MapCard(ft.Container):
         self.padding = 20
         self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.alignment = ft.alignment.center
-        self.on_sensor_click = on_sensor_click  # Callback para el clic
+        self.on_sensor_click = on_sensor_click  
 
-        # Tamaño fijo para el mapa para asegurar coordenadas correctas
+        
         self.map_size = 400
 
-        # (key, top_pct, left_pct, color, default_label, icon)
+        
         self.sensor_config = [
             ("wind", 0.25, 0.50, ft.Colors.BLUE_GREY, "Viento", ft.Icons.AIR),
             (
@@ -43,6 +43,7 @@ class MapCard(ft.Container):
         self.content = self._build_map()
 
     def _build_map(self):
+        """Construye la capa visual del mapa con marcadores."""
         stack_controls = [
             ft.Image(
                 src="/img/artemus_park_map.png",
@@ -53,14 +54,14 @@ class MapCard(ft.Container):
             )
         ]
 
-        marker_size = 36  # Tamaño del punto interactivo
+        marker_size = 36  
 
         for key, top_pct, left_pct, color, label, icon in self.sensor_config:
 
-            # El icono visual
+            
             icon_control = ft.Icon(icon, color=ft.Colors.WHITE, size=18)
 
-            # El contenedor circular (Marker)
+            
             marker = ft.Container(
                 content=icon_control,
                 bgcolor=color,
@@ -71,15 +72,15 @@ class MapCard(ft.Container):
                 tooltip=f"{label}: --",
                 shadow=ft.BoxShadow(blur_radius=6, color=ft.Colors.BLACK26),
                 on_hover=self._on_marker_hover,
-                on_click=self._on_marker_click,  # Evento de clic activo
-                data=key,  # Guardamos la key para identificarlo
+                on_click=self._on_marker_click,  
+                data=key,  
                 scale=1.0,
                 animate_scale=ft.Animation(300, ft.AnimationCurve.ELASTIC_OUT),
             )
 
             self.markers[key] = marker
 
-            # Posicionamiento absoluto
+            
             left_pos = (self.map_size * left_pct) - (marker_size / 2)
             top_pos = (self.map_size * top_pct) - (marker_size / 2)
 
@@ -103,7 +104,7 @@ class MapCard(ft.Container):
     def _on_marker_click(self, e):
         """Maneja el clic en un marcador y llama al callback principal"""
         if self.on_sensor_click:
-            self.on_sensor_click(e.control.data)  # Pasa la clave del sensor
+            self.on_sensor_click(e.control.data)  
 
     def update_light_marker_status(self, is_on: bool, consumption: float):
         """Actualiza el marcador de luces y el texto de consumo."""
@@ -111,7 +112,7 @@ class MapCard(ft.Container):
         if marker:
             marker_icon_control = (
                 marker.content
-            )  # Esto es el ft.Icon dentro del Container
+            )  
             marker_icon_control.icon = (
                 ft.Icons.LIGHTBULB if is_on else ft.Icons.LIGHTBULB_OUTLINE
             )

@@ -3,7 +3,7 @@ import threading
 import time
 from typing import List, Optional
 
-# --- Imports de Controladores ---
+
 from ArtemusPark.controller.Humidity_Controller import HumidityController
 from ArtemusPark.controller.Temperature_Controller import TemperatureController
 from ArtemusPark.controller.Wind_Controller import WindController
@@ -11,7 +11,7 @@ from ArtemusPark.controller.Door_Controller import DoorController
 from ArtemusPark.controller.Light_Controller import LightController
 from ArtemusPark.controller.Smoke_Controller import SmokeController
 
-# --- Imports de Modelos ---
+
 from ArtemusPark.model.Humidity_Model import HumidityModel
 from ArtemusPark.model.Temperature_Model import TemperatureModel
 from ArtemusPark.model.Wind_Model import WindModel
@@ -19,33 +19,33 @@ from ArtemusPark.model.Door_Model import DoorModel
 from ArtemusPark.model.Light_Model import LightModel
 from ArtemusPark.model.Smoke_Model import SmokeModel
 
-# --- Imports de Repositorios ---
+
 from ArtemusPark.repository.Wind_Repository import save_wind_measurement
 from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
 from ArtemusPark.repository.Temperature_Repository import save_temperature_measurement
 from ArtemusPark.repository.Door_Repository import save_door_event
 from ArtemusPark.repository.Light_Repository import save_light_event
-from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement  # <--- NUEVO
+from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement  
 
-# --- Imports de Servicios ---
+
 from ArtemusPark.service.Wind_Risk_Service import check_wind_risk
-from ArtemusPark.service.Smoke_Risk_Service import check_smoke_risk  # <--- NUEVO
+from ArtemusPark.service.Smoke_Risk_Service import check_smoke_risk  
 
 logger = logging.getLogger(__name__)
 
 
 class SensorController:
-    # Park schedule
+    
     OPEN_HOUR = 9
     CLOSE_HOUR = 18
 
     def __init__(self):
-        # General state
+        
         self.running = False
-        self.park_open = False  # Park closed by default
-        self.simulated_hour = 8  # Initial simulated hour (8:00)
+        self.park_open = False  
+        self.simulated_hour = 8  
 
-        # --- Sensor histories ---
+        
         self.humidity_history: List[HumidityModel] = []
         self.temperature_history: List[TemperatureModel] = []
         self.wind_history: List[WindModel] = []
@@ -53,46 +53,48 @@ class SensorController:
         self.light_history: List[LightModel] = []
         self.smoke_history: List[SmokeModel] = []
 
-        # --- Sensor controllers ---
+        
         self.humidity_controller = HumidityController(on_new_data=self._on_humidity)
         self.temperature_controller = TemperatureController(
             on_new_data=self._on_temperature
         )
         self.wind_controller = WindController(on_new_data=self._on_wind)
 
-        # Smoke Controller (necesita controller_ref para parar bien)
+        
         self.smoke_controller = SmokeController(
             controller_ref=self, on_new_data=self._on_smoke
         )
 
-        # Door Controller (con referencia al controller principal)
+        
         self.door_controller = DoorController(
             controller_ref=self, on_new_data=self._on_door
         )
 
-        # Light Controller (con referencia al controller principal para hora simulada)
+        
         self.light_controller = LightController(
             controller_ref=self, on_new_data=self._on_light
         )
 
-    # ---------- DATA CALLBACKS ---------- #
+    
 
     def _on_humidity(self, data: HumidityModel):
+        """Callback al recibir datos de humedad."""
         self.humidity_history.append(data)
         save_humidity_measurement(data)
 
     def _on_temperature(self, data: TemperatureModel):
+        """Callback al recibir datos de temperatura."""
         self.temperature_history.append(data)
         save_temperature_measurement(data)
 
     def _on_wind(self, data: WindModel):
         """
-        Called automatically by WindController.
+        Callback al recibir datos de viento.
         """
         self.wind_history.append(data)
         save_wind_measurement(data)
 
-        # Usamos el servicio de riesgo de viento
+        
         risk_result = check_wind_risk(data)
         if risk_result.is_risky:
             alert_msg = f"[WIND ALERT] {risk_result.message}"
@@ -109,32 +111,32 @@ class SensorController:
 
     def _on_smoke(self, data: SmokeModel):
         self.smoke_history.append(data)
-        save_smoke_measurement(data)  # <--- Guardamos en JSON
+        save_smoke_measurement(data)  
 
-        # Usamos el servicio de riesgo de humo
+        
         risk_result = check_smoke_risk(data)
 
         if risk_result.is_emergency:
-            # Caso CRITICO (ALARM)
+            
             msg = f"[FIRE EMERGENCY] {risk_result.message}"
             print(msg)
             logger.critical(msg)
 
-            # Lógica de seguridad: Si hay fuego, abrimos el parque para evacuación
+            
             if not self.park_open:
                 print(">>> EMERGENCY PROTOCOL: FORCING GATES OPEN <<<")
                 self.park_open = True
 
         elif risk_result.status == "WARNING":
-            # Caso PRECAUCIÓN
+            
             msg = f"[SMOKE WARNING] {risk_result.message}"
             print(msg)
             logger.warning(msg)
 
-    # ---------- TIME SIMULATION AND PARK STATUS ---------- #
+    
 
     def simulate_time_and_status(self):
-        """Thread that simulates hour and park OPEN/CLOSED status."""
+        """Hilo que simula la hora y el estado de apertura del parque."""
         while self.running:
             is_open_time = self.OPEN_HOUR <= self.simulated_hour < self.CLOSE_HOUR
 
@@ -142,8 +144,8 @@ class SensorController:
                 self.park_open = True
                 print(f"\n--- PARK OPEN at {self.simulated_hour}:00 ---")
             elif not is_open_time and self.park_open:
-                # Solo cerramos si NO hay una emergencia de humo activa (simplificado)
-                # (Para este ejemplo simple, permitimos cerrar, pero en realidad chequearíamos flags de emergencia)
+                
+                
                 self.park_open = False
                 print(f"\n--- PARK CLOSED at {self.simulated_hour}:00 ---")
 
@@ -152,28 +154,29 @@ class SensorController:
                 f"Park {'OPEN' if self.park_open else 'CLOSED'}"
             )
 
-            # Advance simulated hour
+            
             self.simulated_hour += 1
             if self.simulated_hour >= 24:
                 self.simulated_hour = 0
 
             time.sleep(1)
 
-    # ---------- START / STOP SENSORS ---------- #
+    
 
     def start(self):
+        """Inicia los sensores y el reloj del parque."""
         self.running = True
 
-        num_standard_sensors = 5  # Humidity, Temp, Wind, Smoke
-        num_light_sensors = 5  # Light
-        door_sensors = 2  # Doors
+        num_standard_sensors = 5  
+        num_light_sensors = 5  
+        door_sensors = 2  
 
         print("--- Starting Sensors and Park Clock ---")
 
-        # Time + park status thread
+        
         threading.Thread(target=self.simulate_time_and_status, daemon=True).start()
 
-        # 1. Standard Environmental Sensors (Humidity, Temp, Wind, Smoke)
+        
         for i in range(num_standard_sensors):
             sensor_num = i + 1
 
@@ -201,7 +204,7 @@ class SensorController:
                 args=(f"SmokeSens{sensor_num}",),
             ).start()
 
-        # 2. Light sensors
+        
         for i in range(num_light_sensors):
             sensor_num = i + 1
             threading.Thread(
@@ -210,7 +213,7 @@ class SensorController:
                 args=(f"LightSens{sensor_num}",),
             ).start()
 
-        # 3. Door sensors
+        
         for i in range(door_sensors):
             sensor_num = i + 1
             threading.Thread(
@@ -222,12 +225,13 @@ class SensorController:
         print("Sensors are now active.")
 
     def stop(self):
+        """Detiene la simulación."""
         print("\n--- Stop request received. Waiting for threads to finish... ---")
         self.running = False
         time.sleep(6)
         print("Controller and threads stopped.")
 
-    # ---------- QUERY METHODS (for UI / API) ---------- #
+    
 
     def latest_humidity(self) -> Optional[HumidityModel]:
         return self.humidity_history[-1] if self.humidity_history else None

@@ -12,14 +12,13 @@ class DoorStatusResult:
 
 def check_door_status(event: DoorModel, park_open: bool) -> DoorStatusResult:
     """
-    Check if the door state is consistent with park status.
-    Example rule:
-    - If park is CLOSED, any OPEN door is an anomaly.
-    - If park is OPEN, doors can be open or closed (no anomaly here).
+    Verifica si el estado de la puerta es consistente con el estado del parque.
+    Ejemplo:
+    - Si el parque está CERRADO, cualquier puerta ABIERTA es una anomalía.
     """
     is_open = event.is_open
 
-    # Basic rule
+    
     if not park_open and is_open:
         message = (
             f"Door '{event.name}' is OPEN while park is CLOSED → anomaly detected."

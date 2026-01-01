@@ -14,7 +14,7 @@ logging.basicConfig(
 
 class DoorController:
     """
-    Controller: ejecuta la lógica de sensores de puerta.
+    Controlador: ejecuta la lógica de sensores de puerta.
     Usa callbacks tipo on_new_data para entregar DoorModel al SensorController.
     """
 
@@ -23,19 +23,19 @@ class DoorController:
         controller_ref=None,
         on_new_data: Optional[Callable[[DoorModel], None]] = None,
     ):
-        self.controller_ref = controller_ref  # Para leer running y park_open
-        self.on_new_data = on_new_data  # Callback con DoorModel
+        self.controller_ref = controller_ref  
+        self.on_new_data = on_new_data  
 
     def run(self, name: str):
         """Bucle que simula el sensor de puerta."""
 
         while self.controller_ref.running:
-            # Si el parque está cerrado → todas las puertas deben considerarse cerradas
+            
             if not self.controller_ref.park_open:
                 data = DoorModel(is_open=False, name=name)
                 msg = f"[{name}] Park is CLOSED → Door forced CLOSED."
             else:
-                # Parque abierto → lecturas reales simuladas
+                
                 is_open = bool(random.randint(0, 1))
                 data = DoorModel(is_open=is_open, name=name)
                 msg = f"[{name}] Door {'OPEN' if is_open else 'CLOSED'}"

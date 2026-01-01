@@ -12,12 +12,12 @@ class SmokeRiskResult:
 
 def check_smoke_risk(measurement: SmokeModel) -> SmokeRiskResult:
     """
-    Evaluate the smoke measurement to determine immediate risk.
+    Evalúa la medición de humo para determinar riesgo inmediato.
     """
     density = measurement.value
-    status = measurement.status  # "CLEAR", "WARNING", "ALARM"
+    status = measurement.status  
 
-    # Define risk based on the status determined by the controller
+    
     is_emergency = status == "ALARM"
 
     if is_emergency:

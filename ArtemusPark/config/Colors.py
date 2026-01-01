@@ -1,30 +1,31 @@
 class AppColors:
-    # Fondos
-    BG_DARK = "#131921"  # Sidebar fondo
-    BG_DARK_ALT = "#1f2933"  # Sidebar hover / alternativo
-    BG_MAIN = "#e5e7eb"  # Fondo gris de la pantalla principal
-    BG_CARD = "#ffffff"  # Fondo blanco puro
+    """Define la paleta de colores de la aplicación."""
+    
+    BG_DARK = "#131921"  
+    BG_DARK_ALT = "#1f2933"  
+    BG_MAIN = "#e5e7eb"  
+    BG_CARD = "#ffffff"  
 
-    # Transparencias (Flet usa formato #AARRGGBB)
-    GLASS_WHITE = "#e6ffffff"  # Blanco al 90% (para el dashboard)
-    SHADOW = "#140f172a"  # Sombra suave azulada
+    
+    GLASS_WHITE = "#e6ffffff"  
+    SHADOW = "#140f172a"  
     TRANSPARENT = "transparent"
 
-    # Textos
-    TEXT_MAIN = "#111827"  # Texto principal (casi negro)
-    TEXT_MUTED = "#6b7280"  # Texto gris (subtítulos)
-    TEXT_WHITE = "#f9fafb"  # Texto blanco / activo
-    TEXT_LIGHT_GREY = "#d1d5db"  # Texto gris claro (inactivo)
+    
+    TEXT_MAIN = "#111827"  
+    TEXT_MUTED = "#6b7280"  
+    TEXT_WHITE = "#f9fafb"  
+    TEXT_LIGHT_GREY = "#d1d5db"  
 
-    # Acentos y Estados
-    ACCENT = "#2563eb"  # Azul corporativo
-    ACCENT_SOFT = "#dbeafe"  # Azul muy clarito
+    
+    ACCENT = "#2563eb"  
+    ACCENT_SOFT = "#dbeafe"  
 
-    DANGER = "#dc2626"  # Rojo (Alertas)
-    SUCCESS = "#34d399"  # Verde (Semáforo ventana)
-    WARNING = "#fbbf24"  # Amarillo (Semáforo ventana)
-    ERROR_LIGHT = "#f97373"  # Rojo (Semáforo ventana)
+    DANGER = "#dc2626"  
+    SUCCESS = "#34d399"  
+    WARNING = "#fbbf24"  
+    ERROR_LIGHT = "#f97373"  
 
-    # Gráficos
+    
     CHART_LINE = "#2563eb"
-    CHART_FILL = "#1a2563eb"  # Azul con mucha transparencia
+    CHART_FILL = "#1a2563eb"  

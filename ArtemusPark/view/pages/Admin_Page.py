@@ -19,27 +19,27 @@ class AdminPage(ft.Container):
         self.padding = 20
         self.bgcolor = AppColors.BG_MAIN
 
-        # Instancia del servicio
+        
         self.service = DashboardService()
         self.simulation_running = False
 
-        # --- SEGURIDAD ---
+        
         if user_role != "admin":
             self.content = ft.Center(
                 ft.Text("Acceso Restringido", size=30, color=ft.Colors.BLACK)
             )
             return
 
-        # --- DATOS GRÁFICA ---
-        # Inicializamos 20 puntos de datos
+        
+        
         self.energy_data_points = [ft.LineChartDataPoint(i, 50) for i in range(20)]
 
-        # Inicializamos etiquetas de tiempo
+        
         now_str = datetime.now().strftime("%H:%M:%S")
         self.time_labels = [now_str for _ in range(20)]
 
-        # --- BOTÓN DE CATÁSTROFE (INTELIGENTE) ---
-        # Se configurará visualmente en did_mount
+        
+        
         self.btn_catastrophe = ft.ElevatedButton(
             text="CARGANDO ESTADO...",
             icon=ft.Icons.WARNING_AMBER_ROUNDED,
@@ -52,7 +52,7 @@ class AdminPage(ft.Container):
             on_click=self._toggle_catastrophe,
         )
 
-        # Textos Energía
+        
         self.txt_energy_value = ft.Text(
             "Iniciando...",
             size=40,
@@ -63,7 +63,7 @@ class AdminPage(ft.Container):
             "Sincronizando...", size=12, color=ft.Colors.GREY
         )
 
-        # Gráfica Energía
+        
         self.chart = ft.LineChart(
             data_series=[
                 ft.LineChartData(
@@ -94,7 +94,7 @@ class AdminPage(ft.Container):
             expand=True,
         )
 
-        # --- ESTRUCTURA VISUAL ---
+        
         self.content = ft.ListView(
             spacing=20,
             controls=[
@@ -104,7 +104,7 @@ class AdminPage(ft.Container):
                     weight="bold",
                     color=ft.Colors.BLACK,
                 ),
-                # Perfil
+                
                 self._build_section_container(
                     "Perfil de Administrador",
                     ft.Row(
@@ -131,7 +131,7 @@ class AdminPage(ft.Container):
                         ]
                     ),
                 ),
-                # Emergencia
+                
                 self._build_section_container(
                     "Control de Emergencia",
                     ft.Column(
@@ -147,7 +147,7 @@ class AdminPage(ft.Container):
                         ],
                     ),
                 ),
-                # Monitor Energía
+                
                 self._build_section_container(
                     "Monitor de Consumo Eléctrico (Tiempo Real)",
                     ft.Container(
@@ -180,36 +180,39 @@ class AdminPage(ft.Container):
             ],
         )
 
-    # --- CICLO DE VIDA ---
+    
     def did_mount(self):
+        """Ciclo de vida: Inicia simulación y actualiza UI."""
         self.simulation_running = True
 
-        # 1. Configurar botón visualmente según estado guardado en el Servicio
+        
         self._update_button_state()
 
-        # 2. Iniciar gráfica en segundo plano
+        
         threading.Thread(target=self._realtime_energy_loop, daemon=True).start()
 
     def will_unmount(self):
+        """Ciclo de vida: Detiene simulación."""
         self.simulation_running = False
 
-    # --- ACCIÓN DEL BOTÓN (TOGGLE) ---
+    
     def _toggle_catastrophe(self, e):
-        # Leemos estado actual desde la memoria compartida
+        """Alterna el modo de catástrofe globalmente."""
+        
         is_active = self.service.is_catastrophe_mode()
 
         if is_active:
-            # Si estaba activo, lo APAGAMOS
+            
             self.service.set_catastrophe_mode(False)
             print("AdminPage: Enviando señal 'normal_mode'")
             self.page.pubsub.send_all("normal_mode")
         else:
-            # Si estaba apagado, lo ENCENDEMOS
+            
             self.service.set_catastrophe_mode(True)
             print("AdminPage: Enviando señal 'catastrophe_mode'")
             self.page.pubsub.send_all("catastrophe_mode")
 
-        # Actualizamos el botón visualmente
+        
         self._update_button_state()
 
     def _update_button_state(self):
@@ -220,22 +223,22 @@ class AdminPage(ft.Container):
             self.btn_catastrophe.text = "DESACTIVAR PROTOCOLO Y RESTAURAR"
             self.btn_catastrophe.bgcolor = (
                 ft.Colors.GREEN_700
-            )  # Verde para volver a la calma
+            )  
             self.btn_catastrophe.icon = ft.Icons.CHECK_CIRCLE_OUTLINE
         else:
             self.btn_catastrophe.text = "ACTIVAR PROTOCOLO DE CATÁSTROFE"
-            self.btn_catastrophe.bgcolor = ft.Colors.RED_700  # Rojo para peligro
+            self.btn_catastrophe.bgcolor = ft.Colors.RED_700  
             self.btn_catastrophe.icon = ft.Icons.WARNING_AMBER_ROUNDED
 
         self.btn_catastrophe.update()
 
-    # --- LÓGICA DE CONSUMO ---
+    
     def _calculate_sensor_load(self) -> dict:
         """Calcula kW basándose en estado real de sensores"""
         base_load = 50.0
         reasons = []
 
-        # 1. LUCES
+        
         lights = Light_Repository.load_all_light_events()
         if lights:
             last_light = lights[-1]
@@ -248,7 +251,7 @@ class AdminPage(ft.Container):
                 base_load += 150.0
                 reasons.append("Luces ON")
 
-        # 2. CLIMATIZACIÓN
+        
         temps = Temperature_Repository.load_all_temperature_measurements()
         if temps:
             last_temp = temps[-1]
@@ -267,7 +270,7 @@ class AdminPage(ft.Container):
                 base_load += 180.0
                 reasons.append(f"Calefacción ({val}ºC)")
 
-        # 3. MOTORES (Puertas)
+        
         doors = Door_Repository.load_all_door_events()
         if doors:
             last_door = doors[-1]
@@ -285,12 +288,12 @@ class AdminPage(ft.Container):
     def _realtime_energy_loop(self):
         """Bucle que actualiza la gráfica"""
         while self.simulation_running:
-            # 1. Calcular datos
+            
             load_data = self._calculate_sensor_load()
             current_kw = load_data["total"]
             current_time_str = datetime.now().strftime("%H:%M:%S")
 
-            # 2. Actualizar Textos
+            
             self.txt_energy_value.value = f"{current_kw:.1f} kW"
             self.txt_energy_detail.value = (
                 load_data["details"]
@@ -298,17 +301,17 @@ class AdminPage(ft.Container):
                 else "Consumo Base (Standby)"
             )
 
-            # 3. Mover Gráfica
+            
             self.energy_data_points.pop(0)
             for i, p in enumerate(self.energy_data_points):
                 p.x = i
             self.energy_data_points.append(ft.LineChartDataPoint(19, current_kw))
 
-            # 4. Mover Eje X (Tiempo)
+            
             self.time_labels.pop(0)
             self.time_labels.append(current_time_str)
 
-            # Reconstruir etiquetas X (una de cada 4 para que no se monten)
+            
             new_labels = []
             for i in range(0, 20, 4):
                 new_labels.append(
@@ -324,22 +327,23 @@ class AdminPage(ft.Container):
                 )
             self.chart.bottom_axis.labels = new_labels
 
-            # Color alerta en gráfica si el consumo es alto
+            
             color = ft.Colors.RED if current_kw > 500 else ft.Colors.BLUE
             self.chart.data_series[0].color = color
             self.chart.data_series[0].below_line_bgcolor = ft.Colors.with_opacity(
                 0.2, color
             )
 
-            # 5. Refrescar
+            
             self.chart.update()
             self.txt_energy_value.update()
             self.txt_energy_detail.update()
 
-            time.sleep(1)  # Actualizar cada segundo
+            time.sleep(1)  
 
-    # --- HELPERS ---
+    
     def _build_section_container(self, title, content_control):
+        """Helper para crear secciones visuales uniformes."""
         return ft.Container(
             bgcolor=ft.Colors.WHITE,
             padding=20,
