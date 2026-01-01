@@ -83,30 +83,29 @@ async def main(page: ft.Page):
                 SmokeModel(value=smoke_val, status=smoke_status, timestamp=now)
             )
 
-            # 5. Eventos Aleatorios (Aumentamos probabilidad para ver movimiento)
+            # 5. Eventos de Puerta (Aforo)
             if random.random() < 0.4:
-                if random.choice([True, False]):
-                    # --- SIMULACIÓN DE PUERTA (AFORO) ---
-                    is_open = True  # Asumimos que se abre para que pase alguien
-
-                    # Decidimos aleatoriamente si entra o sale
-                    # Damos más peso a entrar (60%) para que el aforo suba poco a poco
-                    direction = "IN" if random.random() < 0.6 else "OUT"
-
-                    save_door_event(
-                        DoorModel(
-                            is_open=is_open,
-                            name="Torniquete Principal",
-                            direction=direction,  # <--- Pasamos la dirección
-                            timestamp=now,
-                        )
+                is_open = True
+                direction = "IN" if random.random() < 0.6 else "OUT"
+                save_door_event(
+                    DoorModel(
+                        is_open=is_open,
+                        name="Torniquete Principal",
+                        direction=direction,
+                        timestamp=now,
                     )
-                else:
-                    # Luces (Sin cambios)
-                    is_on = random.choice([True, False])
-                    save_light_event(
-                        LightModel(value=100, status="OK", is_on=is_on, timestamp=now)
-                    )
+                )
+
+            # 6. LUCES (Muy frecuente y consumo variable)
+            # 90% de probabilidad de cambio en cada ciclo
+            if random.random() < 0.9:
+                is_on = random.choice([True, False])
+                # Consumo: 0.5W en standby, entre 100W y 250W si están encendidas
+                watts = round(random.uniform(100, 250), 2) if is_on else 0.5
+
+                save_light_event(
+                    LightModel(value=watts, status="OK", is_on=is_on, timestamp=now)
+                )
 
             # ¡Avisar al Dashboard!
             try:
@@ -119,7 +118,7 @@ async def main(page: ft.Page):
     # ---------------------------------------------------------
     # NAVEGACIÓN Y LOGIN
     # ---------------------------------------------------------
-    def change_view(page_name):
+    def change_view(page_name, data=None):
         current_role = session.get("role")
 
         # Lógica de protección de admin
@@ -133,7 +132,9 @@ async def main(page: ft.Page):
         content_area.content = None
 
         if page_name == "dashboard":
-            content_area.content = DashboardPage(user_role=current_role)
+            content_area.content = DashboardPage(
+                user_role=current_role, on_navigate=change_view
+            )
 
         # --- NUEVAS RUTAS ---
         elif page_name == "history":
@@ -144,7 +145,6 @@ async def main(page: ft.Page):
 
         elif page_name == "admin":
             content_area.content = AdminPage(user_role=current_role)
-        # --------------------
 
         content_area.update()
 
