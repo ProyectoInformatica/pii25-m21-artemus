@@ -126,7 +126,7 @@ async def main(page: ft.Page):
             content_area.content = HistoryPage()
 
         elif page_name == "maintenance":
-            content_area.content = MaintenancePage()
+            content_area.content = MaintenancePage(current_username=current_username)
 
         elif page_name == "admin":
             content_area.content = AdminPage(
