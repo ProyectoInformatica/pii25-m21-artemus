@@ -5,7 +5,7 @@ class TempChart(ft.Container):
     def __init__(self):
         super().__init__()
 
-        # --- TU ESTILO ORIGINAL ---
+        
         self.expand = True
         self.constraints = ft.BoxConstraints(min_height=400)
         self.bgcolor = "#ffffff"
@@ -13,13 +13,13 @@ class TempChart(ft.Container):
         self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.padding = 20
 
-        # --- DATOS INICIALES (Con referencia para poder editar luego) ---
+        
         self.main_line = ft.LineChartData(
             data_points=[
                 ft.LineChartDataPoint(0, 0),
             ],
             stroke_width=3,
-            color="#2563eb",  # Tu azul
+            color="#2563eb",  
             curved=True,
             stroke_cap_round=True,
             below_line_bgcolor="#1a2563eb",
@@ -44,7 +44,7 @@ class TempChart(ft.Container):
             ),
             tooltip_bgcolor="#111827",
             min_y=15,
-            max_y=35,  # Ajustado para rango 20-30ºC
+            max_y=35,  
             expand=True,
         )
 
@@ -67,8 +67,9 @@ class TempChart(ft.Container):
             ]
         )
 
-    # --- MÉTODO PARA RECIBIR DATOS DEL SERVICE ---
+    
     def update_data(self, chart_data: list):
+        """Actualiza los puntos del gráfico con nuevos datos."""
         if not chart_data:
             return
 

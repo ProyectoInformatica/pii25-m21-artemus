@@ -23,10 +23,10 @@ class LightController:
 
     def run(self, name: str):
         """
-        Simulates a light sensor/controller.
-        Logic: Lights turn ON between 19:00 and 07:00 based on SIMULATED time.
+        Simula el sensor/controlador de luz.
+        Lógica: Las luces se encienden entre 19:00 y 07:00 (hora simulada).
         """
-        # Si no hay referencia, no podemos leer la hora simulada, así que fallamos o usamos hora real
+        
         if not self.controller_ref:
             logging.error(
                 "LightController needs controller_ref to read simulated time."
@@ -34,10 +34,10 @@ class LightController:
             return
 
         while self.controller_ref.running:
-            # Check SIMULATED time from the main controller
+            
             current_hour = self.controller_ref.simulated_hour
 
-            # Logic: ON between 19:00 and 07:00
+            
             should_be_on = current_hour >= 19 or current_hour < 7
 
             status = "ON" if should_be_on else "OFF"

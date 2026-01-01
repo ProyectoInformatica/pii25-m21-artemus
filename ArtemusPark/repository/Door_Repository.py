@@ -3,21 +3,23 @@ from pathlib import Path
 from typing import List, Dict, Any
 from ArtemusPark.model.Door_Model import DoorModel
 
-# --- RUTA ---
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_FILE = BASE_DIR / "json" / "door_events.json"
 
 
 def _serialize(event: DoorModel) -> Dict[str, Any]:
+    """Convierte el modelo a un diccionario serializable."""
     return {
         "timestamp": event.timestamp,
         "is_open": event.is_open,
         "name": event.name,
-        "direction": event.direction,  # <--- GUARDAMOS LA DIRECCIÓN
+        "direction": event.direction,  
     }
 
 
 def save_door_event(event: DoorModel) -> None:
+    """Guarda un registro en el archivo JSON."""
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     if DATA_FILE.exists():
@@ -33,6 +35,7 @@ def save_door_event(event: DoorModel) -> None:
 
 
 def load_all_door_events() -> List[Dict[str, Any]]:
+    """Carga todos los registros del archivo JSON."""
     if not DATA_FILE.exists():
         return []
     try:

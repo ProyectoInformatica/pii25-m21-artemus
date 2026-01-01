@@ -19,7 +19,7 @@ class HumidityMetrics:
 
 def compute_humidity_metrics() -> HumidityMetrics:
     """
-    Compute statistics for humidity based on stored measurements.
+    Calcula estadísticas de humedad basadas en mediciones almacenadas.
     """
     records: List[Dict[str, Any]] = load_all_humidity_measurements()
     if not records:

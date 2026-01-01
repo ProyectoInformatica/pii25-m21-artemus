@@ -1,9 +1,10 @@
 import time
 
-# Asegúrate de que Python encuentre la carpeta ArtemusPark
+
 import sys
 import os
 
+# Script para ejecutar la simulación de sensores en modo CLI.
 sys.path.append(os.getcwd())
 
 from controller.Sensor_Controller import SensorController
@@ -19,7 +20,7 @@ if __name__ == "__main__":
         print("   Presiona Ctrl + C para detener.")
         print("------------------------------------------------")
         while True:
-            # Mantener el script vivo
+            
             time.sleep(1)
     except KeyboardInterrupt:
         controller.stop()

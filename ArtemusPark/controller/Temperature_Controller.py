@@ -19,6 +19,7 @@ class TemperatureController:
         self.on_new_data = on_new_data
 
     def run(self, name):
+        """Simula el sensor de temperatura."""
         while True:
             value = random.randint(-5, 40)
 

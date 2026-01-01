@@ -3,12 +3,13 @@ from pathlib import Path
 from typing import List, Dict, Any
 from ArtemusPark.model.Smoke_Model import SmokeModel
 
-# --- CORRECCIÓN DE RUTA ---
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_FILE = BASE_DIR / "json" / "smoke_measurements.json"
 
 
 def _serialize(measurement: SmokeModel) -> Dict[str, Any]:
+    """Convierte el modelo a un diccionario serializable."""
     return {
         "timestamp": measurement.timestamp,
         "value": measurement.value,
@@ -17,6 +18,7 @@ def _serialize(measurement: SmokeModel) -> Dict[str, Any]:
 
 
 def save_smoke_measurement(measurement: SmokeModel) -> None:
+    """Guarda un registro en el archivo JSON."""
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     if DATA_FILE.exists():
@@ -32,6 +34,7 @@ def save_smoke_measurement(measurement: SmokeModel) -> None:
 
 
 def load_all_smoke_measurements() -> List[Dict[str, Any]]:
+    """Carga todos los registros del archivo JSON."""
     if not DATA_FILE.exists():
         return []
     try:

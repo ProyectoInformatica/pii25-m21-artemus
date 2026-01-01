@@ -4,6 +4,7 @@ import time
 
 @dataclass
 class TemperatureModel:
-    value: int  # ºC
-    status: str  # "COLD" | "MILD" | "HOT"
+    """Modelo de datos para sensores de temperatura."""
+    value: int  
+    status: str  
     timestamp: float = field(default_factory=time.time)

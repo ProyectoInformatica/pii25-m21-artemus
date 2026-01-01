@@ -3,8 +3,8 @@ import time
 import random
 import flet as ft
 
-# Asegúrate de ajustar los imports según tu estructura de carpetas real
-# Si "ArtemusPark" es tu carpeta raíz, mantén el prefijo.
+
+
 from view.pages.Login_Page import LoginPage
 from view.components.Sidebar import Sidebar
 from view.pages.Dashboard_Page import DashboardPage
@@ -13,7 +13,7 @@ from view.pages.History_Page import HistoryPage
 from view.pages.Maintenance_Page import MaintenancePage
 from view.pages.Admin_Page import AdminPage
 
-# --- IMPORTS DE MODELOS ---
+
 from model.Temperature_Model import TemperatureModel
 from model.Humidity_Model import HumidityModel
 from model.Wind_Model import WindModel
@@ -21,7 +21,7 @@ from model.Smoke_Model import SmokeModel
 from model.Door_Model import DoorModel
 from model.Light_Model import LightModel
 
-# --- IMPORTS DE REPOSITORIOS ---
+
 from repository.Temperature_Repository import save_temperature_measurement
 from repository.Humidity_Repository import save_humidity_measurement
 from repository.Wind_Repository import save_wind_measurement
@@ -33,6 +33,7 @@ import multiprocessing
 
 
 async def main(page: ft.Page):
+    """Punto de entrada de la aplicación GUI."""
     page.title = "Artemus Smart Park"
     page.padding = 0
     page.bgcolor = "#e5e7eb"
@@ -42,31 +43,31 @@ async def main(page: ft.Page):
     session = {"role": None}
     content_area = ft.Container(expand=True, padding=0)
 
-    # ---------------------------------------------------------
-    # TAREA DE FONDO: SIMULACIÓN DE DATOS
-    # ---------------------------------------------------------
+    
+    
+    
     async def sensor_simulation_loop():
-        """Genera datos aleatorios cada 3s respetando tus Modelos"""
+        """Genera datos aleatorios de sensores periódicamente."""
         while True:
             now = time.time()
 
-            # 1. Temperatura
-            # Modelo: value (int), status (str), timestamp (float)
+            
+            
             temp_val = int(random.uniform(20, 32))
             temp_status = "HOT" if temp_val > 30 else "MILD"
             save_temperature_measurement(
                 TemperatureModel(value=temp_val, status=temp_status, timestamp=now)
             )
 
-            # 2. Humedad
-            # Modelo: value (int), status (str), timestamp
+            
+            
             hum_val = int(random.uniform(30, 60))
             save_humidity_measurement(
                 HumidityModel(value=hum_val, status="NORMAL", timestamp=now)
             )
 
-            # 3. Viento
-            # Modelo: speed (int), state (str), label (str), timestamp
+            
+            
             wind_speed = int(random.uniform(0, 25))
             wind_state = "WARNING" if wind_speed > 20 else "SAFE"
             save_wind_measurement(
@@ -75,15 +76,15 @@ async def main(page: ft.Page):
                 )
             )
 
-            # 4. Calidad Aire (Smoke)
-            # Modelo: value (int), status (str), timestamp
+            
+            
             smoke_val = int(random.uniform(0, 50))
             smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
             save_smoke_measurement(
                 SmokeModel(value=smoke_val, status=smoke_status, timestamp=now)
             )
 
-            # 5. Eventos de Puerta (Aforo)
+            
             if random.random() < 0.4:
                 is_open = True
                 direction = "IN" if random.random() < 0.6 else "OUT"
@@ -96,18 +97,18 @@ async def main(page: ft.Page):
                     )
                 )
 
-            # 6. LUCES (Muy frecuente y consumo variable)
-            # 90% de probabilidad de cambio en cada ciclo
+            
+            
             if random.random() < 0.9:
                 is_on = random.choice([True, False])
-                # Consumo: 0.5W en standby, entre 100W y 250W si están encendidas
+                
                 watts = round(random.uniform(100, 250), 2) if is_on else 0.5
 
                 save_light_event(
                     LightModel(value=watts, status="OK", is_on=is_on, timestamp=now)
                 )
 
-            # ¡Avisar al Dashboard!
+            
             try:
                 page.pubsub.send_all("refresh_dashboard")
             except Exception as e:
@@ -115,15 +116,16 @@ async def main(page: ft.Page):
 
             await asyncio.sleep(3)
 
-    # ---------------------------------------------------------
-    # NAVEGACIÓN Y LOGIN
-    # ---------------------------------------------------------
+    
+    
+    
     def change_view(page_name, data=None):
+        """Cambia la vista actual en el área de contenido principal."""
         current_role = session.get("role")
 
-        # Lógica de protección de admin
+        
         if page_name == "admin" and current_role != "admin":
-            # Opcional: Mostrar snackbar de error
+            
             page.snack_bar = ft.SnackBar(ft.Text("Acceso denegado"))
             page.snack_bar.open = True
             page.update()
@@ -136,7 +138,7 @@ async def main(page: ft.Page):
                 user_role=current_role, on_navigate=change_view
             )
 
-        # --- NUEVAS RUTAS ---
+        
         elif page_name == "history":
             content_area.content = HistoryPage()
 
@@ -148,28 +150,30 @@ async def main(page: ft.Page):
 
         content_area.update()
 
-    # --- NUEVA FUNCIÓN LOGOUT ---
+    
     def logout():
+        """Cierra la sesión del usuario actual y vuelve al login."""
         print("Cerrando sesión...")
-        session["role"] = None  # Borramos el rol
-        page.clean()  # Limpiamos toda la interfaz
-        # Volvemos a mostrar el Login
+        session["role"] = None  
+        page.clean()  
+        
         page.add(LoginPage(on_login_success=login_success))
 
     def login_success(role):
+        """Maneja el inicio de sesión exitoso y configura la interfaz principal."""
         session["role"] = role
         page.clean()
 
-        # Nota: La tarea de simulación sigue corriendo en segundo plano,
-        # lo cual está bien para este prototipo.
+        
+        
         if not hasattr(page, "simulation_started"):
             page.run_task(sensor_simulation_loop)
             page.simulation_started = True
 
-        # --- AQUÍ CONECTAMOS EL LOGOUT ---
+        
         sidebar = Sidebar(
             on_nav_change=change_view,
-            on_logout=logout,  # <--- Pasamos la función nueva
+            on_logout=logout,  
             user_role=role,
         )
 

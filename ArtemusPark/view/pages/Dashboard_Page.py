@@ -10,23 +10,23 @@ from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class DashboardPage(ft.Container):
-    def __init__(self, user_role="user", on_navigate=None):  # Añadimos on_navigate
+    def __init__(self, user_role="user", on_navigate=None):  
         super().__init__()
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
         self.padding = 18
         self.user_role = user_role
         self.service = DashboardService()
-        self.on_navigate = on_navigate  # Guardamos la función de navegación
+        self.on_navigate = on_navigate  
 
-        # KPIs Superiores
+        
         self.card_capacity = CapacityCard(max_capacity=2000)
         self.card_capacity.expand = 2
 
         self.card_alerts = AlertCard()
         self.card_alerts.expand = 2
 
-        # Sensores
+        
         self.card_temp = SensorCard("Temperatura", "🌡", "--", "ºC", "Zona Central")
         self.card_hum = SensorCard("Humedad", "💧", "--", "%", "Suelo Riego A")
         self.card_wind = SensorCard("Viento", "💨", "--", "km/h", "Estación Norte")
@@ -35,14 +35,14 @@ class DashboardPage(ft.Container):
         for c in [self.card_temp, self.card_hum, self.card_wind, self.card_air]:
             c.expand = 1
 
-        # Componentes Visuales
+        
         self.card_map = MapCard(
             on_sensor_click=self._on_map_sensor_click
-        )  # Pasamos el callback
+        )  
         self.chart_component = TempChart()
         self.panel_events = EventsPanel(self.service.get_recent_events())
 
-        # Guardamos referencia al contenedor para cambiarle el color luego
+        
         self.main_card_container = self._build_main_card()
 
         self.content = ft.Column(
@@ -53,7 +53,7 @@ class DashboardPage(ft.Container):
     def _on_map_sensor_click(self, sensor_type: str):
         """Muestra un diálogo modal con la lista de sensores de ese tipo."""
 
-        # 1. Configuración visual según el tipo
+        
         configs = {
             "temperature": {
                 "color": ft.Colors.RED_50,
@@ -92,8 +92,8 @@ class DashboardPage(ft.Container):
             {"color": ft.Colors.GREY_50, "icon": ft.Icons.INFO, "title": sensor_type},
         )
 
-        # 2. Generar lista simulada de componentes
-        # En un sistema real, esto vendría de una base de datos de inventario
+        
+        
         component_list = ft.Column(
             spacing=10,
             height=200,
@@ -112,7 +112,7 @@ class DashboardPage(ft.Container):
             ],
         )
 
-        # 3. Crear y abrir el diálogo
+        
         dlg = ft.AlertDialog(
             title=ft.Row(
                 [
@@ -125,17 +125,17 @@ class DashboardPage(ft.Container):
                 content=component_list,
                 width=400,
                 padding=10,
-                bgcolor=cfg["color"],  # Color de fondo temático
+                bgcolor=cfg["color"],  
                 border_radius=10,
             ),
             actions=[
                 ft.TextButton("Cerrar", on_click=lambda e: self.page.close_dialog())
             ],
             actions_alignment=ft.MainAxisAlignment.CENTER,
-            bgcolor=ft.Colors.WHITE,  # Fondo del marco del diálogo
+            bgcolor=ft.Colors.WHITE,  
         )
 
-        # self.page.show_dialog(dlg)
+        
 
     def _build_sensor_row(self, name, status, bg_color):
         return ft.Container(
@@ -160,22 +160,23 @@ class DashboardPage(ft.Container):
         )
 
     def did_mount(self):
-        # 1. Suscribirse
+        """Suscribe a eventos y verifica estado inicial."""
         self.page.pubsub.subscribe(self._on_message)
 
-        # 2. Comprobar memoria al nacer
+        
         if self.service.is_catastrophe_mode():
             self._activate_catastrophe_protocol()
 
     def will_unmount(self):
+        """Desuscribe eventos."""
         self.page.pubsub.unsubscribe_all()
 
     def _on_message(self, message):
         """Gestor de mensajes centralizado"""
 
-        # CASO 1: Refresco habitual (cada 3s)
+        
         if message == "refresh_dashboard":
-            # Actualizamos datos numéricos siempre
+            
             data = self.service.get_latest_sensor_data()
             if data:
                 self.card_temp.update_value(data.get("temperature", 0))
@@ -184,7 +185,7 @@ class DashboardPage(ft.Container):
                 self.card_air.update_value(data.get("air_quality", 0))
                 self.card_capacity.update_occupancy(data.get("occupancy", 0))
 
-                # Actualizar Mapa
+                
                 self.card_map.update_sensor_data(data)
 
             chart_data = self.service.get_temp_chart_data()
@@ -193,16 +194,16 @@ class DashboardPage(ft.Container):
             new_events = self.service.get_recent_events()
             self.panel_events.update_events(new_events)
 
-            # Si NO hay catástrofe, mostramos estado normal en la tarjeta de alertas
+            
             if not self.service.is_catastrophe_mode():
-                # Opcional: Podrías poner lógica de alertas de sensores aquí
+                
                 pass
 
-        # CASO 2: ¡ACTIVAR EMERGENCIA!
+        
         elif message == "catastrophe_mode":
             self._activate_catastrophe_protocol()
 
-        # CASO 3: ¡DESACTIVAR EMERGENCIA! (Esto es lo que te faltaba)
+        
         elif message == "normal_mode":
             self._deactivate_catastrophe_protocol()
 
@@ -211,7 +212,7 @@ class DashboardPage(ft.Container):
         self.bgcolor = ft.Colors.RED_900
         self.main_card_container.bgcolor = ft.Colors.RED_50
 
-        # Cambiar colores de textos para catástrofe
+        
         self.txt_welcome.color = ft.Colors.WHITE
         self.txt_dashboard.color = ft.Colors.WHITE
         self.txt_sensors_title.color = ft.Colors.RED_900
@@ -230,7 +231,7 @@ class DashboardPage(ft.Container):
         self.bgcolor = AppColors.BG_MAIN
         self.main_card_container.bgcolor = AppColors.GLASS_WHITE
 
-        # Restaurar colores de textos
+        
         self.txt_welcome.color = AppColors.TEXT_MUTED
         self.txt_dashboard.color = AppColors.TEXT_MUTED
         self.txt_sensors_title.color = AppColors.TEXT_MAIN
@@ -274,7 +275,7 @@ class DashboardPage(ft.Container):
 
         return ft.Container(
             expand=True,
-            bgcolor=AppColors.GLASS_WHITE,  # Color por defecto
+            bgcolor=AppColors.GLASS_WHITE,  
             border_radius=12,
             padding=20,
             content=ft.Column(
@@ -294,23 +295,23 @@ class DashboardPage(ft.Container):
                     ),
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
                     ft.Row(
-                        height=500,  # Aumentamos altura para acomodar mapa
+                        height=500,  
                         controls=[
-                            # Columna Izquierda: Mapa
+                            
                             ft.Container(
                                 content=self.card_map, alignment=ft.alignment.top_center
                             ),
                             ft.Container(width=20),
-                            # Columna Derecha: Gráfica + Eventos
+                            
                             ft.Column(
                                 expand=True,
                                 spacing=15,
                                 controls=[
-                                    # Gráfica (Arriba)
+                                    
                                     ft.Container(
                                         expand=1, content=self.chart_component
                                     ),
-                                    # Eventos (Abajo)
+                                    
                                     ft.Container(
                                         expand=1,
                                         bgcolor="white",

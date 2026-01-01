@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class SmokeModel:
-    value: int  # Densidad de humo (0-100)
-    status: str  # "CLEAR" | "WARNING" | "ALARM"
+    """Modelo de datos para sensores de humo/calidad de aire."""
+    value: int  
+    status: str  
     timestamp: float = field(default_factory=time.time)

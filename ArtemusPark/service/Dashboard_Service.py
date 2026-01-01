@@ -4,7 +4,7 @@ import flet as ft
 from typing import Dict, Any, List
 from datetime import datetime
 
-# Importamos los modelos y repositorios
+
 from ArtemusPark.model.Door_Model import DoorModel
 from ArtemusPark.repository import (
     Temperature_Repository,
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class DashboardService:
-    # Variable global
+    
     _catastrophe_active = False
 
     def set_catastrophe_mode(self, active: bool):
@@ -31,11 +31,12 @@ class DashboardService:
         return DashboardService._catastrophe_active
 
     def get_latest_sensor_data(self) -> Dict[str, Any]:
+        """Obtiene los últimos datos de todos los sensores."""
         temps = Temperature_Repository.load_all_temperature_measurements()
         hums = Humidity_Repository.load_all_humidity_measurements()
         winds = Wind_Repository.load_all_wind_measurements()
         smokes = Smoke_Repository.load_all_smoke_measurements()
-        lights = Light_Repository.load_all_light_events()  # Cargar eventos de luz
+        lights = Light_Repository.load_all_light_events()  
 
         real_occupancy = self._calculate_occupancy()
 
@@ -47,13 +48,14 @@ class DashboardService:
             "occupancy": real_occupancy,
             "light_is_on": self._get_last_value(
                 lights, "is_on", False
-            ),  # Estado ON/OFF de la luz
+            ),  
             "light_consumption": self._get_last_value(
                 lights, "value", 0
-            ),  # Consumo de la luz
+            ),  
         }
 
     def _calculate_occupancy(self) -> int:
+        """Calcula la ocupación actual basada en eventos de puertas."""
         events = Door_Repository.load_all_door_events()
         count = 0
         for e in events:
@@ -75,6 +77,7 @@ class DashboardService:
         return max(0, count)
 
     def get_temp_chart_data(self) -> List[Dict[str, Any]]:
+        """Prepara datos para el gráfico de temperatura."""
         temps = Temperature_Repository.load_all_temperature_measurements()
         recent = temps[-10:] if temps else []
         chart_data = []
@@ -97,6 +100,7 @@ class DashboardService:
         return chart_data
 
     def get_recent_events(self) -> List[Dict[str, Any]]:
+        """Obtiene una lista de eventos recientes (puertas y luces)."""
         doors = Door_Repository.load_all_door_events()
         lights = Light_Repository.load_all_light_events()
         combined = []
@@ -141,6 +145,7 @@ class DashboardService:
         return combined[:15]
 
     def get_all_history_logs(self) -> List[Dict[str, Any]]:
+        """Recopila el historial completo de todos los sensores."""
         history = []
 
         def add_records(source_list, type_label, detail_key):
@@ -199,6 +204,7 @@ class DashboardService:
         return history
 
     def get_sensors_health_status(self) -> List[Dict[str, Any]]:
+        """Verifica si los sensores están enviando datos recientemente."""
         now = time.time()
         threshold = 15
 
@@ -258,6 +264,7 @@ class DashboardService:
         return health_report
 
     def _get_last_value(self, data_list: List[Dict], key: str, default: Any):
+        """Helper para obtener el último valor de una lista."""
         if not data_list:
             return default
         last = data_list[-1]
