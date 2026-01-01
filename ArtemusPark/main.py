@@ -40,7 +40,7 @@ async def main(page: ft.Page):
     page.fonts = {"RobotoCondensed": "/fonts/RobotoCondensed.ttf"}
     page.window.icon = "/img/logo_pequenio.png"
 
-    session = {"role": None}
+    session = {"role": None, "username": None}
     content_area = ft.Container(expand=True, padding=0)
 
     
@@ -122,6 +122,7 @@ async def main(page: ft.Page):
     def change_view(page_name, data=None):
         """Cambia la vista actual en el área de contenido principal."""
         current_role = session.get("role")
+        current_username = session.get("username")
 
         
         if page_name == "admin" and current_role != "admin":
@@ -146,7 +147,9 @@ async def main(page: ft.Page):
             content_area.content = MaintenancePage()
 
         elif page_name == "admin":
-            content_area.content = AdminPage(user_role=current_role)
+            content_area.content = AdminPage(
+                user_role=current_role, current_username=current_username
+            )
 
         content_area.update()
 
@@ -155,13 +158,15 @@ async def main(page: ft.Page):
         """Cierra la sesión del usuario actual y vuelve al login."""
         print("Cerrando sesión...")
         session["role"] = None  
+        session["username"] = None
         page.clean()  
         
         page.add(LoginPage(on_login_success=login_success))
 
-    def login_success(role):
+    def login_success(username, role):
         """Maneja el inicio de sesión exitoso y configura la interfaz principal."""
         session["role"] = role
+        session["username"] = username
         page.clean()
 
         

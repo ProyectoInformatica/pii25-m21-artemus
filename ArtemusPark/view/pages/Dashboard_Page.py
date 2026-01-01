@@ -129,11 +129,13 @@ class DashboardPage(ft.Container):
                 border_radius=10,
             ),
             actions=[
-                ft.TextButton("Cerrar", on_click=lambda e: self.page.close_dialog())
+                ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dlg))
             ],
             actions_alignment=ft.MainAxisAlignment.CENTER,
             bgcolor=ft.Colors.WHITE,  
         )
+
+        self.page.open(dlg)
 
         
 

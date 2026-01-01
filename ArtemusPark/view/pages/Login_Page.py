@@ -113,7 +113,7 @@ class LoginPage(ft.Container):
 
         if role:
             print(f"Login: Acceso concedido a {username} ({role})")
-            self.on_login_success(role)
+            self.on_login_success(username, role)
         else:
             self._show_error("Usuario o contraseña incorrectos")
 
