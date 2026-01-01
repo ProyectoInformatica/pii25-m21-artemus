@@ -41,7 +41,7 @@ class MaintenancePage(ft.Container):
                 ft.Container(height=10),
                 self.my_sensors_row,
                 ft.Divider(height=30, color=ft.Colors.GREY_300),
-            ]
+            ],
         )
 
         self.grid_devices = ft.GridView(
@@ -53,14 +53,14 @@ class MaintenancePage(ft.Container):
             run_spacing=20,
             controls=[],
         )
-        
+
         self.btn_request_change = ft.ElevatedButton(
             "Solicitar Cambio de Sensores",
             icon=ft.Icons.EDIT_NOTE,
             bgcolor=ft.Colors.BLUE_GREY_100,
             color=ft.Colors.BLUE_GREY_900,
             on_click=self._open_request_dialog,
-            visible=bool(self.current_username) and self.current_role != "admin"
+            visible=bool(self.current_username) and self.current_role != "admin",
         )
 
         self.content = ft.Column(
@@ -69,14 +69,14 @@ class MaintenancePage(ft.Container):
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                         ft.Text(
+                        ft.Text(
                             "Monitor de Estado del Sistema (Global)",
                             size=24,
                             weight="bold",
                             color=ft.Colors.BLACK,
                         ),
-                        self.btn_request_change
-                    ]
+                        self.btn_request_change,
+                    ],
                 ),
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -94,9 +94,9 @@ class MaintenancePage(ft.Container):
                     ],
                 ),
                 ft.Divider(height=20, color="transparent"),
-                self.my_sensors_container, # Insertamos la seccion personalizada aqui
+                self.my_sensors_container,  # Insertamos la seccion personalizada aqui
                 self.grid_devices,
-            ]
+            ],
         )
 
     def did_mount(self):
@@ -111,24 +111,35 @@ class MaintenancePage(ft.Container):
     def _on_message(self, message):
         if message == "refresh_dashboard":
             self.update_data()
-            
+
     def _open_request_dialog(self, e):
         self.tf_request_msg = ft.TextField(
-            label="Detalle de la solicitud", 
-            multiline=True, 
+            label="Detalle de la solicitud",
+            multiline=True,
             min_lines=3,
-            hint_text="Ej: Solicito añadir el sensor de la Puerta Norte."
+            hint_text="Ej: Solicito añadir el sensor de la Puerta Norte.",
         )
-        
+
         self.dlg_request = ft.AlertDialog(
             title=ft.Text("Solicitar Cambio de Sensores"),
-            content=ft.Column([
-                ft.Text("Describe los cambios que necesitas en tu asignación:"),
-                self.tf_request_msg
-            ], tight=True, width=400),
+            content=ft.Column(
+                [
+                    ft.Text("Describe los cambios que necesitas en tu asignación:"),
+                    self.tf_request_msg,
+                ],
+                tight=True,
+                width=400,
+            ),
             actions=[
-                ft.TextButton("Cancelar", on_click=lambda e: self.page.close(self.dlg_request)),
-                ft.ElevatedButton("Enviar a Supervisor", on_click=self._submit_request, bgcolor=AppColors.BG_DARK, color="white")
+                ft.TextButton(
+                    "Cancelar", on_click=lambda e: self.page.close(self.dlg_request)
+                ),
+                ft.ElevatedButton(
+                    "Enviar a Supervisor",
+                    on_click=self._submit_request,
+                    bgcolor=AppColors.BG_DARK,
+                    color="white",
+                ),
             ],
             actions_alignment=ft.MainAxisAlignment.END,
         )
@@ -140,13 +151,12 @@ class MaintenancePage(ft.Container):
             self.tf_request_msg.error_text = "Escribe un motivo"
             self.tf_request_msg.update()
             return
-            
+
         self.req_repo.create_request(self.current_username, msg)
         self.page.close(self.dlg_request)
-        
+
         self.page.snack_bar = ft.SnackBar(
-            content=ft.Text("Solicitud enviada correctamente"),
-            bgcolor="green"
+            content=ft.Text("Solicitud enviada correctamente"), bgcolor="green"
         )
         self.page.snack_bar.open = True
         self.page.update()
@@ -156,7 +166,7 @@ class MaintenancePage(ft.Container):
         health_data = self.service.get_sensors_health_status()
 
         self.grid_devices.controls.clear()
-        
+
         if self.assigned_sensors:
             self.my_sensors_row.controls.clear()
 
@@ -172,22 +182,22 @@ class MaintenancePage(ft.Container):
             device_type_map = {
                 "Sensor Temperatura": "temperature",
                 "Sensor Humedad": "humidity",
-                "Anemómetro": "wind", 
+                "Anemómetro": "wind",
                 "Detector Humo": "smoke",
                 "Iluminación": "light",
-                "Puertas": "door"
+                "Puertas": "door",
             }
-            
+
             sensor_key = device_type_map.get(device["name"])
-            
+
             if sensor_key and sensor_key in self.assigned_sensors:
                 highlighted_card = self._build_device_card(
-                     name=device["name"],
-                     status_text=device["status"],
-                     icon=device["icon"],
-                     is_online=device["is_online"],
-                     last_seen=device["last_seen"],
-                     highlight=True
+                    name=device["name"],
+                    status_text=device["status"],
+                    icon=device["icon"],
+                    is_online=device["is_online"],
+                    last_seen=device["last_seen"],
+                    highlight=True,
                 )
                 self.my_sensors_row.controls.append(highlighted_card)
 
@@ -195,7 +205,9 @@ class MaintenancePage(ft.Container):
 
         self.update()
 
-    def _build_device_card(self, name, status_text, icon, is_online, last_seen, highlight=False):
+    def _build_device_card(
+        self, name, status_text, icon, is_online, last_seen, highlight=False
+    ):
         """Crea la tarjeta visual para un dispositivo."""
 
         if is_online:
@@ -206,7 +218,7 @@ class MaintenancePage(ft.Container):
             status_color = ft.Colors.RED
             bg_icon = ft.Colors.RED_50
             border_color = ft.Colors.RED_200
-            
+
         if highlight:
             border_color = ft.Colors.BLUE_400
             bg_color = ft.Colors.BLUE_50
@@ -216,7 +228,7 @@ class MaintenancePage(ft.Container):
         return ft.Container(
             bgcolor=bg_color,
             padding=15,
-            width=240 if highlight else None, # Fijo para fila horizontal
+            width=240 if highlight else None,  # Fijo para fila horizontal
             border_radius=12,
             border=ft.border.all(2 if highlight else 1, border_color),
             shadow=ft.BoxShadow(
@@ -235,7 +247,11 @@ class MaintenancePage(ft.Container):
                                 border_radius=10,
                             ),
                             ft.Icon(
-                                ft.Icons.STAR if highlight else ft.Icons.FIBER_MANUAL_RECORD,
+                                (
+                                    ft.Icons.STAR
+                                    if highlight
+                                    else ft.Icons.FIBER_MANUAL_RECORD
+                                ),
                                 color=ft.Colors.BLUE if highlight else status_color,
                                 size=20,
                             ),
@@ -253,7 +269,12 @@ class MaintenancePage(ft.Container):
                         ],
                     ),
                     ft.Container(
-                        border=ft.border.only(top=ft.BorderSide(1, ft.Colors.GREY_300 if highlight else ft.Colors.GREY_100)),
+                        border=ft.border.only(
+                            top=ft.BorderSide(
+                                1,
+                                ft.Colors.GREY_300 if highlight else ft.Colors.GREY_100,
+                            )
+                        ),
                         padding=ft.padding.only(top=10),
                         content=ft.Row(
                             controls=[

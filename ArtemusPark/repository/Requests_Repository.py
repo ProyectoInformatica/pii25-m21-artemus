@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import time
 
+
 class RequestsRepository:
     def __init__(self):
         self.base_dir = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ class RequestsRepository:
             "type": request_type,
             "message": message,
             "status": "PENDING",
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
         data.append(new_req)
         self.data_file.write_text(json.dumps(data, indent=4), encoding="utf-8")

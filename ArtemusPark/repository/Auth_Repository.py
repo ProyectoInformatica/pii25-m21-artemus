@@ -196,23 +196,37 @@ class AuthRepository:
         """Retorna todos los usuarios."""
         return self._load_users()
 
-    def add_user(self, username, password, role, full_name="", dni="", phone="", address=""):
+    def add_user(
+        self, username, password, role, full_name="", dni="", phone="", address=""
+    ):
         """Agrega un nuevo usuario con datos personales."""
         users = self._load_users()
         if username in users:
             raise ValueError("El usuario ya existe.")
-        
+
         users[username] = {
-            "password": password, 
+            "password": password,
             "role": role,
             "full_name": full_name,
             "dni": dni,
             "phone": phone,
-            "address": address
+            "address": address,
         }
         self._save_users(users)
 
-    def update_user(self, username, password=None, role=None, assigned_sensors=None, full_name=None, dni=None, phone=None, address=None, supervisors=None, subordinates=None):
+    def update_user(
+        self,
+        username,
+        password=None,
+        role=None,
+        assigned_sensors=None,
+        full_name=None,
+        dni=None,
+        phone=None,
+        address=None,
+        supervisors=None,
+        subordinates=None,
+    ):
         """Actualiza datos de un usuario existente."""
         users = self._load_users()
         if username not in users:
@@ -228,7 +242,7 @@ class AuthRepository:
             users[username]["supervisors"] = supervisors
         if subordinates is not None:
             users[username]["subordinates"] = subordinates
-        
+
         if full_name is not None:
             users[username]["full_name"] = full_name
         if dni is not None:

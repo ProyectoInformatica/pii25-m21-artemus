@@ -27,7 +27,7 @@ class LoginPage(ft.Container):
             on_change=self._reset_error_state,
             on_submit=self._handle_submit,
             height=40,
-            content_padding=10
+            content_padding=10,
         )
 
         self.tf_password = ft.TextField(
@@ -45,7 +45,7 @@ class LoginPage(ft.Container):
             on_change=self._reset_error_state,
             on_submit=self._handle_submit,
             height=40,
-            content_padding=10
+            content_padding=10,
         )
 
         common_tf_props = {
@@ -59,26 +59,17 @@ class LoginPage(ft.Container):
             "cursor_color": AppColors.BG_DARK,
             "height": 40,
             "content_padding": 10,
-            "visible": False
+            "visible": False,
         }
-        
-        self.tf_full_name = ft.TextField(
-            label="Nombre Completo", 
-            **common_tf_props
-        )
-        self.tf_dni = ft.TextField(
-            label="DNI (8 nums + letra)", 
-            **common_tf_props
-        )
+
+        self.tf_full_name = ft.TextField(label="Nombre Completo", **common_tf_props)
+        self.tf_dni = ft.TextField(label="DNI (8 nums + letra)", **common_tf_props)
         self.tf_phone = ft.TextField(
-            label="Teléfono (9 dígitos)", 
+            label="Teléfono (9 dígitos)",
             keyboard_type=ft.KeyboardType.PHONE,
-            **common_tf_props
+            **common_tf_props,
         )
-        self.tf_address = ft.TextField(
-            label="Dirección", 
-            **common_tf_props
-        )
+        self.tf_address = ft.TextField(label="Dirección", **common_tf_props)
 
         self.btn_enter = ft.ElevatedButton(
             text="Entrar al Sistema",
@@ -166,7 +157,6 @@ class LoginPage(ft.Container):
             ),
         )
 
-
     def _reset_error_state(self, e):
         """Limpia los estados de error en los campos de texto."""
         fields_to_check = [
@@ -200,7 +190,7 @@ class LoginPage(ft.Container):
             self.sub_title_text.value = "Crea tu cuenta de usuario"
             self.btn_enter.text = "Registrarse"
             self.btn_switch.text = "¿Ya tienes cuenta? Inicia sesión"
-            
+
             self.tf_full_name.visible = True
             self.tf_dni.visible = True
             self.tf_phone.visible = True
@@ -237,7 +227,7 @@ class LoginPage(ft.Container):
                     )
                 ],
             )
-            
+
         else:
             self.title_text.value = "ARTEMUS PARK"
             self.sub_title_text.value = "Identifícate para acceder"
@@ -250,10 +240,11 @@ class LoginPage(ft.Container):
             self.tf_address.visible = False
 
             self.animated_switcher.content = self.login_controls
-            
+
         self.animated_switcher.update()
         self.content.update()
         self.update()
+
     def _handle_submit(self, e):
         """Maneja el envío del formulario (login o registro)."""
         username = self.tf_username.value
@@ -268,7 +259,7 @@ class LoginPage(ft.Container):
             dni = self.tf_dni.value
             phone = self.tf_phone.value
             address = self.tf_address.value
-            
+
             if not full_name.strip():
                 self._show_error(
                     "El nombre completo no puede estar vacío.",
@@ -308,8 +299,13 @@ class LoginPage(ft.Container):
 
             try:
                 self.auth_repo.add_user(
-                    username, password, "user", 
-                    full_name=full_name, dni=dni, phone=phone, address=address
+                    username,
+                    password,
+                    "user",
+                    full_name=full_name,
+                    dni=dni,
+                    phone=phone,
+                    address=address,
                 )
                 self._show_success("Registro exitoso. Por favor inicia sesión.")
                 self._toggle_mode(None)
@@ -329,20 +325,22 @@ class LoginPage(ft.Container):
         if fields_to_highlight is None:
             fields_to_highlight = [self.tf_username, self.tf_password]
             if self.is_registering:
-                fields_to_highlight.extend([
-                    self.tf_full_name,
-                    self.tf_dni,
-                    self.tf_phone,
-                    self.tf_address,
-                ])
+                fields_to_highlight.extend(
+                    [
+                        self.tf_full_name,
+                        self.tf_dni,
+                        self.tf_phone,
+                        self.tf_address,
+                    ]
+                )
         else:
             self._reset_error_state(None)
-            
+
         for field in fields_to_highlight:
             field.border_color = ft.Colors.RED
-        
+
         self.input_fields_container.update()
-        
+
         if self.page:
             self.page.open(
                 ft.SnackBar(

@@ -46,8 +46,7 @@ class Sidebar(ft.Container):
                     "Solicitudes",
                     "📩",
                     "requests",
-                    show_badge=self.user_role == "admin"
-                    and self.has_pending_requests,
+                    show_badge=self.user_role == "admin" and self.has_pending_requests,
                 )
             )
 
@@ -95,7 +94,10 @@ class Sidebar(ft.Container):
         bg_color = "#111827" if active else "transparent"
         text_color = "white" if active else "#9ca3af"
 
-        row_controls = [ft.Text(icon, size=16), ft.Text(text, size=14, color=text_color)]
+        row_controls = [
+            ft.Text(icon, size=16),
+            ft.Text(text, size=14, color=text_color),
+        ]
         if show_badge:
             row_controls.append(
                 ft.Container(
@@ -114,9 +116,7 @@ class Sidebar(ft.Container):
             bgcolor=bg_color,
             ink=True,
             on_click=self._handle_click,
-            content=ft.Row(
-                controls=row_controls
-            ),
+            content=ft.Row(controls=row_controls),
         )
         self.nav_buttons[key] = button
         return button

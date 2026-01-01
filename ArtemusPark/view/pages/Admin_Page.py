@@ -360,7 +360,7 @@ class AdminPage(ft.Container):
             ],
             value=user_data.get("role", "user"),
         )
-        
+
         assigned = user_data.get("assigned_sensors", [])
         sensor_options = ["temperature", "humidity", "wind", "smoke", "light", "door"]
         sensor_checks = []
@@ -422,18 +422,17 @@ class AdminPage(ft.Container):
                 selected_subordinates = [c.label for c in subordinate_checks if c.value]
                 if is_edit:
                     self.auth_repo.update_user(
-                        username, 
-                        tf_pass.value, 
+                        username,
+                        tf_pass.value,
                         dd_role.value,
-                        assigned_sensors=selected_sensors
+                        assigned_sensors=selected_sensors,
                     )
                 else:
                     self.auth_repo.add_user(tf_user.value, tf_pass.value, dd_role.value)
                     self.auth_repo.update_user(
-                        tf_user.value,
-                        assigned_sensors=selected_sensors
+                        tf_user.value, assigned_sensors=selected_sensors
                     )
-                    
+
                 target_username = username if is_edit else tf_user.value
                 if dd_role.value == "admin":
                     self._sync_subordinates(target_username, selected_subordinates)
@@ -446,7 +445,9 @@ class AdminPage(ft.Container):
                 self._load_users()
                 self.page.open(
                     ft.SnackBar(
-                        content=ft.Text("Usuario guardado correctamente", color="white"),
+                        content=ft.Text(
+                            "Usuario guardado correctamente", color="white"
+                        ),
                         bgcolor=ft.Colors.GREEN_700,
                     )
                 )
@@ -462,8 +463,8 @@ class AdminPage(ft.Container):
             title=ft.Text("Editar Usuario" if is_edit else "Nuevo Usuario"),
             content=ft.Column(
                 [
-                    tf_user, 
-                    tf_pass, 
+                    tf_user,
+                    tf_pass,
                     dd_role,
                     ft.Divider(),
                     ft.Text("Sensores Asignados:", weight="bold"),
@@ -471,10 +472,10 @@ class AdminPage(ft.Container):
                     ft.Divider(),
                     supervisors_section,
                     subordinates_section,
-                ], 
-                height=400, 
+                ],
+                height=400,
                 width=300,
-                scroll=ft.ScrollMode.AUTO
+                scroll=ft.ScrollMode.AUTO,
             ),
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
@@ -522,9 +523,7 @@ class AdminPage(ft.Container):
             self._load_users()
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text(
-                        f"Usuario {username} eliminado", color="white"
-                    ),
+                    content=ft.Text(f"Usuario {username} eliminado", color="white"),
                     bgcolor=ft.Colors.RED_700,
                 )
             )
