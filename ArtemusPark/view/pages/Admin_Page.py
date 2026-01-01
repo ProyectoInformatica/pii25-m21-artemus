@@ -303,6 +303,14 @@ class AdminPage(ft.Container):
         user_data = users.get(username, {})
         assigned = user_data.get("assigned_sensors", [])
         assigned_text = ", ".join(assigned) if assigned else "Sin asignaciones"
+        supervisors = self._get_supervisors_for_user(username, users)
+        supervisors_text = (
+            ", ".join(sorted(supervisors)) if supervisors else "Sin supervisores"
+        )
+        subordinates = user_data.get("subordinates", [])
+        subordinates_text = (
+            ", ".join(sorted(subordinates)) if subordinates else "Sin subordinados"
+        )
 
         dialog = ft.AlertDialog(
             title=ft.Text(f"Datos de {username}"),
@@ -314,6 +322,8 @@ class AdminPage(ft.Container):
                     ft.Text(f"Telefono: {user_data.get('phone', '-') }"),
                     ft.Text(f"Direccion: {user_data.get('address', '-') }"),
                     ft.Text(f"Sensores asignados: {assigned_text}"),
+                    ft.Text(f"Supervisores: {supervisors_text}"),
+                    ft.Text(f"Subordinados: {subordinates_text}"),
                 ],
                 width=360,
                 tight=True,
@@ -359,9 +369,57 @@ class AdminPage(ft.Container):
                 ft.Checkbox(label=s.capitalize(), value=(s in assigned))
             )
 
+        supervisor_candidates = [
+            u for u, d in users.items() if d.get("role") == "admin" and u != username
+        ]
+        subordinate_candidates = [
+            u for u, d in users.items() if d.get("role") == "user" and u != username
+        ]
+        current_supervisors = (
+            self._get_supervisors_for_user(username, users) if is_edit else set()
+        )
+        current_subordinates = set(user_data.get("subordinates", []))
+
+        supervisor_checks = []
+        for sup in supervisor_candidates:
+            supervisor_checks.append(
+                ft.Checkbox(label=sup, value=(sup in current_supervisors))
+            )
+
+        subordinate_checks = []
+        for sub in subordinate_candidates:
+            subordinate_checks.append(
+                ft.Checkbox(label=sub, value=(sub in current_subordinates))
+            )
+
+        supervisors_section = ft.Column(
+            [
+                ft.Text("Supervisores:", weight="bold"),
+                ft.Column(supervisor_checks, spacing=0),
+            ],
+            visible=dd_role.value != "admin",
+        )
+        subordinates_section = ft.Column(
+            [
+                ft.Text("Usuarios supervisados:", weight="bold"),
+                ft.Column(subordinate_checks, spacing=0),
+            ],
+            visible=dd_role.value == "admin",
+        )
+
+        def on_role_change(e):
+            is_admin = dd_role.value == "admin"
+            supervisors_section.visible = not is_admin
+            subordinates_section.visible = is_admin
+            dialog.update()
+
+        dd_role.on_change = on_role_change
+
         def save(e):
             try:
                 selected_sensors = [c.label.lower() for c in sensor_checks if c.value]
+                selected_supervisors = [c.label for c in supervisor_checks if c.value]
+                selected_subordinates = [c.label for c in subordinate_checks if c.value]
                 if is_edit:
                     self.auth_repo.update_user(
                         username, 
@@ -376,6 +434,14 @@ class AdminPage(ft.Container):
                         assigned_sensors=selected_sensors
                     )
                     
+                target_username = username if is_edit else tf_user.value
+                if dd_role.value == "admin":
+                    self._sync_subordinates(target_username, selected_subordinates)
+                    self.auth_repo.update_user(target_username, supervisors=[])
+                else:
+                    self._sync_supervisors(target_username, selected_supervisors)
+                    self.auth_repo.update_user(target_username, subordinates=[])
+
                 self.page.close(dialog)
                 self._load_users()
                 self.page.snack_bar = ft.SnackBar(
@@ -397,7 +463,10 @@ class AdminPage(ft.Container):
                     dd_role,
                     ft.Divider(),
                     ft.Text("Sensores Asignados:", weight="bold"),
-                    ft.Column(sensor_checks, spacing=0)
+                    ft.Column(sensor_checks, spacing=0),
+                    ft.Divider(),
+                    supervisors_section,
+                    subordinates_section,
                 ], 
                 height=400, 
                 width=300,
@@ -409,6 +478,38 @@ class AdminPage(ft.Container):
             ],
         )
         self.page.open(dialog)
+
+    def _get_supervisors_for_user(self, username, users):
+        supervisors = set(users.get(username, {}).get("supervisors", []))
+        for sup_name, sup_data in users.items():
+            if sup_data.get("role") == "admin":
+                if username in sup_data.get("subordinates", []):
+                    supervisors.add(sup_name)
+        return supervisors
+
+    def _sync_supervisors(self, username, selected_supervisors):
+        users = self.auth_repo.get_all_users()
+        admin_users = [u for u, d in users.items() if d.get("role") == "admin"]
+        for sup in admin_users:
+            subs = set(users.get(sup, {}).get("subordinates", []))
+            if sup in selected_supervisors:
+                subs.add(username)
+            else:
+                subs.discard(username)
+            self.auth_repo.update_user(sup, subordinates=list(subs))
+        self.auth_repo.update_user(username, supervisors=selected_supervisors)
+
+    def _sync_subordinates(self, supervisor, selected_subordinates):
+        self.auth_repo.update_user(supervisor, subordinates=selected_subordinates)
+        users = self.auth_repo.get_all_users()
+        user_accounts = [u for u, d in users.items() if d.get("role") == "user"]
+        for user in user_accounts:
+            sups = set(users.get(user, {}).get("supervisors", []))
+            if user in selected_subordinates:
+                sups.add(supervisor)
+            else:
+                sups.discard(supervisor)
+            self.auth_repo.update_user(user, supervisors=list(sups))
 
     def _delete_user(self, username):
         def confirm_delete(e):

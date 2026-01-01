@@ -21,6 +21,7 @@ class AuthRepository:
                 "dni": "11111111A",
                 "phone": "600111111",
                 "address": "Calle Falsa 123",
+                "subordinates": ["user_laura", "user_carlos"],
             },
             "admin_super": {
                 "password": "root2025",
@@ -29,6 +30,7 @@ class AuthRepository:
                 "dni": "22222222B",
                 "phone": "600222222",
                 "address": "Avenida Siempre Viva 45",
+                "subordinates": ["client_ana", "visit_tom", "user_demo"],
             },
             "boss_artemus": {
                 "password": "masterkey",
@@ -37,6 +39,7 @@ class AuthRepository:
                 "dni": "33333333C",
                 "phone": "600333333",
                 "address": "Plaza Mayor 1",
+                "subordinates": ["client_ana", "user_sofia", "user_pedro"],
             },
             "admin_alpha": {
                 "password": "alpha_pass",
@@ -45,6 +48,7 @@ class AuthRepository:
                 "dni": "44444444D",
                 "phone": "600444444",
                 "address": "Rua Augusta 10",
+                "subordinates": ["user_maria", "user_luis"],
             },
             "maint_joe": {
                 "password": "fixitnow",
@@ -53,6 +57,7 @@ class AuthRepository:
                 "dni": "55555555E",
                 "phone": "600555555",
                 "address": "Paseo de la Castellana 50",
+                "supervisors": ["admin_super"],
             },
             "tech_sarah": {
                 "password": "cables99",
@@ -61,6 +66,7 @@ class AuthRepository:
                 "dni": "66666666F",
                 "phone": "600666666",
                 "address": "Gran Via 20",
+                "supervisors": ["admin_super"],
             },
             "eng_mike": {
                 "password": "wrench77",
@@ -69,6 +75,7 @@ class AuthRepository:
                 "dni": "77777777G",
                 "phone": "600777777",
                 "address": "Via Laietana 30",
+                "supervisors": ["admin_alpha"],
             },
             "client_ana": {
                 "password": "guest001",
@@ -77,6 +84,7 @@ class AuthRepository:
                 "dni": "88888888H",
                 "phone": "600888888",
                 "address": "Calle del Arenal 1",
+                "supervisors": ["admin_super", "boss_artemus"],
             },
             "visit_tom": {
                 "password": "parkfun2",
@@ -85,6 +93,7 @@ class AuthRepository:
                 "dni": "99999999I",
                 "phone": "600999999",
                 "address": "Calle Alcala 15",
+                "supervisors": ["admin_super"],
             },
             "user_demo": {
                 "password": "testpass",
@@ -93,6 +102,7 @@ class AuthRepository:
                 "dni": "10101010J",
                 "phone": "600101010",
                 "address": "Calle Mayor 5",
+                "supervisors": ["admin_super"],
             },
             "user_sofia": {
                 "password": "sofia_pass",
@@ -101,6 +111,7 @@ class AuthRepository:
                 "dni": "12121212K",
                 "phone": "600121212",
                 "address": "Plaza de Espana 3",
+                "supervisors": ["boss_artemus"],
             },
             "user_pedro": {
                 "password": "pedro_pass",
@@ -109,6 +120,7 @@ class AuthRepository:
                 "dni": "13131313L",
                 "phone": "600131313",
                 "address": "Paseo del Prado 10",
+                "supervisors": ["boss_artemus"],
             },
             "user_maria": {
                 "password": "maria_pass",
@@ -117,6 +129,7 @@ class AuthRepository:
                 "dni": "14141414M",
                 "phone": "600141414",
                 "address": "Calle Serrano 25",
+                "supervisors": ["admin_alpha"],
             },
             "user_luis": {
                 "password": "luis_pass",
@@ -125,6 +138,7 @@ class AuthRepository:
                 "dni": "15151515N",
                 "phone": "600151515",
                 "address": "Ronda de Toledo 5",
+                "supervisors": ["admin_alpha"],
             },
             "user_laura": {
                 "password": "laura_pass",
@@ -133,6 +147,7 @@ class AuthRepository:
                 "dni": "16161616O",
                 "phone": "600161616",
                 "address": "Calle de la Paz 7",
+                "supervisors": ["admin1"],
             },
             "user_carlos": {
                 "password": "carlos_pass",
@@ -141,6 +156,7 @@ class AuthRepository:
                 "dni": "17171717P",
                 "phone": "600171717",
                 "address": "Avenida de America 12",
+                "supervisors": ["admin1"],
             },
         }
 
@@ -196,7 +212,7 @@ class AuthRepository:
         }
         self._save_users(users)
 
-    def update_user(self, username, password=None, role=None, assigned_sensors=None, full_name=None, dni=None, phone=None, address=None):
+    def update_user(self, username, password=None, role=None, assigned_sensors=None, full_name=None, dni=None, phone=None, address=None, supervisors=None, subordinates=None):
         """Actualiza datos de un usuario existente."""
         users = self._load_users()
         if username not in users:
@@ -208,6 +224,10 @@ class AuthRepository:
             users[username]["role"] = role
         if assigned_sensors is not None:
             users[username]["assigned_sensors"] = assigned_sensors
+        if supervisors is not None:
+            users[username]["supervisors"] = supervisors
+        if subordinates is not None:
+            users[username]["subordinates"] = subordinates
         
         if full_name is not None:
             users[username]["full_name"] = full_name
