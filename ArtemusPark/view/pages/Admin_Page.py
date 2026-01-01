@@ -33,7 +33,6 @@ class AdminPage(ft.Container):
             )
             return
 
-
         self.users_table = ft.DataTable(
             columns=[
                 ft.DataColumn(ft.Text("Usuario", color=ft.Colors.BLACK)),
@@ -42,7 +41,6 @@ class AdminPage(ft.Container):
             ],
             rows=[],
             width=float("inf"),
-                                                                
         )
 
         self.energy_data_points = [ft.LineChartDataPoint(i, 50) for i in range(20)]
@@ -110,12 +108,14 @@ class AdminPage(ft.Container):
                     ),
                     ft.Divider(color=AppColors.TRANSPARENT),
                     ft.Container(
-                        content=ft.Column([self.users_table], scroll=ft.ScrollMode.AUTO),
+                        content=ft.Column(
+                            [self.users_table], scroll=ft.ScrollMode.AUTO
+                        ),
                         height=500,
-                        margin=2
+                        margin=2,
                     ),
                 ],
-                expand=True
+                expand=True,
             ),
         )
         user_mgmt_section.expand = 1
@@ -166,11 +166,8 @@ class AdminPage(ft.Container):
             ),
         )
 
-                                                
         right_column = ft.Column(
-            expand=1,
-            spacing=20,
-            controls=[emergency_section, energy_section]
+            expand=1, spacing=20, controls=[emergency_section, energy_section]
         )
 
         self.content = ft.ListView(
@@ -243,7 +240,9 @@ class AdminPage(ft.Container):
             delete_btn = ft.IconButton(
                 icon=ft.Icons.DELETE,
                 icon_color=ft.Colors.GREY if is_me else ft.Colors.RED,
-                tooltip="Eliminar" if not is_me else "No puedes eliminar tu propia cuenta",
+                tooltip=(
+                    "Eliminar" if not is_me else "No puedes eliminar tu propia cuenta"
+                ),
                 disabled=is_me,
                 on_click=lambda e, u=username: self._delete_user(u),
             )
@@ -251,8 +250,22 @@ class AdminPage(ft.Container):
             self.users_table.rows.append(
                 ft.DataRow(
                     cells=[
-                        ft.DataCell(ft.Text(display_name, color=ft.Colors.BLACK, overflow=ft.TextOverflow.ELLIPSIS, max_lines=1)),
-                        ft.DataCell(ft.Text(role_text, color=ft.Colors.BLACK, overflow=ft.TextOverflow.ELLIPSIS, max_lines=1)),
+                        ft.DataCell(
+                            ft.Text(
+                                display_name,
+                                color=ft.Colors.BLACK,
+                                overflow=ft.TextOverflow.ELLIPSIS,
+                                max_lines=1,
+                            )
+                        ),
+                        ft.DataCell(
+                            ft.Text(
+                                role_text,
+                                color=ft.Colors.BLACK,
+                                overflow=ft.TextOverflow.ELLIPSIS,
+                                max_lines=1,
+                            )
+                        ),
                         ft.DataCell(
                             ft.Row(
                                 [
@@ -260,14 +273,16 @@ class AdminPage(ft.Container):
                                         icon=ft.Icons.EDIT,
                                         icon_color=ft.Colors.BLUE,
                                         tooltip="Editar",
-                                        on_click=lambda e, u=username: self._open_user_dialog(u),
+                                        on_click=lambda e, u=username: self._open_user_dialog(
+                                            u
+                                        ),
                                     ),
                                     delete_btn,
                                 ],
-                                alignment = ft.MainAxisAlignment.END,
+                                alignment=ft.MainAxisAlignment.END,
                                 spacing=0,
                             ),
-                        )
+                        ),
                     ]
                 )
             )
@@ -279,10 +294,16 @@ class AdminPage(ft.Container):
         user_data = users.get(username, {}) if is_edit else {}
 
         tf_user = ft.TextField(
-            label="Usuario", value=username if is_edit else "", disabled=is_edit, max_length=24
+            label="Usuario",
+            value=username if is_edit else "",
+            disabled=is_edit,
+            max_length=24,
         )
         tf_pass = ft.TextField(
-            label="Contraseña", value=user_data.get("password", ""), password=True, can_reveal_password=True
+            label="Contraseña",
+            value=user_data.get("password", ""),
+            password=True,
+            can_reveal_password=True,
         )
         dd_role = ft.Dropdown(
             label="Rol",
@@ -302,7 +323,9 @@ class AdminPage(ft.Container):
                     self.auth_repo.add_user(tf_user.value, tf_pass.value, dd_role.value)
                 self.page.close(dialog)
                 self._load_users()
-                self.page.snack_bar = ft.SnackBar(ft.Text("Usuario guardado correctamente"))
+                self.page.snack_bar = ft.SnackBar(
+                    ft.Text("Usuario guardado correctamente")
+                )
                 self.page.snack_bar.open = True
                 self.page.update()
             except Exception as ex:
@@ -335,7 +358,10 @@ class AdminPage(ft.Container):
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
                 ft.ElevatedButton(
-                    "Eliminar", bgcolor=ft.Colors.RED, color=ft.Colors.WHITE, on_click=confirm_delete
+                    "Eliminar",
+                    bgcolor=ft.Colors.RED,
+                    color=ft.Colors.WHITE,
+                    on_click=confirm_delete,
                 ),
             ],
         )

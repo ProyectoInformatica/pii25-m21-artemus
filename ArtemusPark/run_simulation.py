@@ -4,7 +4,7 @@ import time
 import sys
 import os
 
-""" Script para ejecutar la simulación de sensores """  
+""" Script para ejecutar la simulación de sensores """
 sys.path.append(os.getcwd())
 
 from controller.Sensor_Controller import SensorController
@@ -20,7 +20,7 @@ if __name__ == "__main__":
         print("   Presiona Ctrl + C para detener.")
         print("------------------------------------------------")
         while True:
-            
+
             time.sleep(1)
     except KeyboardInterrupt:
         controller.stop()

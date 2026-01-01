@@ -28,7 +28,7 @@ class SmokeController:
             return
 
         while self.controller_ref.running:
-            
+
             value = random.randint(0, 100)
 
             if value > 95:

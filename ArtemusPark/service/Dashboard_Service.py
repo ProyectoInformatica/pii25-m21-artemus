@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class DashboardService:
-    
+
     _catastrophe_active = False
 
     def set_catastrophe_mode(self, active: bool):
@@ -36,7 +36,7 @@ class DashboardService:
         hums = Humidity_Repository.load_all_humidity_measurements()
         winds = Wind_Repository.load_all_wind_measurements()
         smokes = Smoke_Repository.load_all_smoke_measurements()
-        lights = Light_Repository.load_all_light_events()  
+        lights = Light_Repository.load_all_light_events()
 
         real_occupancy = self._calculate_occupancy()
 
@@ -46,12 +46,8 @@ class DashboardService:
             "wind": self._get_last_value(winds, "speed", 0),
             "air_quality": self._get_last_value(smokes, "value", 0),
             "occupancy": real_occupancy,
-            "light_is_on": self._get_last_value(
-                lights, "is_on", False
-            ),  
-            "light_consumption": self._get_last_value(
-                lights, "value", 0
-            ),  
+            "light_is_on": self._get_last_value(lights, "is_on", False),
+            "light_consumption": self._get_last_value(lights, "value", 0),
         }
 
     def _calculate_occupancy(self) -> int:

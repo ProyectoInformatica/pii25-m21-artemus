@@ -10,12 +10,10 @@ class MapCard(ft.Container):
         self.padding = 20
         self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.alignment = ft.alignment.center
-        self.on_sensor_click = on_sensor_click  
+        self.on_sensor_click = on_sensor_click
 
-        
         self.map_size = 400
 
-        
         self.sensor_config = [
             ("wind", 0.25, 0.50, ft.Colors.BLUE_GREY, "Viento", ft.Icons.AIR),
             (
@@ -54,14 +52,12 @@ class MapCard(ft.Container):
             )
         ]
 
-        marker_size = 36  
+        marker_size = 36
 
         for key, top_pct, left_pct, color, label, icon in self.sensor_config:
 
-            
             icon_control = ft.Icon(icon, color=ft.Colors.WHITE, size=18)
 
-            
             marker = ft.Container(
                 content=icon_control,
                 bgcolor=color,
@@ -72,15 +68,14 @@ class MapCard(ft.Container):
                 tooltip=f"{label}: --",
                 shadow=ft.BoxShadow(blur_radius=6, color=ft.Colors.BLACK26),
                 on_hover=self._on_marker_hover,
-                on_click=self._on_marker_click,  
-                data=key,  
+                on_click=self._on_marker_click,
+                data=key,
                 scale=1.0,
                 animate_scale=ft.Animation(300, ft.AnimationCurve.ELASTIC_OUT),
             )
 
             self.markers[key] = marker
 
-            
             left_pos = (self.map_size * left_pct) - (marker_size / 2)
             top_pos = (self.map_size * top_pct) - (marker_size / 2)
 
@@ -104,15 +99,13 @@ class MapCard(ft.Container):
     def _on_marker_click(self, e):
         """Maneja el clic en un marcador y llama al callback principal"""
         if self.on_sensor_click:
-            self.on_sensor_click(e.control.data)  
+            self.on_sensor_click(e.control.data)
 
     def update_light_marker_status(self, is_on: bool, consumption: float):
         """Actualiza el marcador de luces y el texto de consumo."""
         marker = self.markers.get("lights")
         if marker:
-            marker_icon_control = (
-                marker.content
-            )  
+            marker_icon_control = marker.content
             marker_icon_control.icon = (
                 ft.Icons.LIGHTBULB if is_on else ft.Icons.LIGHTBULB_OUTLINE
             )

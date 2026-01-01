@@ -11,7 +11,6 @@ class AlertCard(ft.Container):
         self.padding = 20
         self.border = ft.border.all(1, ft.Colors.GREY_300)
 
-        
         self.icon_alert = ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.GREEN, size=40)
         self.title_alert = ft.Text(
             "Sistema Normal", size=16, weight="bold", color=AppColors.TEXT_MAIN
@@ -36,8 +35,8 @@ class AlertCard(ft.Container):
         if is_critical:
             self.icon_alert.name = ft.Icons.WARNING_AMBER_ROUNDED
             self.icon_alert.color = ft.Colors.RED
-            self.bgcolor = ft.Colors.RED_50  
-            self.border = ft.border.all(2, ft.Colors.RED)  
+            self.bgcolor = ft.Colors.RED_50
+            self.border = ft.border.all(2, ft.Colors.RED)
         else:
             self.icon_alert.name = ft.Icons.INFO
             self.icon_alert.color = ft.Colors.BLUE

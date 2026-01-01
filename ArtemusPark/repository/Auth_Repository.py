@@ -1,9 +1,10 @@
 import json
 from pathlib import Path
 
+
 class AuthRepository:
     """Repositorio para gestionar la autenticación de usuarios con persistencia JSON."""
-    
+
     def __init__(self):
         self.base_dir = Path(__file__).resolve().parent.parent
         self.data_file = self.base_dir / "json" / "users.json"
@@ -63,12 +64,12 @@ class AuthRepository:
         users = self._load_users()
         if username not in users:
             raise ValueError("El usuario no existe.")
-        
+
         if password:
             users[username]["password"] = password
         if role:
             users[username]["role"] = role
-            
+
         self._save_users(users)
 
     def delete_user(self, username):

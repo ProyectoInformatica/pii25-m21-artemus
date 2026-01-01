@@ -66,9 +66,7 @@ class LoginPage(ft.Container):
             weight=ft.FontWeight.BOLD,
             color=AppColors.BG_DARK,
             text_align=ft.TextAlign.CENTER,
-            style=ft.TextStyle(
-                font_family="RobotoCondensed", letter_spacing=1.5
-            ),
+            style=ft.TextStyle(font_family="RobotoCondensed", letter_spacing=1.5),
         )
 
         self.sub_title_text = ft.Text(
@@ -96,7 +94,7 @@ class LoginPage(ft.Container):
                     self.sub_title_text,
                     self.tf_username,
                     self.tf_password,
-                    ft.Container(height=10),  
+                    ft.Container(height=10),
                     self.btn_enter,
                     self.btn_switch,
                 ],
@@ -115,8 +113,7 @@ class LoginPage(ft.Container):
     def _toggle_mode(self, e):
         """Alterna entre modo Login y Registro."""
         self.is_registering = not self.is_registering
-        
-                                  
+
         self.tf_username.value = ""
         self.tf_password.value = ""
         self._reset_error_state(None)
@@ -131,7 +128,7 @@ class LoginPage(ft.Container):
             self.sub_title_text.value = "Identifícate para acceder"
             self.btn_enter.text = "Entrar al Sistema"
             self.btn_switch.text = "¿No tienes cuenta? Regístrate"
-        
+
         self.update()
 
     def _handle_submit(self, e):
@@ -145,17 +142,16 @@ class LoginPage(ft.Container):
 
         if self.is_registering:
             try:
-                                                              
+
                 self.auth_repo.add_user(username, password, "user")
                 self._show_success("Registro exitoso. Por favor inicia sesión.")
-                
-                                                      
+
                 self._toggle_mode(None)
-                
+
             except ValueError as ex:
                 self._show_error(str(ex))
         else:
-                             
+
             role = self.auth_repo.authenticate(username, password)
 
             if role:

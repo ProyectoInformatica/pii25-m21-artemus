@@ -3,20 +3,13 @@ from flet import Container, Row, Icon, Text, Icons, Colors
 from datetime import datetime
 
 
-
 class EventsPanel(ft.ListView):
     def __init__(self, events: list):
         super().__init__()
-        self.expand = True  
+        self.expand = True
         self.spacing = 10
-        self.padding = ft.padding.only(
-            right=10, bottom=10
-        )  
+        self.padding = ft.padding.only(right=10, bottom=10)
 
-        
-        
-
-        
         self.controls = [self._create_event_item(e) for e in events]
 
     def update_events(self, new_events: list):
@@ -36,23 +29,21 @@ class EventsPanel(ft.ListView):
             except Exception:
                 time_str = "--:--"
         elif isinstance(raw_ts, str):
-            
-            
+
             time_str = raw_ts.split("T")[-1][:5] if "T" in raw_ts else raw_ts[-8:-3]
         else:
             time_str = "--:--"
 
-        evt_type = event.get("type", "unknown").lower()  
+        evt_type = event.get("type", "unknown").lower()
 
-        
         if "temp" in evt_type:
             icon = Icons.THERMOSTAT
             color = Colors.ORANGE
-        elif "hum" in evt_type:  
+        elif "hum" in evt_type:
             icon = Icons.WATER_DROP
             color = Colors.BLUE
         elif "light" in evt_type:
-            icon = Icons.LIGHTBULB  
+            icon = Icons.LIGHTBULB
             color = Colors.YELLOW_700
         elif "door" in evt_type:
             icon = Icons.DOOR_SLIDING

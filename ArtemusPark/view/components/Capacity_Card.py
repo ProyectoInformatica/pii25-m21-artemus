@@ -13,7 +13,6 @@ class CapacityCard(ft.Container):
         self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.padding = 20
 
-        
         self.txt_value = ft.Text(
             "0", size=30, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN
         )
@@ -23,11 +22,9 @@ class CapacityCard(ft.Container):
             value=0, color=ft.Colors.BLUE, bgcolor=ft.Colors.GREY_200, height=8
         )
 
-        
         self.content = ft.Column(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
@@ -37,7 +34,6 @@ class CapacityCard(ft.Container):
                             color=AppColors.TEXT_MUTED,
                             weight=ft.FontWeight.W_500,
                         ),
-                        
                         ft.Container(
                             content=ft.Text("Live", size=10, color=ft.Colors.BLUE),
                             bgcolor=ft.Colors.BLUE_50,
@@ -46,13 +42,11 @@ class CapacityCard(ft.Container):
                         ),
                     ],
                 ),
-                
                 ft.Row(
-                    vertical_alignment=ft.CrossAxisAlignment.END,  
+                    vertical_alignment=ft.CrossAxisAlignment.END,
                     controls=[
                         self.txt_value,
-                        ft.Container(width=10),  
-                        
+                        ft.Container(width=10),
                         ft.Column(
                             spacing=0,
                             controls=[
@@ -61,12 +55,11 @@ class CapacityCard(ft.Container):
                                     size=12,
                                     color=AppColors.TEXT_LIGHT_GREY,
                                 ),
-                                self.txt_percent,  
+                                self.txt_percent,
                             ],
                         ),
                     ],
                 ),
-                
                 ft.Column(
                     spacing=5,
                     controls=[
@@ -80,24 +73,20 @@ class CapacityCard(ft.Container):
         """
         Recibe el nuevo valor, calcula porcentajes y actualiza la UI.
         """
-        
+
         if current_value is None:
             current_value = 0
 
-        
         safe_value = min(current_value, self.max_capacity)
 
-        
         if self.max_capacity > 0:
             percentage = safe_value / self.max_capacity
         else:
             percentage = 0
 
-        
         self.txt_value.value = str(current_value)
         self.txt_percent.value = f"{int(percentage * 100)}%"
 
-        
         self.progress_bar.value = percentage
 
         if percentage > 0.9:

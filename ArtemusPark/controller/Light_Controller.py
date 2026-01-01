@@ -26,7 +26,7 @@ class LightController:
         Simula el sensor/controlador de luz.
         Lógica: Las luces se encienden entre 19:00 y 07:00 (hora simulada).
         """
-        
+
         if not self.controller_ref:
             logging.error(
                 "LightController needs controller_ref to read simulated time."
@@ -34,10 +34,9 @@ class LightController:
             return
 
         while self.controller_ref.running:
-            
+
             current_hour = self.controller_ref.simulated_hour
 
-            
             should_be_on = current_hour >= 19 or current_hour < 7
 
             status = "ON" if should_be_on else "OFF"

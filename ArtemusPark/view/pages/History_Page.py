@@ -10,10 +10,8 @@ class HistoryPage(ft.Container):
         self.padding = 20
         self.bgcolor = AppColors.BG_MAIN
 
-        
         self.service = DashboardService()
 
-        
         header = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
@@ -25,7 +23,6 @@ class HistoryPage(ft.Container):
                             weight="bold",
                             color=ft.Colors.BLACK,
                         ),
-                        
                         ft.Container(
                             content=ft.Text(
                                 "LIVE", size=10, color=ft.Colors.WHITE, weight="bold"
@@ -45,14 +42,12 @@ class HistoryPage(ft.Container):
             ],
         )
 
-        
         self.data_table = ft.DataTable(
             width=float("inf"),
             bgcolor=ft.Colors.WHITE,
             border_radius=10,
             border=ft.border.all(1, ft.Colors.GREY_200),
             heading_row_color=ft.Colors.GREY_100,
-            
             columns=[
                 ft.DataColumn(
                     ft.Text("Fecha/Hora", color=ft.Colors.BLACK, weight="bold")
@@ -66,7 +61,7 @@ class HistoryPage(ft.Container):
                 ),
                 ft.DataColumn(ft.Text("Estado", color=ft.Colors.BLACK, weight="bold")),
             ],
-            rows=[],  
+            rows=[],
         )
 
         self.content = ft.Column(
@@ -87,8 +82,6 @@ class HistoryPage(ft.Container):
             ],
         )
 
-    
-
     def did_mount(self):
         """1. Se ejecuta al entrar: Nos suscribimos a los avisos."""
         self.page.pubsub.subscribe(self._on_message)
@@ -103,16 +96,13 @@ class HistoryPage(ft.Container):
         if message == "refresh_dashboard":
             self.load_data()
 
-    
-
     def load_data(self):
         """Pide el historial al servicio y rellena la tabla"""
-        
+
         logs = self.service.get_all_history_logs()
 
         self.data_table.rows.clear()
 
-        
         for log in logs[:30]:
             row = self._create_row(
                 log["time_str"],
@@ -129,7 +119,6 @@ class HistoryPage(ft.Container):
         """Crea una fila de datos para la tabla."""
         status_upper = str(status).upper()
 
-        
         if status_upper in ["ALERTA", "WARNING", "HOT", "OFFLINE", "CERRADA"]:
             color_bg = ft.Colors.RED_50
             color_txt = ft.Colors.RED

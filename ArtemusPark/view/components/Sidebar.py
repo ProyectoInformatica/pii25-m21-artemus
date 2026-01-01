@@ -3,11 +3,11 @@ from ArtemusPark.config.Colors import AppColors
 
 
 class Sidebar(ft.Container):
-    
+
     def __init__(self, on_nav_change, on_logout, user_role="user", username=""):
         super().__init__()
         self.on_nav_change = on_nav_change
-        self.on_logout = on_logout  
+        self.on_logout = on_logout
         self.user_role = user_role
         self.username = username
 
@@ -32,7 +32,6 @@ class Sidebar(ft.Container):
             self._make_button("Dashboard", "📊", "dashboard", active=True),
         ]
 
-        
         if self.user_role in ["admin", "maintenance"]:
             controls_list.append(self._make_button("Historial", "🧾", "history"))
 
@@ -42,31 +41,31 @@ class Sidebar(ft.Container):
         if self.user_role == "admin":
             controls_list.append(self._make_button("Administración", "⚙️", "admin"))
 
-        
         controls_list.append(ft.Container(expand=True))
 
-        
         controls_list.append(
             ft.Container(
                 padding=ft.padding.only(top=10),
-                
                 border=ft.border.only(top=ft.border.BorderSide(1, "#374151")),
                 content=ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        
                         ft.Column(
                             spacing=2,
                             controls=[
-                                ft.Text(f"{self.username.upper()} ({self.user_role.upper()})", size=12, weight=ft.FontWeight.BOLD, color="white"),
+                                ft.Text(
+                                    f"{self.username.upper()} ({self.user_role.upper()})",
+                                    size=12,
+                                    weight=ft.FontWeight.BOLD,
+                                    color="white",
+                                ),
                             ],
                         ),
-                        
                         ft.IconButton(
                             icon=ft.Icons.LOGOUT_ROUNDED,
-                            icon_color="#ef4444",  
+                            icon_color="#ef4444",
                             tooltip="Cerrar Sesión",
-                            on_click=lambda e: self.on_logout(),  
+                            on_click=lambda e: self.on_logout(),
                         ),
                     ],
                 ),

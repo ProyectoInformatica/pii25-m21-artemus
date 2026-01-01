@@ -11,7 +11,6 @@ class MaintenancePage(ft.Container):
         self.bgcolor = AppColors.BG_MAIN
         self.service = DashboardService()
 
-        
         self.grid_devices = ft.GridView(
             expand=1,
             runs_count=5,
@@ -19,7 +18,7 @@ class MaintenancePage(ft.Container):
             child_aspect_ratio=1.2,
             spacing=20,
             run_spacing=20,
-            controls=[],  
+            controls=[],
         )
 
         self.content = ft.Column(
@@ -38,7 +37,6 @@ class MaintenancePage(ft.Container):
                             size=14,
                             color=ft.Colors.GREY_700,
                         ),
-                        
                         ft.IconButton(
                             icon=ft.Icons.REFRESH,
                             icon_color=ft.Colors.BLUE,
@@ -54,7 +52,7 @@ class MaintenancePage(ft.Container):
     def did_mount(self):
         """Inicia suscripción y carga datos iniciales."""
         self.page.pubsub.subscribe(self._on_message)
-        
+
         self.update_data()
 
     def will_unmount(self):
@@ -69,7 +67,6 @@ class MaintenancePage(ft.Container):
         """Consulta el estado de salud y regenera las tarjetas"""
         health_data = self.service.get_sensors_health_status()
 
-        
         self.grid_devices.controls.clear()
 
         for device in health_data:
@@ -86,7 +83,7 @@ class MaintenancePage(ft.Container):
 
     def _build_device_card(self, name, status_text, icon, is_online, last_seen):
         """Crea la tarjeta visual para un dispositivo."""
-        
+
         if is_online:
             status_color = ft.Colors.GREEN
             bg_icon = ft.Colors.GREEN_50
@@ -100,7 +97,6 @@ class MaintenancePage(ft.Container):
             bgcolor=ft.Colors.WHITE,
             padding=15,
             border_radius=12,
-            
             border=ft.border.all(1, border_color),
             shadow=ft.BoxShadow(
                 blur_radius=5, color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK)
@@ -108,7 +104,6 @@ class MaintenancePage(ft.Container):
             content=ft.Column(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
-                    
                     ft.Row(
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         controls=[
@@ -118,7 +113,6 @@ class MaintenancePage(ft.Container):
                                 padding=10,
                                 border_radius=10,
                             ),
-                            
                             ft.Icon(
                                 ft.Icons.FIBER_MANUAL_RECORD,
                                 color=status_color,
@@ -126,7 +120,6 @@ class MaintenancePage(ft.Container):
                             ),
                         ],
                     ),
-                    
                     ft.Column(
                         spacing=2,
                         controls=[
@@ -138,7 +131,6 @@ class MaintenancePage(ft.Container):
                             ),
                         ],
                     ),
-                    
                     ft.Container(
                         border=ft.border.only(top=ft.BorderSide(1, ft.Colors.GREY_100)),
                         padding=ft.padding.only(top=10),

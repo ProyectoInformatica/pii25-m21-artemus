@@ -25,14 +25,11 @@ def compute_light_metrics() -> LightMetrics:
             off_count=0,
         )
 
-    
     values = [int(r["value"]) for r in records]
     count = len(values)
     total_value = sum(values)
     avg_intensity = total_value / count if count > 0 else None
 
-    
-    
     on_count = sum(1 for r in records if r.get("is_on") is True)
     off_count = sum(1 for r in records if r.get("is_on") is False)
 

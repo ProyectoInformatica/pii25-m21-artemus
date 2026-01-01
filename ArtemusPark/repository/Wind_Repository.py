@@ -5,7 +5,7 @@ from ArtemusPark.model.Wind_Model import WindModel
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_FILE = BASE_DIR / "json" / "wind_measurements.json"  
+DATA_FILE = BASE_DIR / "json" / "wind_measurements.json"
 
 
 def _serialize_measurement(measurement: WindModel) -> Dict[str, Any]:

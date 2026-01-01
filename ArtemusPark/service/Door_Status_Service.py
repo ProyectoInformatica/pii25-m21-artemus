@@ -18,7 +18,6 @@ def check_door_status(event: DoorModel, park_open: bool) -> DoorStatusResult:
     """
     is_open = event.is_open
 
-    
     if not park_open and is_open:
         message = (
             f"Door '{event.name}' is OPEN while park is CLOSED → anomaly detected."
