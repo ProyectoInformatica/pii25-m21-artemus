@@ -4,11 +4,12 @@ from ArtemusPark.config.Colors import AppColors
 
 class Sidebar(ft.Container):
     
-    def __init__(self, on_nav_change, on_logout, user_role="user"):
+    def __init__(self, on_nav_change, on_logout, user_role="user", username=""):
         super().__init__()
         self.on_nav_change = on_nav_change
         self.on_logout = on_logout  
         self.user_role = user_role
+        self.username = username
 
         self.width = 260
         self.bgcolor = AppColors.BG_DARK
@@ -57,13 +58,7 @@ class Sidebar(ft.Container):
                         ft.Column(
                             spacing=2,
                             controls=[
-                                ft.Text("Perfil:", size=10, color="#9ca3af"),
-                                ft.Text(
-                                    self.user_role.upper(),
-                                    size=12,
-                                    weight=ft.FontWeight.BOLD,
-                                    color="white",
-                                ),
+                                ft.Text(f"{self.username.upper()} ({self.user_role.upper()})", size=12, weight=ft.FontWeight.BOLD, color="white"),
                             ],
                         ),
                         

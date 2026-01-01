@@ -42,7 +42,7 @@ class AdminPage(ft.Container):
             ],
             rows=[],
             width=float("inf"),
-            # heading_row_alignment=ft.MainAxisAlignment.CENTER,
+                                                                
         )
 
         self.energy_data_points = [ft.LineChartDataPoint(i, 50) for i in range(20)]
@@ -166,7 +166,7 @@ class AdminPage(ft.Container):
             ),
         )
 
-        # Columna Derecha (Emergencia + Energía)
+                                                
         right_column = ft.Column(
             expand=1,
             spacing=20,

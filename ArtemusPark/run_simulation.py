@@ -4,7 +4,7 @@ import time
 import sys
 import os
 
-# Script para ejecutar la simulación de sensores en modo CLI.
+""" Script para ejecutar la simulación de sensores """  
 sys.path.append(os.getcwd())
 
 from controller.Sensor_Controller import SensorController

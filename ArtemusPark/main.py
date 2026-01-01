@@ -172,8 +172,9 @@ async def main(page: ft.Page):
         
         sidebar = Sidebar(
             on_nav_change=change_view,
-            on_logout=logout,  
+            on_logout=logout,
             user_role=role,
+            username=username,
         )
 
         page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
