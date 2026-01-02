@@ -22,7 +22,10 @@ from model.Door_Model import DoorModel
 from model.Light_Model import LightModel
 
 
-from repository.Temperature_Repository import save_temperature_measurement
+from repository.Temperature_Repository import (
+    save_temperature_measurement,
+    load_all_temperature_measurements,
+)
 from repository.Humidity_Repository import save_humidity_measurement
 from repository.Wind_Repository import save_wind_measurement
 from repository.Smoke_Repository import save_smoke_measurement
@@ -102,6 +105,64 @@ async def main(page: ft.Page):
             await asyncio.sleep(3)
 
     """Iniciar simulación al empezar para tener siempre datos disponibles"""
+    def seed_historical_data_if_needed(days=30):
+        now = time.time()
+        temps = load_all_temperature_measurements()
+        if temps:
+            min_ts = min(
+                item.get("timestamp", now)
+                for item in temps
+                if isinstance(item, dict)
+            )
+            if min_ts <= now - (days * 86400):
+                return
+
+        for day in range(days, 0, -1):
+            ts = now - (day * 86400) + random.uniform(0, 86000)
+
+            temp_val = int(random.uniform(18, 32))
+            temp_status = "HOT" if temp_val > 30 else "MILD"
+            save_temperature_measurement(
+                TemperatureModel(value=temp_val, status=temp_status, timestamp=ts)
+            )
+
+            hum_val = int(random.uniform(30, 65))
+            save_humidity_measurement(
+                HumidityModel(value=hum_val, status="NORMAL", timestamp=ts)
+            )
+
+            wind_speed = int(random.uniform(0, 25))
+            wind_state = "WARNING" if wind_speed > 20 else "SAFE"
+            save_wind_measurement(
+                WindModel(speed=wind_speed, state=wind_state, label="Norte", timestamp=ts)
+            )
+
+            smoke_val = int(random.uniform(0, 50))
+            smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
+            save_smoke_measurement(
+                SmokeModel(value=smoke_val, status=smoke_status, timestamp=ts)
+            )
+
+            if random.random() < 0.5:
+                is_open = True
+                direction = "IN" if random.random() < 0.6 else "OUT"
+                save_door_event(
+                    DoorModel(
+                        is_open=is_open,
+                        name="Torniquete Principal",
+                        direction=direction,
+                        timestamp=ts,
+                    )
+                )
+
+            if random.random() < 0.7:
+                is_on = random.choice([True, False])
+                watts = round(random.uniform(100, 250), 2) if is_on else 0.5
+                save_light_event(
+                    LightModel(value=watts, status="OK", is_on=is_on, timestamp=ts)
+                )
+
+    seed_historical_data_if_needed()
     page.run_task(sensor_simulation_loop)
 
     def change_view(page_name, data=None):

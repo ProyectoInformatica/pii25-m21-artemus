@@ -1,3 +1,4 @@
+import time
 import flet as ft
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.service.Dashboard_Service import DashboardService
@@ -11,6 +12,7 @@ class HistoryPage(ft.Container):
         self.bgcolor = AppColors.BG_MAIN
 
         self.service = DashboardService()
+        self.selected_range_days = 30
 
         header = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -68,6 +70,17 @@ class HistoryPage(ft.Container):
             scroll=ft.ScrollMode.AUTO,
             controls=[
                 header,
+                ft.Tabs(
+                    label_color=ft.Colors.BLACK,
+                    unselected_label_color=ft.Colors.BLACK87,
+                    selected_index=0,
+                    on_change=self._on_range_change,
+                    tabs=[
+                        ft.Tab(text="1 mes"),
+                        ft.Tab(text="1 semana"),
+                        ft.Tab(text="1 dia"),
+                    ],
+                ),
                 ft.Divider(height=20, color="transparent"),
                 ft.Container(
                     content=self.data_table,
@@ -100,6 +113,9 @@ class HistoryPage(ft.Container):
         """Pide el historial al servicio y rellena la tabla"""
 
         logs = self.service.get_all_history_logs()
+        now = time.time()
+        threshold = now - (self.selected_range_days * 86400)
+        logs = [log for log in logs if log.get("timestamp", 0) >= threshold]
 
         self.data_table.rows.clear()
 
@@ -114,6 +130,16 @@ class HistoryPage(ft.Container):
             self.data_table.rows.append(row)
 
         self.update()
+
+    def _on_range_change(self, e):
+        index = e.control.selected_index
+        if index == 0:
+            self.selected_range_days = 30
+        elif index == 1:
+            self.selected_range_days = 7
+        else:
+            self.selected_range_days = 1
+        self.load_data()
 
     def _create_row(self, time, type_e, loc, detail, status):
         """Crea una fila de datos para la tabla."""
