@@ -105,14 +105,13 @@ async def main(page: ft.Page):
             await asyncio.sleep(3)
 
     """Iniciar simulación al empezar para tener siempre datos disponibles"""
+
     def seed_historical_data_if_needed(days=30):
         now = time.time()
         temps = load_all_temperature_measurements()
         if temps:
             min_ts = min(
-                item.get("timestamp", now)
-                for item in temps
-                if isinstance(item, dict)
+                item.get("timestamp", now) for item in temps if isinstance(item, dict)
             )
             if min_ts <= now - (days * 86400):
                 return
@@ -134,7 +133,9 @@ async def main(page: ft.Page):
             wind_speed = int(random.uniform(0, 25))
             wind_state = "WARNING" if wind_speed > 20 else "SAFE"
             save_wind_measurement(
-                WindModel(speed=wind_speed, state=wind_state, label="Norte", timestamp=ts)
+                WindModel(
+                    speed=wind_speed, state=wind_state, label="Norte", timestamp=ts
+                )
             )
 
             smoke_val = int(random.uniform(0, 50))
