@@ -45,7 +45,12 @@
     },
     "maint_joe": {
         "password": "fixitnow",
-        "role": "maintenance"
+        "role": "maintenance",
+        "assigned_sensors": [
+            "temperature",
+            "smoke",
+            "wind"
+        ]
     },
     "tech_sarah": {
         "password": "cables99",
