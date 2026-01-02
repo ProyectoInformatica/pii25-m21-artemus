@@ -4,7 +4,6 @@ import random
 import flet as ft
 
 
-
 from view.pages.Login_Page import LoginPage
 from view.components.Sidebar import Sidebar
 from view.pages.Dashboard_Page import DashboardPage
@@ -40,34 +39,25 @@ async def main(page: ft.Page):
     page.fonts = {"RobotoCondensed": "/fonts/RobotoCondensed.ttf"}
     page.window.icon = "/img/logo_pequenio.png"
 
-    session = {"role": None}
+    session = {"role": None, "username": None}
     content_area = ft.Container(expand=True, padding=0)
 
-    
-    
-    
     async def sensor_simulation_loop():
         """Genera datos aleatorios de sensores periódicamente."""
         while True:
             now = time.time()
 
-            
-            
             temp_val = int(random.uniform(20, 32))
             temp_status = "HOT" if temp_val > 30 else "MILD"
             save_temperature_measurement(
                 TemperatureModel(value=temp_val, status=temp_status, timestamp=now)
             )
 
-            
-            
             hum_val = int(random.uniform(30, 60))
             save_humidity_measurement(
                 HumidityModel(value=hum_val, status="NORMAL", timestamp=now)
             )
 
-            
-            
             wind_speed = int(random.uniform(0, 25))
             wind_state = "WARNING" if wind_speed > 20 else "SAFE"
             save_wind_measurement(
@@ -76,15 +66,12 @@ async def main(page: ft.Page):
                 )
             )
 
-            
-            
             smoke_val = int(random.uniform(0, 50))
             smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
             save_smoke_measurement(
                 SmokeModel(value=smoke_val, status=smoke_status, timestamp=now)
             )
 
-            
             if random.random() < 0.4:
                 is_open = True
                 direction = "IN" if random.random() < 0.6 else "OUT"
@@ -97,18 +84,15 @@ async def main(page: ft.Page):
                     )
                 )
 
-            
-            
             if random.random() < 0.9:
                 is_on = random.choice([True, False])
-                
+
                 watts = round(random.uniform(100, 250), 2) if is_on else 0.5
 
                 save_light_event(
                     LightModel(value=watts, status="OK", is_on=is_on, timestamp=now)
                 )
 
-            
             try:
                 page.pubsub.send_all("refresh_dashboard")
             except Exception as e:
@@ -116,16 +100,16 @@ async def main(page: ft.Page):
 
             await asyncio.sleep(3)
 
-    
-    
-    
+    """Iniciar simulación al empezar para tener siempre datos disponibles"""
+    page.run_task(sensor_simulation_loop)
+
     def change_view(page_name, data=None):
         """Cambia la vista actual en el área de contenido principal."""
         current_role = session.get("role")
+        current_username = session.get("username")
 
-        
         if page_name == "admin" and current_role != "admin":
-            
+
             page.snack_bar = ft.SnackBar(ft.Text("Acceso denegado"))
             page.snack_bar.open = True
             page.update()
@@ -138,7 +122,6 @@ async def main(page: ft.Page):
                 user_role=current_role, on_navigate=change_view
             )
 
-        
         elif page_name == "history":
             content_area.content = HistoryPage()
 
@@ -146,35 +129,32 @@ async def main(page: ft.Page):
             content_area.content = MaintenancePage()
 
         elif page_name == "admin":
-            content_area.content = AdminPage(user_role=current_role)
+            content_area.content = AdminPage(
+                user_role=current_role, current_username=current_username
+            )
 
         content_area.update()
 
-    
     def logout():
         """Cierra la sesión del usuario actual y vuelve al login."""
         print("Cerrando sesión...")
-        session["role"] = None  
-        page.clean()  
-        
-        page.add(LoginPage(on_login_success=login_success))
-
-    def login_success(role):
-        """Maneja el inicio de sesión exitoso y configura la interfaz principal."""
-        session["role"] = role
+        session["role"] = None
+        session["username"] = None
         page.clean()
 
-        
-        
-        if not hasattr(page, "simulation_started"):
-            page.run_task(sensor_simulation_loop)
-            page.simulation_started = True
+        page.add(LoginPage(on_login_success=login_success))
 
-        
+    def login_success(username, role):
+        """Maneja el inicio de sesión exitoso y configura la interfaz principal."""
+        session["role"] = role
+        session["username"] = username
+        page.clean()
+
         sidebar = Sidebar(
             on_nav_change=change_view,
-            on_logout=logout,  
+            on_logout=logout,
             user_role=role,
+            username=username,
         )
 
         page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))

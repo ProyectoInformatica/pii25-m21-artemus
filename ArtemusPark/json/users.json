@@ -1,0 +1,143 @@
+{
+    "admin1": {
+        "password": "admin123",
+        "role": "admin",
+        "subordinates": []
+    },
+    "admin_super": {
+        "password": "root2025",
+        "role": "admin",
+        "subordinates": []
+    },
+    "boss_artemus": {
+        "password": "masterkey",
+        "role": "admin",
+        "subordinates": []
+    },
+    "sup_carlos": {
+        "password": "sup123",
+        "role": "admin",
+        "subordinates": [
+            "client_ana",
+            "runner_lucas"
+        ]
+    },
+    "sup_elena": {
+        "password": "sup456",
+        "role": "admin",
+        "subordinates": [
+            "client_ana"
+        ]
+    },
+    "sup_roberto": {
+        "password": "sup789",
+        "role": "admin",
+        "subordinates": [
+            "walker_maria"
+        ]
+    },
+    "sup_laura": {
+        "password": "sup000",
+        "role": "admin",
+        "subordinates": [
+            "cyclist_juan"
+        ]
+    },
+    "maint_joe": {
+        "password": "fixitnow",
+        "role": "maintenance"
+    },
+    "tech_sarah": {
+        "password": "cables99",
+        "role": "maintenance"
+    },
+    "eng_mike": {
+        "password": "wrench77",
+        "role": "maintenance"
+    },
+    "doc_house": {
+        "password": "lupus",
+        "role": "maintenance",
+        "assigned_patients": [
+            "client_ana",
+            "runner_lucas",
+            "walker_maria"
+        ]
+    },
+    "analyst_jen": {
+        "password": "data99",
+        "role": "maintenance",
+        "assigned_patients": [
+            "cyclist_juan",
+            "skater_sofia"
+        ]
+    },
+    "client_ana": {
+        "password": "guest001",
+        "role": "user",
+        "supervisors": [
+            "sup_carlos",
+            "sup_elena"
+        ]
+    },
+    "visit_tom": {
+        "password": "parkfun2",
+        "role": "user",
+        "supervisors": [
+            "admin1"
+        ]
+    },
+    "user_demo": {
+        "password": "testpass",
+        "role": "user",
+        "supervisors": [
+            "admin_super"
+        ]
+    },
+    "runner_lucas": {
+        "password": "runrun1",
+        "role": "user",
+        "supervisors": [
+            "sup_carlos"
+        ]
+    },
+    "walker_maria": {
+        "password": "walk123",
+        "role": "user",
+        "supervisors": [
+            "sup_roberto"
+        ]
+    },
+    "cyclist_juan": {
+        "password": "cycle44",
+        "role": "user",
+        "supervisors": [
+            "sup_laura"
+        ]
+    },
+    "skater_sofia": {
+        "password": "skate88",
+        "role": "user",
+        "supervisors": [
+            "sup_laura"
+        ]
+    },
+    "yoga_clara": {
+        "password": "ommm11",
+        "role": "user",
+        "supervisors": [
+            "boss_artemus"
+        ]
+    },
+    "picnic_fam": {
+        "password": "foodie2",
+        "role": "user",
+        "supervisors": [
+            "boss_artemus"
+        ]
+    },
+    "igomez": {
+        "password": "igomez",
+        "role": "user"
+    }
+}

@@ -14,7 +14,7 @@ def _serialize(event: DoorModel) -> Dict[str, Any]:
         "timestamp": event.timestamp,
         "is_open": event.is_open,
         "name": event.name,
-        "direction": event.direction,  
+        "direction": event.direction,
     }
 
 

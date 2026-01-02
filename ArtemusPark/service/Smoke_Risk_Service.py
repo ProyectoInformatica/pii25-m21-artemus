@@ -15,9 +15,8 @@ def check_smoke_risk(measurement: SmokeModel) -> SmokeRiskResult:
     Evalúa la medición de humo para determinar riesgo inmediato.
     """
     density = measurement.value
-    status = measurement.status  
+    status = measurement.status
 
-    
     is_emergency = status == "ALARM"
 
     if is_emergency:

@@ -1,7 +1,7 @@
 import time
 from ArtemusPark.controller.Sensor_Controller import SensorController
 
-# Script de inicio para testing.
+
 controller = SensorController()
 controller.start()
 

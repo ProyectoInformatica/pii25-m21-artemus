@@ -10,23 +10,21 @@ from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class DashboardPage(ft.Container):
-    def __init__(self, user_role="user", on_navigate=None):  
+    def __init__(self, user_role="user", on_navigate=None):
         super().__init__()
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
         self.padding = 18
         self.user_role = user_role
         self.service = DashboardService()
-        self.on_navigate = on_navigate  
+        self.on_navigate = on_navigate
 
-        
         self.card_capacity = CapacityCard(max_capacity=2000)
         self.card_capacity.expand = 2
 
         self.card_alerts = AlertCard()
         self.card_alerts.expand = 2
 
-        
         self.card_temp = SensorCard("Temperatura", "🌡", "--", "ºC", "Zona Central")
         self.card_hum = SensorCard("Humedad", "💧", "--", "%", "Suelo Riego A")
         self.card_wind = SensorCard("Viento", "💨", "--", "km/h", "Estación Norte")
@@ -35,14 +33,10 @@ class DashboardPage(ft.Container):
         for c in [self.card_temp, self.card_hum, self.card_wind, self.card_air]:
             c.expand = 1
 
-        
-        self.card_map = MapCard(
-            on_sensor_click=self._on_map_sensor_click
-        )  
+        self.card_map = MapCard(on_sensor_click=self._on_map_sensor_click)
         self.chart_component = TempChart()
         self.panel_events = EventsPanel(self.service.get_recent_events())
 
-        
         self.main_card_container = self._build_main_card()
 
         self.content = ft.Column(
@@ -53,7 +47,6 @@ class DashboardPage(ft.Container):
     def _on_map_sensor_click(self, sensor_type: str):
         """Muestra un diálogo modal con la lista de sensores de ese tipo."""
 
-        
         configs = {
             "temperature": {
                 "color": ft.Colors.RED_50,
@@ -92,8 +85,6 @@ class DashboardPage(ft.Container):
             {"color": ft.Colors.GREY_50, "icon": ft.Icons.INFO, "title": sensor_type},
         )
 
-        
-        
         component_list = ft.Column(
             spacing=10,
             height=200,
@@ -112,7 +103,6 @@ class DashboardPage(ft.Container):
             ],
         )
 
-        
         dlg = ft.AlertDialog(
             title=ft.Row(
                 [
@@ -125,17 +115,15 @@ class DashboardPage(ft.Container):
                 content=component_list,
                 width=400,
                 padding=10,
-                bgcolor=cfg["color"],  
+                bgcolor=cfg["color"],
                 border_radius=10,
             ),
-            actions=[
-                ft.TextButton("Cerrar", on_click=lambda e: self.page.close_dialog())
-            ],
+            actions=[ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dlg))],
             actions_alignment=ft.MainAxisAlignment.CENTER,
-            bgcolor=ft.Colors.WHITE,  
+            bgcolor=ft.Colors.WHITE,
         )
 
-        
+        self.page.open(dlg)
 
     def _build_sensor_row(self, name, status, bg_color):
         return ft.Container(
@@ -162,8 +150,8 @@ class DashboardPage(ft.Container):
     def did_mount(self):
         """Suscribe a eventos y verifica estado inicial."""
         self.page.pubsub.subscribe(self._on_message)
+        self._on_message("refresh_dashboard")
 
-        
         if self.service.is_catastrophe_mode():
             self._activate_catastrophe_protocol()
 
@@ -174,9 +162,8 @@ class DashboardPage(ft.Container):
     def _on_message(self, message):
         """Gestor de mensajes centralizado"""
 
-        
         if message == "refresh_dashboard":
-            
+
             data = self.service.get_latest_sensor_data()
             if data:
                 self.card_temp.update_value(data.get("temperature", 0))
@@ -185,7 +172,6 @@ class DashboardPage(ft.Container):
                 self.card_air.update_value(data.get("air_quality", 0))
                 self.card_capacity.update_occupancy(data.get("occupancy", 0))
 
-                
                 self.card_map.update_sensor_data(data)
 
             chart_data = self.service.get_temp_chart_data()
@@ -194,16 +180,13 @@ class DashboardPage(ft.Container):
             new_events = self.service.get_recent_events()
             self.panel_events.update_events(new_events)
 
-            
             if not self.service.is_catastrophe_mode():
-                
+
                 pass
 
-        
         elif message == "catastrophe_mode":
             self._activate_catastrophe_protocol()
 
-        
         elif message == "normal_mode":
             self._deactivate_catastrophe_protocol()
 
@@ -212,7 +195,6 @@ class DashboardPage(ft.Container):
         self.bgcolor = ft.Colors.RED_900
         self.main_card_container.bgcolor = ft.Colors.RED_50
 
-        
         self.txt_welcome.color = ft.Colors.WHITE
         self.txt_dashboard.color = ft.Colors.WHITE
         self.txt_sensors_title.color = ft.Colors.RED_900
@@ -231,7 +213,6 @@ class DashboardPage(ft.Container):
         self.bgcolor = AppColors.BG_MAIN
         self.main_card_container.bgcolor = AppColors.GLASS_WHITE
 
-        
         self.txt_welcome.color = AppColors.TEXT_MUTED
         self.txt_dashboard.color = AppColors.TEXT_MUTED
         self.txt_sensors_title.color = AppColors.TEXT_MAIN
@@ -275,7 +256,7 @@ class DashboardPage(ft.Container):
 
         return ft.Container(
             expand=True,
-            bgcolor=AppColors.GLASS_WHITE,  
+            bgcolor=AppColors.GLASS_WHITE,
             border_radius=12,
             padding=20,
             content=ft.Column(
@@ -295,23 +276,19 @@ class DashboardPage(ft.Container):
                     ),
                     ft.Divider(height=10, color=AppColors.BG_MAIN),
                     ft.Row(
-                        height=500,  
+                        height=500,
                         controls=[
-                            
                             ft.Container(
                                 content=self.card_map, alignment=ft.alignment.top_center
                             ),
                             ft.Container(width=20),
-                            
                             ft.Column(
                                 expand=True,
                                 spacing=15,
                                 controls=[
-                                    
                                     ft.Container(
                                         expand=1, content=self.chart_component
                                     ),
-                                    
                                     ft.Container(
                                         expand=1,
                                         bgcolor="white",

@@ -23,19 +23,19 @@ class DoorController:
         controller_ref=None,
         on_new_data: Optional[Callable[[DoorModel], None]] = None,
     ):
-        self.controller_ref = controller_ref  
-        self.on_new_data = on_new_data  
+        self.controller_ref = controller_ref
+        self.on_new_data = on_new_data
 
     def run(self, name: str):
         """Bucle que simula el sensor de puerta."""
 
         while self.controller_ref.running:
-            
+
             if not self.controller_ref.park_open:
                 data = DoorModel(is_open=False, name=name)
                 msg = f"[{name}] Park is CLOSED → Door forced CLOSED."
             else:
-                
+
                 is_open = bool(random.randint(0, 1))
                 data = DoorModel(is_open=is_open, name=name)
                 msg = f"[{name}] Door {'OPEN' if is_open else 'CLOSED'}"
