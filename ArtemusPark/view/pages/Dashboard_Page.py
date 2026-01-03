@@ -33,7 +33,7 @@ class DashboardPage(ft.Container):
         for c in [self.card_temp, self.card_hum, self.card_wind, self.card_air]:
             c.expand = 1
 
-        self.card_map = MapCard(on_sensor_click=self._on_map_sensor_click)
+        self.card_map = MapCard()
         self.chart_component = TempChart()
         self.panel_events = EventsPanel(self.service.get_recent_events())
 
@@ -43,87 +43,6 @@ class DashboardPage(ft.Container):
             scroll=ft.ScrollMode.AUTO,
             controls=[self._build_window_bar(), self.main_card_container],
         )
-
-    def _on_map_sensor_click(self, sensor_type: str):
-        """Muestra un diálogo modal con la lista de sensores de ese tipo."""
-
-        configs = {
-            "temperature": {
-                "color": ft.Colors.RED_50,
-                "icon": ft.Icons.THERMOSTAT,
-                "title": "Temperatura",
-            },
-            "humidity": {
-                "color": ft.Colors.BLUE_50,
-                "icon": ft.Icons.WATER_DROP,
-                "title": "Humedad",
-            },
-            "wind": {
-                "color": ft.Colors.CYAN_50,
-                "icon": ft.Icons.WIND_POWER,
-                "title": "Viento",
-            },
-            "smoke": {
-                "color": ft.Colors.YELLOW_50,
-                "icon": ft.Icons.AIR,
-                "title": "Calidad Aire",
-            },
-            "lights": {
-                "color": ft.Colors.ORANGE_50,
-                "icon": ft.Icons.LIGHTBULB,
-                "title": "Iluminación",
-            },
-            "capacity": {
-                "color": ft.Colors.PURPLE_50,
-                "icon": ft.Icons.PEOPLE,
-                "title": "Control Aforo",
-            },
-        }
-
-        cfg = configs.get(
-            sensor_type,
-            {"color": ft.Colors.GREY_50, "icon": ft.Icons.INFO, "title": sensor_type},
-        )
-
-        component_list = ft.Column(
-            spacing=10,
-            height=200,
-            scroll=ft.ScrollMode.AUTO,
-            controls=[
-                self._build_sensor_row(
-                    "Sensor Principal (Central)", "En línea", cfg["color"]
-                ),
-                self._build_sensor_row(
-                    "Nodo Entrada Norte", "En línea", ft.Colors.WHITE
-                ),
-                self._build_sensor_row("Nodo Zona Picnic", "Standby", ft.Colors.WHITE),
-                self._build_sensor_row(
-                    "Nodo Mantenimiento", "Offline", ft.Colors.GREY_300
-                ),
-            ],
-        )
-
-        dlg = ft.AlertDialog(
-            title=ft.Row(
-                [
-                    ft.Icon(cfg["icon"], color="black"),
-                    ft.Text(f"Sensores de {cfg['title']}"),
-                ],
-                alignment=ft.MainAxisAlignment.CENTER,
-            ),
-            content=ft.Container(
-                content=component_list,
-                width=400,
-                padding=10,
-                bgcolor=cfg["color"],
-                border_radius=10,
-            ),
-            actions=[ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dlg))],
-            actions_alignment=ft.MainAxisAlignment.CENTER,
-            bgcolor=ft.Colors.WHITE,
-        )
-
-        self.page.open(dlg)
 
     def _build_sensor_row(self, name, status, bg_color):
         return ft.Container(
