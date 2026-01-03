@@ -3,7 +3,7 @@ import time
 import random
 import flet as ft
 
-
+from ArtemusPark.repository.Auth_Repository import AuthRepository
 from view.pages.Login_Page import LoginPage
 from view.components.Sidebar import Sidebar
 from view.pages.Dashboard_Page import DashboardPage
@@ -37,7 +37,7 @@ import multiprocessing
 
 async def main(page: ft.Page):
     """Punto de entrada de la aplicación GUI."""
-    page.title = "Artemus Smart Park"
+    page.title = "Artemus Park"
     page.padding = 0
     page.bgcolor = "#e5e7eb"
     page.fonts = {"RobotoCondensed": "/fonts/RobotoCondensed.ttf"}
@@ -45,6 +45,9 @@ async def main(page: ft.Page):
 
     session = {"role": None, "username": None}
     content_area = ft.Container(expand=True, padding=0)
+
+    auth_repo = AuthRepository()
+    all_users = list(auth_repo.get_all_users().keys())
 
     async def sensor_simulation_loop():
         """Genera datos aleatorios de sensores periódicamente."""
@@ -79,11 +82,13 @@ async def main(page: ft.Page):
             if random.random() < 0.4:
                 is_open = True
                 direction = "IN" if random.random() < 0.6 else "OUT"
+                sim_user = random.choice(all_users) if all_users else "unknown"
                 save_door_event(
                     DoorModel(
                         is_open=is_open,
                         name="Torniquete Principal",
                         direction=direction,
+                        username=sim_user,
                         timestamp=now,
                     )
                 )
@@ -147,11 +152,13 @@ async def main(page: ft.Page):
             if random.random() < 0.5:
                 is_open = True
                 direction = "IN" if random.random() < 0.6 else "OUT"
+                sim_user = random.choice(all_users) if all_users else "unknown"
                 save_door_event(
                     DoorModel(
                         is_open=is_open,
                         name="Torniquete Principal",
                         direction=direction,
+                        username=sim_user,
                         timestamp=ts,
                     )
                 )

@@ -4,6 +4,7 @@ import time
 from typing import Callable, Optional
 
 from ArtemusPark.model.Door_Model import DoorModel
+from ArtemusPark.repository.Auth_Repository import AuthRepository
 
 logging.basicConfig(
     filename="door_controller.log",
@@ -25,6 +26,9 @@ class DoorController:
     ):
         self.controller_ref = controller_ref
         self.on_new_data = on_new_data
+        
+        self.auth_repo = AuthRepository()
+        self.users_list = list(self.auth_repo.get_all_users().keys())
 
     def run(self, name: str):
         """Bucle que simula el sensor de puerta."""
@@ -32,13 +36,21 @@ class DoorController:
         while self.controller_ref.running:
 
             if not self.controller_ref.park_open:
-                data = DoorModel(is_open=False, name=name)
+                data = DoorModel(is_open=False, name=name, direction="NONE", username=None)
                 msg = f"[{name}] Park is CLOSED → Door forced CLOSED."
             else:
 
                 is_open = bool(random.randint(0, 1))
-                data = DoorModel(is_open=is_open, name=name)
-                msg = f"[{name}] Door {'OPEN' if is_open else 'CLOSED'}"
+                direction = "IN" if random.random() < 0.6 else "OUT"
+                sim_user = random.choice(self.users_list) if self.users_list else "unknown"
+
+                data = DoorModel(
+                    is_open=is_open, 
+                    name=name, 
+                    direction=direction, 
+                    username=sim_user
+                )
+                msg = f"[{name}] Door {'OPEN' if is_open else 'CLOSED'} ({direction}) - User: {sim_user}"
 
             print(msg)
             logging.info(msg)
