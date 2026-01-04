@@ -1,0 +1,3596 @@
+[
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864000.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864900.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764865800.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764866700.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764867600.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764868500.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764869400.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764870300.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764871200.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764872100.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873000.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873900.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764874800.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764875700.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764876600.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864000.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864900.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764865800.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764866700.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864000.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864900.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764865800.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764866700.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764867600.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764868500.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764869400.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764870300.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764871200.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764872100.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873000.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873900.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764874800.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764875700.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764876600.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764877500.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764878400.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764879300.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764880200.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764881100.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764882000.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764882900.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764883800.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764884700.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764885600.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764886500.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764887400.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764888300.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764802800.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764803700.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764804600.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764805500.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764806400.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764807300.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764808200.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764809100.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764810000.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764810900.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764811800.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764812700.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764813600.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764814500.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764815400.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764816300.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764817200.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764818100.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764819000.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764819900.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764820800.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764821700.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764822600.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764823500.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764824400.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764825300.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764826200.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764827100.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764828000.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764828900.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764829800.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764830700.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864000.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864900.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764865800.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764866700.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764867600.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764868500.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764869400.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764870300.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764871200.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764872100.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873000.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873900.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764874800.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764875700.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764876600.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764877500.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764878400.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764879300.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764880200.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764881100.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764882000.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764882900.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764883800.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764884700.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764885600.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764886500.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764887400.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764888300.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864000.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864900.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764865800.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764866700.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764867600.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764868500.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764869400.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764870300.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764871200.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764872100.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873000.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873900.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764874800.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864000.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864900.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764865800.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764866700.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764867600.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764868500.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764869400.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764870300.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764871200.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764872100.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873000.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873900.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764874800.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764875700.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764876600.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764877500.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764878400.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764879300.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764880200.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764881100.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764882000.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764882900.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764883800.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764884700.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764885600.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764886500.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764887400.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764888300.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 3,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864000.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864900.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764865800.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764866700.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764867600.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764868500.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764869400.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764870300.0,
+        "speed": 22,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764871200.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764872100.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873000.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873900.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764874800.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764875700.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764876600.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764877500.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764878400.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764879300.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764880200.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764881100.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764882000.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764882900.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764883800.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764884700.0,
+        "speed": 13,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764885600.0,
+        "speed": 6,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764886500.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764887400.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764888300.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 15,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764831600.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764832500.0,
+        "speed": 0,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764833400.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764834300.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764835200.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764836100.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837000.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764837900.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764838800.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764839700.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764840600.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764841500.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764842400.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764843300.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764844200.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764845100.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846000.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764846900.0,
+        "speed": 11,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764847800.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764848700.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764849600.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764850500.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764851400.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764852300.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764853200.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764854100.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855000.0,
+        "speed": 24,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764855900.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764856800.0,
+        "speed": 17,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764857700.0,
+        "speed": 4,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764858600.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764859500.0,
+        "speed": 5,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764860400.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764861300.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764862200.0,
+        "speed": 16,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764863100.0,
+        "speed": 20,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864000.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764864900.0,
+        "speed": 23,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764865800.0,
+        "speed": 12,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764866700.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764867600.0,
+        "speed": 10,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764868500.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764869400.0,
+        "speed": 8,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764870300.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764871200.0,
+        "speed": 2,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764872100.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873000.0,
+        "speed": 19,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764873900.0,
+        "speed": 21,
+        "state": "WARNING"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764874800.0,
+        "speed": 7,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764875700.0,
+        "speed": 9,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764876600.0,
+        "speed": 18,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764877500.0,
+        "speed": 14,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764878400.0,
+        "speed": 1,
+        "state": "SAFE"
+    },
+    {
+        "sensor_id": "wind_01",
+        "timestamp": 1764879300.0,
+        "speed": 8,
+        "state": "SAFE"
+    }
+]
