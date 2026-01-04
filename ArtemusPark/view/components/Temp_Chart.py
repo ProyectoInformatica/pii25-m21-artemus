@@ -38,7 +38,7 @@ class TempChart(ft.Container):
                     ft.ChartAxisLabel(value=0, label=ft.Text("Inicio", size=10)),
                     ft.ChartAxisLabel(value=5, label=ft.Text("Actual", size=10)),
                 ],
-                labels_size=20,
+                labels_size=40,
             ),
             tooltip_bgcolor="#111827",
             min_y=15,
@@ -47,6 +47,7 @@ class TempChart(ft.Container):
         )
 
         self.content = ft.Column(
+            expand=True,
             controls=[
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -57,7 +58,7 @@ class TempChart(ft.Container):
                             weight=ft.FontWeight.BOLD,
                             color="#6b7280",
                         ),
-                        ft.Text("Última hora", size=12, color="#9ca3af"),
+                        ft.Text("Actualmente", size=12, color="#9ca3af"),
                     ],
                 ),
                 ft.Container(height=20),

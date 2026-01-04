@@ -27,7 +27,7 @@ class Sidebar(ft.Container):
         self.nav_buttons = {}
         controls_list = [
             ft.Text(
-                "ARTEMUS",
+                "ARTEMUS PARK",
                 size=22,
                 weight=ft.FontWeight.BOLD,
                 color="white",

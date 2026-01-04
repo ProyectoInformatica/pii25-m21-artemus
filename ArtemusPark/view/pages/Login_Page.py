@@ -111,8 +111,9 @@ class LoginPage(ft.Container):
 
         self.input_fields_container = ft.Container(
             alignment=ft.alignment.center,
-            height=155,
+            height=165,
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
+            padding=ft.padding.only(top=10),
             content=ft.AnimatedSwitcher(
                 self.login_controls,
                 transition=ft.AnimatedSwitcherTransition.FADE,

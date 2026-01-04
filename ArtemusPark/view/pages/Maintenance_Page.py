@@ -64,7 +64,7 @@ class MaintenancePage(ft.Container):
         )
 
         self.content = ft.Column(
-            scroll=ft.ScrollMode.AUTO,
+            expand=True,
             controls=[
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -171,44 +171,31 @@ class MaintenancePage(ft.Container):
             self.my_sensors_row.controls.clear()
 
         for device in health_data:
-            card = self._build_device_card(
-                name=device["name"],
-                status_text=device["status"],
-                icon=device["icon"],
-                is_online=device["is_online"],
-                last_seen=device["last_seen"],
-            )
+            # device contains: id, name, type, status, is_online, icon, last_seen, last_value
+            
+            # Use specific ID matching if available, otherwise fallback (though ID is preferred)
+            is_assigned = device["id"] in self.assigned_sensors
 
-            device_type_map = {
-                "Sensor Temperatura": "temperature",
-                "Sensor Humedad": "humidity",
-                "Anemómetro": "wind",
-                "Detector Humo": "smoke",
-                "Iluminación": "light",
-                "Puertas": "door",
-            }
+            card = self._build_device_card(device, highlight=False)
 
-            sensor_key = device_type_map.get(device["name"])
-
-            if sensor_key and sensor_key in self.assigned_sensors:
-                highlighted_card = self._build_device_card(
-                    name=device["name"],
-                    status_text=device["status"],
-                    icon=device["icon"],
-                    is_online=device["is_online"],
-                    last_seen=device["last_seen"],
-                    highlight=True,
-                )
+            if is_assigned:
+                highlighted_card = self._build_device_card(device, highlight=True)
                 self.my_sensors_row.controls.append(highlighted_card)
 
             self.grid_devices.controls.append(card)
 
-        self.update()
+        if self.page:
+            self.update()
 
-    def _build_device_card(
-        self, name, status_text, icon, is_online, last_seen, highlight=False
-    ):
+    def _build_device_card(self, device, highlight=False):
         """Crea la tarjeta visual para un dispositivo."""
+        
+        name = device["name"]
+        status_text = device["status"]
+        icon = device["icon"]
+        is_online = device["is_online"]
+        last_seen = device["last_seen"]
+        last_value = device.get("last_value", "--")
 
         if is_online:
             status_color = ft.Colors.GREEN
@@ -246,14 +233,28 @@ class MaintenancePage(ft.Container):
                                 padding=10,
                                 border_radius=10,
                             ),
-                            ft.Icon(
-                                (
-                                    ft.Icons.STAR
-                                    if highlight
-                                    else ft.Icons.FIBER_MANUAL_RECORD
-                                ),
-                                color=ft.Colors.BLUE if highlight else status_color,
-                                size=20,
+                            ft.Row(
+                                spacing=0,
+                                controls=[
+                                    ft.IconButton(
+                                        icon=ft.Icons.INFO_OUTLINE,
+                                        icon_color=ft.Colors.GREY_600,
+                                        tooltip="Ver detalles",
+                                        on_click=lambda e: self._show_sensor_details_dialog(device),
+                                        height=30,
+                                        width=30,
+                                        icon_size=20,
+                                    ),
+                                    # ft.Icon(
+                                    #     (
+                                    #         ft.Icons.STAR
+                                    #         if highlight
+                                    #         else ft.Icons.FIBER_MANUAL_RECORD
+                                    #     ),
+                                    #     color=ft.Colors.BLUE if highlight else status_color,
+                                    #     size=20,
+                                    # ),
+                                ]
                             ),
                         ],
                     ),
@@ -261,10 +262,18 @@ class MaintenancePage(ft.Container):
                         spacing=2,
                         controls=[
                             ft.Text(
-                                name, weight="bold", size=16, color=ft.Colors.BLACK
+                                name, 
+                                weight="bold", 
+                                size=14, 
+                                color=ft.Colors.BLACK,
+                                max_lines=2,
+                                overflow=ft.TextOverflow.ELLIPSIS
                             ),
                             ft.Text(
-                                status_text, color=status_color, weight="bold", size=12
+                                f"{status_text} | {last_value}", 
+                                color=status_color, 
+                                weight="bold", 
+                                size=12
                             ),
                         ],
                     ),
@@ -292,3 +301,53 @@ class MaintenancePage(ft.Container):
                 ],
             ),
         )
+
+    def _show_sensor_details_dialog(self, device):
+        """Muestra un diálogo con toda la información del sensor."""
+        
+        detail_content = ft.Column(
+            tight=True,
+            spacing=10,
+            controls=[
+                ft.Row([
+                    ft.Icon(device["icon"], size=30, color=ft.Colors.BLUE_GREY),
+                    ft.Text(device["name"], size=18, weight="bold", expand=True)
+                ]),
+                ft.Divider(),
+                ft.Row([
+                    ft.Text("ID del Sensor:", weight="bold", width=120),
+                    ft.Text(device["id"], selectable=True, font_family="monospace")
+                ]),
+                ft.Row([
+                    ft.Text("Tipo:", weight="bold", width=120),
+                    ft.Text(device["type"].capitalize())
+                ]),
+                ft.Row([
+                    ft.Text("Estado:", weight="bold", width=120),
+                    ft.Container(
+                        content=ft.Text(device["status"], color="white", size=12),
+                        bgcolor=ft.Colors.GREEN if device["is_online"] else ft.Colors.RED,
+                        padding=ft.padding.symmetric(horizontal=8, vertical=2),
+                        border_radius=4
+                    )
+                ]),
+                ft.Row([
+                    ft.Text("Último Valor:", weight="bold", width=120),
+                    ft.Text(device.get("last_value", "--"), weight="bold", size=16)
+                ]),
+                ft.Row([
+                    ft.Text("Última Señal:", weight="bold", width=120),
+                    ft.Text(device["last_seen"])
+                ]),
+            ]
+        )
+
+        dlg = ft.AlertDialog(
+            title=ft.Text("Detalles del Dispositivo"),
+            content=ft.Container(content=detail_content, width=400),
+            actions=[
+                ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dlg))
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+        self.page.open(dlg)

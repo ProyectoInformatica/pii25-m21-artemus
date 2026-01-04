@@ -10,11 +10,12 @@ from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class DashboardPage(ft.Container):
-    def __init__(self, user_role="user", on_navigate=None):
+    def __init__(self, user_name="Usuario", user_role="user", on_navigate=None):
         super().__init__()
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
         self.padding = 18
+        self.user_name = user_name
         self.user_role = user_role
         self.service = DashboardService()
         self.on_navigate = on_navigate
@@ -25,15 +26,15 @@ class DashboardPage(ft.Container):
         self.card_alerts = AlertCard()
         self.card_alerts.expand = 2
 
-        self.card_temp = SensorCard("Temperatura", "🌡", "--", "ºC", "Zona Central")
-        self.card_hum = SensorCard("Humedad", "💧", "--", "%", "Suelo Riego A")
-        self.card_wind = SensorCard("Viento", "💨", "--", "km/h", "Estación Norte")
-        self.card_air = SensorCard("Calidad Aire", "☁️", "--", "ppm", "Sensor MQ-135")
+        self.card_temp = SensorCard("Temperatura", "🌡", "--", "ºC")
+        self.card_hum = SensorCard("Humedad", "💧", "--", "%")
+        self.card_wind = SensorCard("Viento", "💨", "--", "km/h")
+        self.card_air = SensorCard("Calidad Aire", "☁️", "--", "ppm")
 
         for c in [self.card_temp, self.card_hum, self.card_wind, self.card_air]:
             c.expand = 1
 
-        self.card_map = MapCard(on_sensor_click=self._on_map_sensor_click)
+        self.card_map = MapCard(on_sensor_click=self._handle_sensor_click)
         self.chart_component = TempChart()
         self.panel_events = EventsPanel(self.service.get_recent_events())
 
@@ -44,86 +45,82 @@ class DashboardPage(ft.Container):
             controls=[self._build_window_bar(), self.main_card_container],
         )
 
-    def _on_map_sensor_click(self, sensor_type: str):
-        """Muestra un diálogo modal con la lista de sensores de ese tipo."""
-
-        configs = {
-            "temperature": {
-                "color": ft.Colors.RED_50,
-                "icon": ft.Icons.THERMOSTAT,
-                "title": "Temperatura",
-            },
-            "humidity": {
-                "color": ft.Colors.BLUE_50,
-                "icon": ft.Icons.WATER_DROP,
-                "title": "Humedad",
-            },
-            "wind": {
-                "color": ft.Colors.CYAN_50,
-                "icon": ft.Icons.WIND_POWER,
-                "title": "Viento",
-            },
-            "smoke": {
-                "color": ft.Colors.YELLOW_50,
-                "icon": ft.Icons.AIR,
-                "title": "Calidad Aire",
-            },
-            "lights": {
-                "color": ft.Colors.ORANGE_50,
-                "icon": ft.Icons.LIGHTBULB,
-                "title": "Iluminación",
-            },
-            "capacity": {
-                "color": ft.Colors.PURPLE_50,
-                "icon": ft.Icons.PEOPLE,
-                "title": "Control Aforo",
-            },
+    def _handle_sensor_click(self, sensor_type):
+        """Maneja el clic en los sensores del mapa y muestra detalles."""
+        type_map = {
+            "lights": "light",
+            "capacity": "door",
+            "smoke": "smoke",
+            "temperature": "temperature",
+            "humidity": "humidity",
+            "wind": "wind"
         }
 
-        cfg = configs.get(
-            sensor_type,
-            {"color": ft.Colors.GREY_50, "icon": ft.Icons.INFO, "title": sensor_type},
-        )
+        target_type = type_map.get(sensor_type, sensor_type)
 
-        component_list = ft.Column(
-            spacing=10,
-            height=200,
-            scroll=ft.ScrollMode.AUTO,
-            controls=[
-                self._build_sensor_row(
-                    "Sensor Principal (Central)", "En línea", cfg["color"]
-                ),
-                self._build_sensor_row(
-                    "Nodo Entrada Norte", "En línea", ft.Colors.WHITE
-                ),
-                self._build_sensor_row("Nodo Zona Picnic", "Standby", ft.Colors.WHITE),
-                self._build_sensor_row(
-                    "Nodo Mantenimiento", "Offline", ft.Colors.GREY_300
-                ),
-            ],
-        )
+        title_map = {
+            "light": "Iluminación",
+            "door": "Accesos (Puertas)",
+            "smoke": "Calidad del Aire",
+            "temperature": "Temperatura",
+            "humidity": "Humedad",
+            "wind": "Viento"
+        }
 
-        dlg = ft.AlertDialog(
-            title=ft.Row(
-                [
-                    ft.Icon(cfg["icon"], color="black"),
-                    ft.Text(f"Sensores de {cfg['title']}"),
+        display_title = title_map.get(target_type, target_type.capitalize())
+
+        all_sensors = self.service.get_sensors_health_status()
+        filtered_sensors = [s for s in all_sensors if s["type"] == target_type]
+
+        rows = []
+        for s in filtered_sensors:
+            rows.append(
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(s["name"])),
+                        ft.DataCell(
+                            ft.Container(
+                                content=ft.Text(s["status"], size=12, color="white"),
+                                bgcolor=ft.Colors.GREEN if s["is_online"] else ft.Colors.RED,
+                                padding=5,
+                                border_radius=5
+                            )
+                        ),
+                        ft.DataCell(ft.Text(str(s["last_value"]))),
+                        ft.DataCell(ft.Text(s["last_seen"])),
+                    ]
+                )
+            )
+
+        if not rows:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text("No hay sensores de ese tipo", color=ft.Colors.WHITE),
+                    bgcolor=ft.Colors.RED,
+                )
+            )
+        else:
+             content = ft.DataTable(
+                columns=[
+                    ft.DataColumn(ft.Text("Nombre")),
+                    ft.DataColumn(ft.Text("Estado")),
+                    ft.DataColumn(ft.Text("Valor")),
+                    ft.DataColumn(ft.Text("Últ. Act.")),
                 ],
-                alignment=ft.MainAxisAlignment.CENTER,
-            ),
-            content=ft.Container(
-                content=component_list,
-                width=400,
-                padding=10,
-                bgcolor=cfg["color"],
-                border_radius=10,
-            ),
-            actions=[ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dlg))],
-            actions_alignment=ft.MainAxisAlignment.CENTER,
-            bgcolor=ft.Colors.WHITE,
-        )
+                rows=rows,
+                border=ft.border.all(1, ft.Colors.GREY_300),
+                vertical_lines=ft.border.BorderSide(1, ft.Colors.GREY_200),
+                horizontal_lines=ft.border.BorderSide(1, ft.Colors.GREY_200),
+             )
 
-        self.page.open(dlg)
+             dialog = ft.AlertDialog(
+                title=ft.Text(f"Sensores de {display_title}"),
+                content=ft.Column([content], height=300, width=650, scroll=ft.ScrollMode.AUTO, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                actions=[
+                    ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dialog))
+                ],
+             )
+             self.page.open(dialog)
 
     def _build_sensor_row(self, name, status, bg_color):
         return ft.Container(
@@ -166,11 +163,22 @@ class DashboardPage(ft.Container):
 
             data = self.service.get_latest_sensor_data()
             if data:
-                self.card_temp.update_value(data.get("temperature", 0))
-                self.card_hum.update_value(data.get("humidity", 0))
-                self.card_wind.update_value(data.get("wind", 0))
-                self.card_air.update_value(data.get("air_quality", 0))
                 self.card_capacity.update_occupancy(data.get("occupancy", 0))
+
+            avg_data = self.service.get_average_sensor_data()
+            if avg_data:
+                def update_sensor_ui(card, map_key, value):
+                    if value is None:
+                        card.update_value("--")
+                        self.card_map.update_marker_status_by_type(map_key, False)
+                    else:
+                        card.update_value(value)
+                        self.card_map.update_marker_status_by_type(map_key, True)
+
+                update_sensor_ui(self.card_temp, "temperature", avg_data.get("temperature"))
+                update_sensor_ui(self.card_hum, "humidity", avg_data.get("humidity"))
+                update_sensor_ui(self.card_wind, "wind", avg_data.get("wind"))
+                update_sensor_ui(self.card_air, "air_quality", avg_data.get("air_quality"))
 
                 self.card_map.update_sensor_data(data)
 
@@ -226,7 +234,7 @@ class DashboardPage(ft.Container):
 
     def _build_window_bar(self):
         self.txt_welcome = ft.Text(
-            f"Bienvenido/a {self.user_role}",
+            f"Bienvenido/a {self.user_name}",
             weight=ft.FontWeight.BOLD,
             color=AppColors.TEXT_MUTED,
         )
@@ -243,7 +251,7 @@ class DashboardPage(ft.Container):
 
     def _build_main_card(self):
         self.txt_sensors_title = ft.Text(
-            "Sensores",
+            "Sensores (Media)",
             size=16,
             weight=ft.FontWeight.BOLD,
             color=AppColors.TEXT_MAIN,
@@ -289,6 +297,7 @@ class DashboardPage(ft.Container):
                                     ft.Container(
                                         expand=1, content=self.chart_component
                                     ),
+                                    ft.Container(height=5),
                                     ft.Container(
                                         expand=1,
                                         bgcolor="white",

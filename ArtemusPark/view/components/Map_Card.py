@@ -38,6 +38,7 @@ class MapCard(ft.Container):
         ]
 
         self.markers = {}
+        self.original_colors = {}
         self.content = self._build_map()
 
     def _build_map(self):
@@ -75,6 +76,7 @@ class MapCard(ft.Container):
             )
 
             self.markers[key] = marker
+            self.original_colors[key] = color
 
             left_pos = (self.map_size * left_pct) - (marker_size / 2)
             top_pos = (self.map_size * top_pct) - (marker_size / 2)
@@ -100,6 +102,26 @@ class MapCard(ft.Container):
         """Maneja el clic en un marcador y llama al callback principal"""
         if self.on_sensor_click:
             self.on_sensor_click(e.control.data)
+
+    def update_marker_status_by_type(self, sensor_type, has_data):
+        """Pone el marcador en gris si no hay datos, o restaura su color si hay datos."""
+        key_map = {
+            "air_quality": "smoke",
+            "occupancy": "capacity",
+        }
+        key = key_map.get(sensor_type, sensor_type)
+        
+        if key in self.markers:
+            marker = self.markers[key]
+            if has_data:
+                if key == "lights":
+                    pass
+                else:
+                    marker.bgcolor = self.original_colors.get(key, ft.Colors.BLUE)
+            else:
+                marker.bgcolor = ft.Colors.GREY
+            marker.update()
+
 
     def update_light_marker_status(self, is_on: bool, consumption: float):
         """Actualiza el marcador de luces y el texto de consumo."""
