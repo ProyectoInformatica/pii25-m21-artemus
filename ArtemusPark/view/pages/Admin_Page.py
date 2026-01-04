@@ -316,11 +316,11 @@ class AdminPage(ft.Container):
             title=ft.Text(f"Datos de {username}"),
             content=ft.Column(
                 [
-                    ft.Text(f"Rol: {user_data.get('role', '-') }"),
-                    ft.Text(f"Nombre completo: {user_data.get('full_name', '-') }"),
-                    ft.Text(f"DNI: {user_data.get('dni', '-') }"),
-                    ft.Text(f"Telefono: {user_data.get('phone', '-') }"),
-                    ft.Text(f"Direccion: {user_data.get('address', '-') }"),
+                    ft.Text(f"Rol: {user_data.get('role', '-')}"),
+                    ft.Text(f"Nombre completo: {user_data.get('full_name', '-')}"),
+                    ft.Text(f"DNI: {user_data.get('dni', '-')}"),
+                    ft.Text(f"Telefono: {user_data.get('phone', '-')}"),
+                    ft.Text(f"Direccion: {user_data.get('address', '-')}"),
                     ft.Text(f"Sensores asignados: {assigned_text}"),
                     ft.Text(f"Supervisores: {supervisors_text}"),
                     ft.Text(f"Subordinados: {subordinates_text}"),
@@ -361,103 +361,86 @@ class AdminPage(ft.Container):
             value=user_data.get("role", "user"),
         )
 
-        assigned = user_data.get("assigned_sensors", [])
-        sensor_options = ["temperature", "humidity", "wind", "smoke", "light", "door"]
-        sensor_checks = []
-        for s in sensor_options:
-            sensor_checks.append(
-                ft.Checkbox(label=s.capitalize(), value=(s in assigned))
-            )
-
-        supervisor_candidates = [
-            u for u, d in users.items() if d.get("role") == "admin" and u != username
-        ]
-        subordinate_candidates = [
-            u for u, d in users.items() if d.get("role") == "user" and u != username
-        ]
-        current_supervisors = (
-            self._get_supervisors_for_user(username, users) if is_edit else set()
+        # Profile fields (mandatory for ALL roles now)
+        tf_full_name = ft.TextField(
+            label="Nombre Completo", value=user_data.get("full_name", "")
         )
-        current_subordinates = set(user_data.get("subordinates", []))
+        tf_dni = ft.TextField(label="DNI", value=user_data.get("dni", ""))
+        tf_phone = ft.TextField(label="Teléfono", value=user_data.get("phone", ""))
+        tf_address = ft.TextField(label="Dirección", value=user_data.get("address", ""))
 
-        supervisor_checks = []
-        for sup in supervisor_candidates:
-            supervisor_checks.append(
-                ft.Checkbox(label=sup, value=(sup in current_supervisors))
-            )
-
-        subordinate_checks = []
-        for sub in subordinate_candidates:
-            subordinate_checks.append(
-                ft.Checkbox(label=sub, value=(sub in current_subordinates))
-            )
-
-        supervisors_section = ft.Column(
+        profile_section = ft.Column(
             [
-                ft.Text("Supervisores:", weight="bold"),
-                ft.Column(supervisor_checks, spacing=0),
+                ft.Text("Datos Personales (Obligatorios):", weight="bold"),
+                tf_full_name,
+                tf_dni,
+                tf_phone,
+                tf_address,
+                ft.Divider(),
             ],
-            visible=dd_role.value != "admin",
-        )
-        subordinates_section = ft.Column(
-            [
-                ft.Text("Usuarios supervisados:", weight="bold"),
-                ft.Column(subordinate_checks, spacing=0),
-            ],
-            visible=dd_role.value == "admin",
         )
 
-        def on_role_change(e):
-            is_admin = dd_role.value == "admin"
-            supervisors_section.visible = not is_admin
-            subordinates_section.visible = is_admin
-            dialog.update()
-
-        dd_role.on_change = on_role_change
-
-        def save(e):
-            try:
-                selected_sensors = [c.label.lower() for c in sensor_checks if c.value]
-                selected_supervisors = [c.label for c in supervisor_checks if c.value]
-                selected_subordinates = [c.label for c in subordinate_checks if c.value]
-                if is_edit:
-                    self.auth_repo.update_user(
-                        username,
-                        tf_pass.value,
-                        dd_role.value,
-                        assigned_sensors=selected_sensors,
+        def handle_first_step_save(e):
+            if (
+                    not tf_user.value
+                    or not tf_pass.value
+                    or not dd_role.value
+                    or not tf_full_name.value
+                    or not tf_dni.value
+                    or not tf_phone.value
+                    or not tf_address.value
+            ):
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text("Todos los campos son obligatorios", color=AppColors.TEXT_WHITE),
+                        bgcolor=ft.Colors.RED,
                     )
-                else:
-                    self.auth_repo.add_user(tf_user.value, tf_pass.value, dd_role.value)
-                    self.auth_repo.update_user(
-                        tf_user.value, assigned_sensors=selected_sensors
+                )
+                return
+
+            # DNI Validation
+            if not self._is_valid_dni(tf_dni.value):
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text("DNI inválido. Debe tener 8 números y letra correcta.",
+                                        color=AppColors.TEXT_WHITE),
+                        bgcolor=ft.Colors.RED,
                     )
+                )
+                return
 
-                target_username = username if is_edit else tf_user.value
-                if dd_role.value == "admin":
-                    self._sync_subordinates(target_username, selected_subordinates)
-                    self.auth_repo.update_user(target_username, supervisors=[])
-                else:
-                    self._sync_supervisors(target_username, selected_supervisors)
-                    self.auth_repo.update_user(target_username, subordinates=[])
+            # Phone Validation
+            if not tf_phone.value.strip().isdigit() or len(tf_phone.value.strip()) != 9:
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text("Teléfono inválido. Debe contener 9 dígitos numéricos.",
+                                        color=AppColors.TEXT_WHITE),
+                        bgcolor=ft.Colors.RED,
+                    )
+                )
+                return
 
+            # Prepare data payload
+            user_payload = {
+                "username": tf_user.value,
+                "password": tf_pass.value,
+                "role": dd_role.value,
+                "full_name": tf_full_name.value,
+                "dni": tf_dni.value,
+                "phone": tf_phone.value,
+                "address": tf_address.value,
+                "is_edit": is_edit,
+                "original_username": username,
+            }
+
+            if dd_role.value == "user":
+                # User role doesn't need technical dialog, save directly
+                self._save_final(user_payload)
                 self.page.close(dialog)
-                self._load_users()
-                self.page.open(
-                    ft.SnackBar(
-                        content=ft.Text(
-                            "Usuario guardado correctamente", color="white"
-                        ),
-                        bgcolor=ft.Colors.GREEN_700,
-                    )
-                )
-            except Exception as ex:
-                self.page.open(
-                    ft.SnackBar(
-                        content=ft.Text(f"Error: {str(ex)}", color="white"),
-                        bgcolor=ft.Colors.RED_700,
-                    )
-                )
+            else:
+                # Maintenance/Admin need 2nd step
+                self.page.close(dialog)
+                self._open_technical_dialog(user_payload)
 
         dialog = ft.AlertDialog(
             title=ft.Text("Editar Usuario" if is_edit else "Nuevo Usuario"),
@@ -467,22 +450,229 @@ class AdminPage(ft.Container):
                     tf_pass,
                     dd_role,
                     ft.Divider(),
-                    ft.Text("Sensores Asignados:", weight="bold"),
-                    ft.Column(sensor_checks, spacing=0),
-                    ft.Divider(),
-                    supervisors_section,
-                    subordinates_section,
+                    profile_section,
                 ],
                 height=400,
-                width=300,
+                width=350,
                 scroll=ft.ScrollMode.AUTO,
             ),
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
-                ft.ElevatedButton("Guardar", on_click=save),
+                ft.ElevatedButton(
+                    "Siguiente" if dd_role.value != "user" else "Guardar",
+                    on_click=handle_first_step_save,
+                ),
+            ],
+        )
+
+        def on_role_change(e):
+            dialog.actions[1].text = (
+                "Siguiente" if dd_role.value != "user" else "Guardar"
+            )
+            dialog.update()
+
+        dd_role.on_change = on_role_change
+        self.page.open(dialog)
+
+    def _open_technical_dialog(self, user_payload):
+        users = self.auth_repo.get_all_users()
+        username = user_payload.get("original_username")
+        user_data = users.get(username, {}) if user_payload["is_edit"] else {}
+        role = user_payload["role"]
+
+        content_controls = []
+
+        # Sensors (for maintenance)
+        sensor_checks = []
+        if role == "maintenance":
+            assigned = user_data.get("assigned_sensors", [])
+            sensor_options = [
+                "temperature",
+                "humidity",
+                "wind",
+                "smoke",
+                "light",
+                "door",
+            ]
+
+            def on_sensor_change(e):
+                checked = [c for c in sensor_checks if c.value]
+                if len(checked) > 3:
+                    e.control.value = False
+                    e.control.update()
+                    self.page.open(
+                        ft.SnackBar(
+                            content=ft.Text(
+                                "Máximo 3 sensores permitidos",
+                                color=AppColors.TEXT_WHITE,
+                            ),
+                            bgcolor=ft.Colors.RED,
+                        )
+                    )
+
+            for s in sensor_options:
+                sensor_checks.append(
+                    ft.Checkbox(
+                        label=s.capitalize(),
+                        value=(s in assigned),
+                        on_change=on_sensor_change,
+                    )
+                )
+
+            content_controls.append(
+                ft.Column(
+                    [
+                        ft.Text("Lista de Componentes:", weight="bold"),
+                        ft.Column(sensor_checks, spacing=0),
+                        ft.Divider(),
+                    ]
+                )
+            )
+
+        # Supervision/Subordinates logic
+        supervisor_checks = []
+        subordinate_checks = []
+
+        if role == "maintenance":
+            supervisor_candidates = [
+                u for u, d in users.items() if d.get("role") == "admin"
+            ]  # Can be supervised by any admin
+            current_supervisors = (
+                self._get_supervisors_for_user(username, users)
+                if user_payload["is_edit"]
+                else set()
+            )
+
+            for sup in supervisor_candidates:
+                # Avoid self-reference if role change happened, though unlikely for maint to be admin before
+                if sup == user_payload["username"]:
+                    continue
+                supervisor_checks.append(
+                    ft.Checkbox(label=sup, value=(sup in current_supervisors))
+                )
+
+            content_controls.append(
+                ft.Column(
+                    [
+                        ft.Text(
+                            "¿Por quién va a ser supervisado? (Supervisores):", weight="bold"
+                        ),
+                        ft.Column(supervisor_checks, spacing=0),
+                    ]
+                )
+            )
+
+        if role == "admin":
+            subordinate_candidates = [
+                u for u, d in users.items() if d.get("role") == "user"
+            ]
+            current_subordinates = set(user_data.get("subordinates", []))
+
+            for sub in subordinate_candidates:
+                subordinate_checks.append(
+                    ft.Checkbox(label=sub, value=(sub in current_subordinates))
+                )
+
+            content_controls.append(
+                ft.Column(
+                    [
+                        ft.Text("Usuarios subordinados:", weight="bold"),
+                        ft.Column(subordinate_checks, spacing=0),
+                    ]
+                )
+            )
+
+        def save_second_step(e):
+            selected_sensors = [c.label.lower() for c in sensor_checks if c.value]
+            selected_supervisors = [c.label for c in supervisor_checks if c.value]
+            selected_subordinates = [c.label for c in subordinate_checks if c.value]
+
+            final_payload = user_payload.copy()
+            final_payload["assigned_sensors"] = selected_sensors
+            final_payload["selected_supervisors"] = selected_supervisors
+            final_payload["selected_subordinates"] = selected_subordinates
+
+            self._save_final(final_payload)
+            self.page.close(dialog)
+
+        dialog = ft.AlertDialog(
+            title=ft.Text(f"Configuración Técnica ({role})"),
+            content=ft.Column(
+                content_controls, height=400, width=350, scroll=ft.ScrollMode.AUTO
+            ),
+            actions=[
+                ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
+                ft.ElevatedButton("Guardar", on_click=save_second_step),
             ],
         )
         self.page.open(dialog)
+
+    def _save_final(self, payload):
+        try:
+            username = payload["username"]
+            is_edit = payload["is_edit"]
+            original_username = payload.get("original_username")
+
+            # Default empty lists if not present (e.g. user role)
+            assigned_sensors = payload.get("assigned_sensors", [])
+            selected_supervisors = payload.get("selected_supervisors", [])
+            selected_subordinates = payload.get("selected_subordinates", [])
+
+            if is_edit:
+                # Use original_username for key update in case username changed (not supported yet fully but good practice)
+                target_user = original_username if original_username else username
+                self.auth_repo.update_user(
+                    target_user,
+                    password=payload["password"],
+                    role=payload["role"],
+                    assigned_sensors=assigned_sensors,
+                    full_name=payload["full_name"],
+                    dni=payload["dni"],
+                    phone=payload["phone"],
+                    address=payload["address"],
+                )
+            else:
+                self.auth_repo.add_user(
+                    username,
+                    payload["password"],
+                    payload["role"],
+                    full_name=payload["full_name"],
+                    dni=payload["dni"],
+                    phone=payload["phone"],
+                    address=payload["address"],
+                )
+                self.auth_repo.update_user(
+                    username, assigned_sensors=assigned_sensors
+                )
+
+            target_username = original_username if is_edit else username
+            role = payload["role"]
+
+            if role == "admin":
+                self._sync_subordinates(target_username, selected_subordinates)
+                # Clear supervisors if switching to admin
+                self.auth_repo.update_user(target_username, supervisors=[])
+            elif role == "maintenance":
+                # Maintenance logic for supervisors
+                self._sync_supervisors(target_username, selected_supervisors)
+                self.auth_repo.update_user(target_username, subordinates=[])
+            else:  # User
+                self.auth_repo.update_user(target_username, supervisors=[], subordinates=[])
+
+            self._load_users()
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text("Usuario guardado correctamente", color="white"),
+                    bgcolor=ft.Colors.GREEN_700,
+                )
+            )
+        except Exception as ex:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text(f"Error: {str(ex)}", color="white"),
+                    bgcolor=ft.Colors.RED_700,
+                )
+            )
 
     def _get_supervisors_for_user(self, username, users):
         supervisors = set(users.get(username, {}).get("supervisors", []))
@@ -676,3 +866,16 @@ class AdminPage(ft.Container):
                 ]
             ),
         )
+
+    def _is_valid_dni(self, dni):
+        """Valida formato y letra de DNI español (8 dígitos + letra)."""
+        if not dni:
+            return False
+        dni = dni.strip().upper()
+        if len(dni) != 9:
+            return False
+        if not dni[:8].isdigit() or not dni[8].isalpha():
+            return False
+        letters = "TRWAGMYFPDXBNJZSQVHLCKE"
+        number = int(dni[:8])
+        return dni[8] == letters[number % 23]
