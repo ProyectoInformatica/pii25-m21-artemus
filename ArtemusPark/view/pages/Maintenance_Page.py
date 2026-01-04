@@ -15,6 +15,8 @@ class MaintenancePage(ft.Container):
         self.current_username = current_username
         self.auth_repo = AuthRepository()
         self.req_repo = RequestsRepository()
+        
+        self.current_simulated_time = None
 
         self.assigned_sensors = []
         self.current_role = None
@@ -109,7 +111,14 @@ class MaintenancePage(ft.Container):
         self.page.pubsub.unsubscribe_all()
 
     def _on_message(self, message):
-        if message == "refresh_dashboard":
+        topic = message
+        if isinstance(message, dict):
+            topic = message.get("topic")
+            sim_time = message.get("simulated_time")
+            if sim_time:
+                self.current_simulated_time = sim_time
+
+        if topic == "refresh_dashboard":
             self.update_data()
 
     def _open_request_dialog(self, e):
@@ -152,7 +161,7 @@ class MaintenancePage(ft.Container):
             self.tf_request_msg.update()
             return
 
-        self.req_repo.create_request(self.current_username, msg)
+        self.req_repo.create_request(self.current_username, msg, timestamp=self.current_simulated_time)
         self.page.close(self.dlg_request)
 
         self.page.snack_bar = ft.SnackBar(
@@ -171,9 +180,6 @@ class MaintenancePage(ft.Container):
             self.my_sensors_row.controls.clear()
 
         for device in health_data:
-            # device contains: id, name, type, status, is_online, icon, last_seen, last_value
-            
-            # Use specific ID matching if available, otherwise fallback (though ID is preferred)
             is_assigned = device["id"] in self.assigned_sensors
 
             card = self._build_device_card(device, highlight=False)

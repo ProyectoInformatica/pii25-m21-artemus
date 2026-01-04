@@ -2,8 +2,10 @@ import asyncio
 import time
 import random
 import multiprocessing
+from datetime import datetime
 import flet as ft
 from ArtemusPark.repository.Auth_Repository import AuthRepository
+from ArtemusPark.controller.Sensor_Controller import SensorController
 from repository.Temperature_Repository import (
     save_temperature_measurement,
     load_all_temperature_measurements,
@@ -94,12 +96,32 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
         )
 
     # --- Door ---
-    # Probability unified to 0.45 per sensor
+    dt = datetime.fromtimestamp(timestamp)
+    hour = dt.hour
+    
+    if SensorController.OPEN_HOUR <= hour < SensorController.CLOSE_HOUR:
+        num_events = random.randint(15, 45)
+        prob_in = 0.60
+    elif SensorController.CLOSE_HOUR <= hour < SensorController.CLOSE_HOUR + 2: # Closing rush (18:00 - 20:00)
+        num_events = random.randint(40, 80)
+        prob_in = 0.0
+    else:
+        num_events = random.randint(0, 5)
+        prob_in = 0.0
+
     for sensor in SENSOR_CONFIG.get("door", []):
-        if random.random() < 0.45:
+        for _ in range(num_events):
             is_open = True
-            direction = "IN" if random.random() < 0.6 else "OUT"
+            
+            if random.random() < prob_in:
+                direction = "IN"
+            else:
+                direction = "OUT"
+            
             sim_user = random.choice(all_users) if all_users else "unknown"
+            
+            event_time = timestamp + random.uniform(0, 900)
+            
             save_door_event(
                 DoorModel(
                     is_open=is_open,
@@ -107,12 +129,11 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
                     name=sensor["name"],
                     direction=direction,
                     username=sim_user,
-                    timestamp=timestamp,
+                    timestamp=event_time,
                 )
             )
 
     # --- Light ---
-    # Probability unified to 0.8 per sensor
     for sensor in SENSOR_CONFIG.get("light", []):
         if random.random() < 0.8:
             is_on = random.choice([True, False])
@@ -148,16 +169,25 @@ async def main(page: ft.Page):
     auth_repo = AuthRepository()
     all_users = list(auth_repo.get_all_users().keys())
 
+    start_dt = datetime.now().replace(hour=8, minute=0, second=0, microsecond=0)
+    simulated_timestamp = start_dt.timestamp()
+    time_increment = 15 * 60  # Advance 15 minutes every cycle
+
     async def sensor_simulation_loop():
-        """Genera datos aleatorios de sensores periódicamente."""
+        nonlocal simulated_timestamp
+        """Genera datos aleatorios de sensores periódicamente con hora simulada."""
         while True:
-            now = time.time()
-            generate_sensor_snapshot(now, all_users)
+            generate_sensor_snapshot(simulated_timestamp, all_users)
 
             try:
-                page.pubsub.send_all("refresh_dashboard")
+                page.pubsub.send_all({
+                    "topic": "refresh_dashboard",
+                    "simulated_time": simulated_timestamp
+                })
             except Exception as e:
                 print(f"Error enviando pubsub: {e}")
+            
+            simulated_timestamp += time_increment
 
             await asyncio.sleep(3)
 

@@ -345,11 +345,7 @@ class DashboardService:
 
     def get_sensors_health_status(self) -> List[Dict[str, Any]]:
         """Verifica si los sensores configurados están enviando datos recientemente."""
-        now = time.time()
-        threshold = 15
-        health_report = []
-
-        # Load all data once to avoid reloading for every sensor of same type
+        
         all_data = {
             "temperature": Temperature_Repository.load_all_temperature_measurements(),
             "humidity": Humidity_Repository.load_all_humidity_measurements(),
@@ -358,6 +354,24 @@ class DashboardService:
             "door": Door_Repository.load_all_door_events(),
             "light": Light_Repository.load_all_light_events(),
         }
+        
+        max_ts = 0
+        for data_list in all_data.values():
+            if data_list:
+                last_item = data_list[-1]
+                ts = (
+                    last_item.get("timestamp", 0)
+                    if isinstance(last_item, dict)
+                    else getattr(last_item, "timestamp", 0)
+                )
+                if ts > max_ts:
+                    max_ts = ts
+        
+        now = max_ts if max_ts > 0 else time.time()
+
+        threshold = 60
+
+        health_report = []
 
         icon_map = {
             "temperature": ft.Icons.THERMOSTAT,

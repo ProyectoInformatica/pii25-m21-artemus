@@ -14,7 +14,7 @@ class RequestsRepository:
         if not self.data_file.exists():
             self.data_file.write_text("[]", encoding="utf-8")
 
-    def create_request(self, username, message, request_type="sensor_change"):
+    def create_request(self, username, message, request_type="sensor_change", timestamp=None):
         try:
             content = self.data_file.read_text(encoding="utf-8")
             data = json.loads(content)
@@ -27,7 +27,7 @@ class RequestsRepository:
             "type": request_type,
             "message": message,
             "status": "PENDING",
-            "timestamp": time.time(),
+            "timestamp": timestamp if timestamp is not None else time.time(),
         }
         data.append(new_req)
         self.data_file.write_text(json.dumps(data, indent=4), encoding="utf-8")

@@ -23,7 +23,7 @@ def save_humidity_measurement(measurement: HumidityModel) -> None:
     """Guarda un registro en un archivo JSON diario."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = datetime.fromtimestamp(measurement.timestamp).strftime("%Y-%m-%d")
     file_path = DATA_DIR / f"hum_{today}.json"
 
     if file_path.exists():

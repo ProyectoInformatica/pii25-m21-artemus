@@ -24,7 +24,7 @@ def save_door_event(event: DoorModel) -> None:
     """Guarda un registro en un archivo JSON diario."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = datetime.fromtimestamp(event.timestamp).strftime("%Y-%m-%d")
     file_path = DATA_DIR / f"door_{today}.json"
 
     if file_path.exists():

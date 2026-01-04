@@ -7,6 +7,7 @@ from ArtemusPark.view.components.Capacity_Card import CapacityCard
 from ArtemusPark.view.components.Alert_Card import AlertCard
 from ArtemusPark.view.components.Map_Card import MapCard
 from ArtemusPark.service.Dashboard_Service import DashboardService
+from ArtemusPark.controller.Sensor_Controller import SensorController
 
 
 class DashboardPage(ft.Container):
@@ -158,8 +159,40 @@ class DashboardPage(ft.Container):
 
     def _on_message(self, message):
         """Gestor de mensajes centralizado"""
+        
+        topic = message
+        simulated_time = None
+        
+        if isinstance(message, dict):
+            topic = message.get("topic")
+            simulated_time = message.get("simulated_time")
 
-        if message == "refresh_dashboard":
+        if topic == "refresh_dashboard":
+            
+            if simulated_time:
+                from datetime import datetime
+                try:
+                    dt = datetime.fromtimestamp(simulated_time)
+                    time_str = dt.strftime("%H:%M")
+                    self.txt_clock.value = time_str
+                    
+                    hour = dt.hour
+                    if SensorController.OPEN_HOUR <= hour < SensorController.CLOSE_HOUR:
+                        self.clock_icon.name = ft.Icons.WB_SUNNY
+                        self.clock_icon.color = ft.Colors.ORANGE
+                        self.clock_container.bgcolor = ft.Colors.WHITE
+                        self.txt_clock.color = ft.Colors.BLACK87
+                        self.clock_container.border = ft.border.all(1, ft.Colors.GREY_300)
+                    else:
+                        self.clock_icon.name = ft.Icons.NIGHTLIGHT_ROUND
+                        self.clock_icon.color = ft.Colors.YELLOW_200
+                        self.clock_container.bgcolor = ft.Colors.INDIGO_900
+                        self.txt_clock.color = ft.Colors.WHITE
+                        self.clock_container.border = ft.border.all(1, ft.Colors.INDIGO_800)
+                    
+                    self.clock_container.update()
+                except Exception:
+                    pass
 
             data = self.service.get_latest_sensor_data()
             if data:
@@ -238,15 +271,41 @@ class DashboardPage(ft.Container):
             weight=ft.FontWeight.BOLD,
             color=AppColors.TEXT_MUTED,
         )
+        
+        self.clock_icon = ft.Icon(ft.Icons.WB_SUNNY, color=ft.Colors.ORANGE, size=20)
+        self.txt_clock = ft.Text(
+            "--:--",
+            weight=ft.FontWeight.BOLD,
+            size=16,
+            color=ft.Colors.BLACK87,
+        )
+
+        self.clock_container = ft.Container(
+            padding=ft.padding.symmetric(horizontal=12, vertical=6),
+            bgcolor=ft.Colors.WHITE,
+            border_radius=20, # Pill shape
+            border=ft.border.all(1, ft.Colors.GREY_300),
+            content=ft.Row(
+                controls=[
+                    self.clock_icon,
+                    self.txt_clock,
+                ],
+                spacing=8,
+                alignment=ft.MainAxisAlignment.CENTER,
+            ),
+        )
+
         self.txt_dashboard = ft.Text(
             "Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED
         )
         return ft.Row(
             controls=[
                 self.txt_welcome,
+                self.clock_container,
                 self.txt_dashboard,
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
         )
 
     def _build_main_card(self):

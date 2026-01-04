@@ -23,8 +23,8 @@ def _serialize(event: LightModel) -> Dict[str, Any]:
 def save_light_event(event: LightModel) -> None:
     """Guarda un registro en un archivo JSON diario."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    
-    today = datetime.now().strftime("%Y-%m-%d")
+
+    today = datetime.fromtimestamp(event.timestamp).strftime("%Y-%m-%d")
     file_path = DATA_DIR / f"light_{today}.json"
 
     if file_path.exists():

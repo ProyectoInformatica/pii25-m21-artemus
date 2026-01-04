@@ -111,7 +111,11 @@ class HistoryPage(ft.Container):
 
     def _on_message(self, message):
         """3. Escuchamos el 'grito' del main.py"""
-        if message == "refresh_dashboard":
+        topic = message
+        if isinstance(message, dict):
+            topic = message.get("topic")
+
+        if topic == "refresh_dashboard":
             self.load_data()
 
     def _toggle_sort(self, e):

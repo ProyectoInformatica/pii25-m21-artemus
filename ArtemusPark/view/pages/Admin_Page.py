@@ -29,6 +29,7 @@ class AdminPage(ft.Container):
         self.req_repo = RequestsRepository()
         self.simulation_running = False
         self.current_username = current_username
+        self.current_simulated_time = datetime.now().replace(hour=8, minute=0, second=0, microsecond=0).timestamp()
 
         if user_role != "admin":
             self.content = ft.Center(
@@ -47,8 +48,8 @@ class AdminPage(ft.Container):
         )
 
         self.energy_data_points = [ft.LineChartDataPoint(i, 50) for i in range(20)]
-        now_str = datetime.now().strftime("%H:%M:%S")
-        self.time_labels = [now_str for _ in range(20)]
+        sim_start_time_str = datetime.fromtimestamp(self.current_simulated_time).strftime("%H:%M:%S")
+        self.time_labels = [sim_start_time_str for _ in range(20)]
 
         self.btn_catastrophe = ft.ElevatedButton(
             text="CARGANDO ESTADO...",
@@ -173,6 +174,13 @@ class AdminPage(ft.Container):
             expand=1, spacing=20, controls=[emergency_section, energy_section]
         )
 
+        admin_full_name = "Super Admin"
+        admin_email = "admin@artemus.park"
+        if self.current_username:
+            user_data = self.auth_repo.get_all_users().get(self.current_username, {})
+            admin_full_name = user_data.get("full_name", admin_full_name)
+            admin_email = f"{self.current_username}@artemus.park"
+
         self.content = ft.ListView(
             spacing=20,
             controls=[
@@ -193,13 +201,13 @@ class AdminPage(ft.Container):
                             ft.Column(
                                 [
                                     ft.Text(
-                                        "Super Admin",
+                                        admin_full_name,
                                         weight="bold",
                                         size=16,
                                         color=ft.Colors.BLACK,
                                     ),
                                     ft.Text(
-                                        "admin@artemus.park",
+                                        admin_email,
                                         color=ft.Colors.GREY_700,
                                         size=12,
                                     ),
@@ -220,11 +228,19 @@ class AdminPage(ft.Container):
         self.simulation_running = True
         self._update_button_state()
         self._load_users()
+        self.page.pubsub.subscribe(self._on_message)
 
         threading.Thread(target=self._realtime_energy_loop, daemon=True).start()
 
     def will_unmount(self):
         self.simulation_running = False
+        self.page.pubsub.unsubscribe_all()
+
+    def _on_message(self, message):
+        if isinstance(message, dict) and message.get("topic") == "refresh_dashboard":
+            ts = message.get("simulated_time")
+            if ts:
+                self.current_simulated_time = ts
 
     def _load_users(self):
         users = self.auth_repo.get_all_users()
@@ -804,7 +820,7 @@ class AdminPage(ft.Container):
                 if isinstance(last_door, dict)
                 else getattr(last_door, "timestamp", 0)
             )
-            if (time.time() - ts) < 5:
+            if (self.current_simulated_time - ts) < 5:
                 base_load += 80.0
                 reasons.append("Motor Puerta")
         return {"total": base_load, "details": ", ".join(reasons)}
@@ -813,7 +829,10 @@ class AdminPage(ft.Container):
         while self.simulation_running:
             load_data = self._calculate_sensor_load()
             current_kw = load_data["total"]
-            current_time_str = datetime.now().strftime("%H:%M:%S")
+            
+            sim_dt = datetime.fromtimestamp(self.current_simulated_time)
+            current_time_str = sim_dt.strftime("%H:%M:%S")
+            
             self.txt_energy_value.value = f"{current_kw:.1f} kW"
             self.txt_energy_detail.value = (
                 load_data["details"]

@@ -41,30 +41,33 @@ class DoorController:
 
         while self.controller_ref.running:
             if not self.controller_ref.park_open:
-                msg = f"[{readable_name}] Park is CLOSED. Door activity is suspended."
-                print(msg)
-                logging.info(msg)
-                time.sleep(5)
-                continue
+                is_open = True
+                direction = "OUT"
+                sleep_time = random.uniform(5, 10)
+                msg_prefix = "[NIGHT MODE]"
             else:
                 is_open = bool(random.randint(0, 1))
                 direction = "IN" if random.random() < 0.6 else "OUT"
-                sim_user = random.choice(self.users_list) if self.users_list else "unknown"
+                sleep_time = random.uniform(1, 3)
+                msg_prefix = ""
 
-                data = DoorModel(
-                    is_open=is_open,
-                    sensor_id=sensor_id,
-                    name=readable_name,
-                    direction=direction,
-                    username=sim_user
-                )
-                msg = f"[{readable_name}] Door {'OPEN' if is_open else 'CLOSED'} ({direction}) - User: {sim_user}"
+            sim_user = random.choice(self.users_list) if self.users_list else "unknown"
+
+            data = DoorModel(
+                is_open=is_open,
+                sensor_id=sensor_id,
+                name=readable_name,
+                direction=direction,
+                username=sim_user
+            )
+            msg = f"{msg_prefix}[{readable_name}] Door {'OPEN' if is_open else 'CLOSED'} ({direction}) - User: {sim_user}"
 
             print(msg)
             logging.info(msg)
 
             if self.on_new_data:
                 self.on_new_data(data)
-        time.sleep(5)
+            
+            time.sleep(sleep_time)
 
         print(f"[{readable_name}] Door thread stopped.")
