@@ -203,7 +203,8 @@ class MaintenancePage(ft.Container):
 
             self.grid_devices.controls.append(card)
 
-        self.update()
+        if self.page:
+            self.update()
 
     def _build_device_card(
         self, name, status_text, icon, is_online, last_seen, highlight=False
