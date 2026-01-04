@@ -12,10 +12,10 @@ DATA_DIR = BASE_DIR / "json" / "wind"
 def _serialize_measurement(measurement: WindModel) -> Dict[str, Any]:
     """Convierte el modelo a un diccionario serializable."""
     return {
+        "sensor_id": measurement.sensor_id,
         "timestamp": measurement.timestamp,
         "speed": measurement.speed,
         "state": measurement.state,
-        "label": measurement.label,
     }
 
 

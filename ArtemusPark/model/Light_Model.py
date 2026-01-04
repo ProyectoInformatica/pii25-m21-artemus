@@ -9,4 +9,6 @@ class LightModel:
     value: int
     status: str
     is_on: bool
+    sensor_id: str
+    name: str = ""
     timestamp: float = field(default_factory=time.time)

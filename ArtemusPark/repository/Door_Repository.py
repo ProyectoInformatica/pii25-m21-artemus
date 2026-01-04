@@ -12,9 +12,9 @@ DATA_DIR = BASE_DIR / "json" / "door"
 def _serialize(event: DoorModel) -> Dict[str, Any]:
     """Convierte el modelo a un diccionario serializable."""
     return {
+        "sensor_id": event.sensor_id,
         "timestamp": event.timestamp,
         "is_open": event.is_open,
-        "name": event.name,
         "direction": event.direction,
         "username": event.username,
     }

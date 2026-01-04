@@ -5,7 +5,7 @@ import flet as ft
 from pathlib import Path
 from typing import Dict, Any, List
 from datetime import datetime
-
+from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
 
 from ArtemusPark.model.Door_Model import DoorModel
 from ArtemusPark.repository import (
@@ -103,20 +103,31 @@ class DashboardService:
         lights = Light_Repository.load_all_light_events()
         combined = []
 
+        # Helper to find name by ID in config
+        def get_sensor_name(s_type, s_id):
+            if not s_id: return "Desconocido"
+            for s in SENSOR_CONFIG.get(s_type, []):
+                if s["id"] == s_id:
+                    return s["name"]
+            return s_id
+
         for d in doors:
             if isinstance(d, dict):
-                name = d.get("name")
+                s_id = d.get("sensor_id")
+                name = get_sensor_name("door", s_id)
                 is_open = d.get("is_open")
                 ts = d.get("timestamp")
             else:
-                name = getattr(d, "name", "Puerta")
+                s_id = getattr(d, "sensor_id", None)
+                name = get_sensor_name("door", s_id)
+                if not name and hasattr(d, "name"): name = d.name # Fallback for objects
                 is_open = getattr(d, "is_open", False)
                 ts = getattr(d, "timestamp", 0)
 
             combined.append(
                 {
                     "type": "door",
-                    "label": f"Puerta: {name}",
+                    "label": f"{name}", # Removed redundant "Puerta: " prefix as name usually includes it or context is clear
                     "status": "Abierta" if is_open else "Cerrada",
                     "timestamp": ts,
                 }
@@ -124,16 +135,20 @@ class DashboardService:
 
         for l in lights:
             if isinstance(l, dict):
+                s_id = l.get("sensor_id")
+                name = get_sensor_name("light", s_id)
                 is_on = l.get("is_on")
                 ts = l.get("timestamp")
             else:
+                s_id = getattr(l, "sensor_id", None)
+                name = get_sensor_name("light", s_id)
                 is_on = getattr(l, "is_on", False)
                 ts = getattr(l, "timestamp", 0)
 
             combined.append(
                 {
                     "type": "light",
-                    "label": "Iluminación",
+                    "label": f"{name}",
                     "status": "Encendido" if is_on else "Apagado",
                     "timestamp": ts,
                 }
@@ -329,63 +344,96 @@ class DashboardService:
         return history
 
     def get_sensors_health_status(self) -> List[Dict[str, Any]]:
-        """Verifica si los sensores están enviando datos recientemente."""
+        """Verifica si los sensores configurados están enviando datos recientemente."""
         now = time.time()
         threshold = 15
+        health_report = []
 
-        def check_status(data_list, name_sensor, icon):
-            is_online = False
-            last_seen = "Nunca"
-            if data_list:
-                last_item = data_list[-1]
-                ts = (
-                    last_item.get("timestamp", 0)
-                    if isinstance(last_item, dict)
-                    else getattr(last_item, "timestamp", 0)
-                )
-                if (now - ts) < threshold:
-                    is_online = True
-                try:
-                    last_seen = datetime.fromtimestamp(ts).strftime("%H:%M:%S")
-                except:
-                    last_seen = "Error fecha"
+        # Load all data once to avoid reloading for every sensor of same type
+        all_data = {
+            "temperature": Temperature_Repository.load_all_temperature_measurements(),
+            "humidity": Humidity_Repository.load_all_humidity_measurements(),
+            "wind": Wind_Repository.load_all_wind_measurements(),
+            "smoke": Smoke_Repository.load_all_smoke_measurements(),
+            "door": Door_Repository.load_all_door_events(),
+            "light": Light_Repository.load_all_light_events(),
+        }
 
-            return {
-                "name": name_sensor,
-                "status": "En Línea" if is_online else "Sin Señal",
-                "is_online": is_online,
-                "icon": icon,
-                "last_seen": last_seen,
-            }
+        icon_map = {
+            "temperature": ft.Icons.THERMOSTAT,
+            "humidity": ft.Icons.WATER_DROP,
+            "wind": ft.Icons.AIR,
+            "smoke": ft.Icons.CLOUD,
+            "door": ft.Icons.SENSOR_DOOR,
+            "light": ft.Icons.LIGHTBULB,
+        }
 
-        health_report = [
-            check_status(
-                Temperature_Repository.load_all_temperature_measurements(),
-                "Sensor Temperatura",
-                ft.Icons.THERMOSTAT,
-            ),
-            check_status(
-                Humidity_Repository.load_all_humidity_measurements(),
-                "Sensor Humedad",
-                ft.Icons.WATER_DROP,
-            ),
-            check_status(
-                Wind_Repository.load_all_wind_measurements(), "Anemómetro", ft.Icons.AIR
-            ),
-            check_status(
-                Smoke_Repository.load_all_smoke_measurements(),
-                "Detector Humo",
-                ft.Icons.CLOUD,
-            ),
-            check_status(
-                Door_Repository.load_all_door_events(), "Puertas", ft.Icons.SENSOR_DOOR
-            ),
-            check_status(
-                Light_Repository.load_all_light_events(),
-                "Iluminación",
-                ft.Icons.LIGHTBULB,
-            ),
-        ]
+        for sensor_type, sensors in SENSOR_CONFIG.items():
+            type_data = all_data.get(sensor_type, [])
+            
+            for sensor_config in sensors:
+                s_id = sensor_config["id"]
+                s_name = sensor_config["name"]
+                
+                # Filter data for this specific sensor
+                sensor_data = [
+                    d for d in type_data 
+                    if (isinstance(d, dict) and d.get("sensor_id") == s_id) or 
+                       (not isinstance(d, dict) and getattr(d, "sensor_id", None) == s_id)
+                ]
+
+                is_online = False
+                last_seen = "Nunca"
+                last_value = "--"
+                
+                if sensor_data:
+                    last_item = sensor_data[-1]
+                    ts = (
+                        last_item.get("timestamp", 0)
+                        if isinstance(last_item, dict)
+                        else getattr(last_item, "timestamp", 0)
+                    )
+                    
+                    if (now - ts) < threshold:
+                        is_online = True
+                        
+                    try:
+                        last_seen = datetime.fromtimestamp(ts).strftime("%H:%M:%S")
+                    except:
+                        last_seen = "Error fecha"
+
+                    # Extract main value for display
+                    if sensor_type == "temperature":
+                        val = last_item.get("value") if isinstance(last_item, dict) else last_item.value
+                        last_value = f"{val}°C"
+                    elif sensor_type == "humidity":
+                        val = last_item.get("value") if isinstance(last_item, dict) else last_item.value
+                        last_value = f"{val}%"
+                    elif sensor_type == "wind":
+                        val = last_item.get("speed") if isinstance(last_item, dict) else last_item.speed
+                        last_value = f"{val} km/h"
+                    elif sensor_type == "smoke":
+                        val = last_item.get("value") if isinstance(last_item, dict) else last_item.value
+                        last_value = f"AQI {val}"
+                    elif sensor_type == "door":
+                        is_open = last_item.get("is_open") if isinstance(last_item, dict) else last_item.is_open
+                        last_value = "Abierta" if is_open else "Cerrada"
+                    elif sensor_type == "light":
+                        is_on = last_item.get("is_on") if isinstance(last_item, dict) else last_item.is_on
+                        last_value = "ON" if is_on else "OFF"
+
+
+                health_report.append({
+                    "id": s_id,
+                    "name": s_name,
+                    "type": sensor_type,
+                    "status": "En Línea" if is_online else "Sin Señal",
+                    "is_online": is_online,
+                    "icon": icon_map.get(sensor_type, ft.Icons.DEVICE_UNKNOWN),
+                    "last_seen": last_seen,
+                    "last_value": last_value
+                })
+
         return health_report
 
     def _get_last_value(self, data_list: List[Dict], key: str, default: Any):

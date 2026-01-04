@@ -8,5 +8,6 @@ class WindModel:
 
     speed: int
     state: str
-    label: str
+    sensor_id: str
+    name: str = ""
     timestamp: float = field(default_factory=time.time)

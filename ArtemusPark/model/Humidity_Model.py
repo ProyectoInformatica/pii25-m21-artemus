@@ -8,4 +8,6 @@ class HumidityModel:
 
     value: int
     status: str
+    sensor_id: str
+    name: str = ""
     timestamp: float = field(default_factory=time.time)

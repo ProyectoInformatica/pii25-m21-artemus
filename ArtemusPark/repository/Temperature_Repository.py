@@ -12,6 +12,7 @@ DATA_DIR = BASE_DIR / "json" / "temperature"
 def _serialize(measurement: TemperatureModel) -> Dict[str, Any]:
     """Convierte el modelo a un diccionario serializable."""
     return {
+        "sensor_id": measurement.sensor_id,
         "timestamp": measurement.timestamp,
         "value": measurement.value,
         "status": measurement.status,

@@ -12,6 +12,7 @@ DATA_DIR = BASE_DIR / "json" / "light"
 def _serialize(event: LightModel) -> Dict[str, Any]:
     """Convierte el modelo a un diccionario serializable."""
     return {
+        "sensor_id": event.sensor_id,
         "timestamp": event.timestamp,
         "is_on": event.is_on,
         "status": event.status,

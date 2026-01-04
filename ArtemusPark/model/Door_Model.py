@@ -8,6 +8,7 @@ class DoorModel:
     """Modelo de datos para eventos de puertas."""
 
     is_open: bool
+    sensor_id: str
     name: str
     direction: str
     username: Optional[str] = None
