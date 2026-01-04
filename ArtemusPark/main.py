@@ -38,10 +38,14 @@ import multiprocessing
 async def main(page: ft.Page):
     """Punto de entrada de la aplicación GUI."""
     page.title = "Artemus Park"
+    page.window.width = 1420
+    page.window.height = 820
     page.padding = 0
     page.bgcolor = "#e5e7eb"
     page.fonts = {"RobotoCondensed": "/fonts/RobotoCondensed.ttf"}
     page.window.icon = "/img/logo_pequenio.png"
+    page.window.min_width = 1420
+    page.window.min_height = 800
 
     session = {"role": None, "username": None}
     content_area = ft.Container(expand=True, padding=0)
