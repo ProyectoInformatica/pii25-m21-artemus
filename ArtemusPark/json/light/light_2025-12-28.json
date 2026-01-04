@@ -1,0 +1,576 @@
+[
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766877300.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766877300.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 215.91
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766878200.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 179.4
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766878200.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766879100.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766879100.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 128.65
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766880000.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 191.47
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766880000.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 171.66
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766880900.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 109.17
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766880900.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766881800.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766881800.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 142.88
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766882700.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 175.34
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766882700.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 161.26
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766883600.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 132.74
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766883600.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 247.68
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766884500.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766885400.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766886300.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766887200.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766887200.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 196.13
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766888100.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766888100.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 122.3
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766889900.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766889900.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 126.33
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766890800.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766890800.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766891700.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766892600.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 138.81
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766892600.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 178.28
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766893500.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 241.09
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766893500.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 230.22
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766894400.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766895300.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766895300.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 181.88
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766896200.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766896200.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766897100.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 182.74
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766897100.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 162.24
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766898000.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 119.16
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766898900.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766898900.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766899800.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766899800.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766876400.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766877300.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 212.46
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766877300.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766878200.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766878200.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766879100.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766879100.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 176.69
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766880000.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766880000.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766880900.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 154.92
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766880900.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 135.12
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766881800.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 246.14
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766881800.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766882700.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766882700.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766876400.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 215.32
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766876400.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766877300.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766877300.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 116.34
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766878200.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766878200.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 158.7
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766880000.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 167.18
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766880000.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 211.62
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766880900.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766880900.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 137.9
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766881800.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 167.33
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766883600.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766884500.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766884500.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 223.26
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766885400.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 113.79
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766886300.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 198.49
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766886300.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766887200.0,
+        "is_on": true,
+        "status": "OK",
+        "value": 239.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766887200.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766888100.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766888100.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_01",
+        "timestamp": 1766889000.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    },
+    {
+        "sensor_id": "light_02",
+        "timestamp": 1766889000.0,
+        "is_on": false,
+        "status": "OK",
+        "value": 0.5
+    }
+]
