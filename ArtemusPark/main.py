@@ -178,6 +178,13 @@ async def main(page: ft.Page):
         current_role = session.get("role")
         current_username = session.get("username")
 
+        display_name = current_username
+        if current_username:
+            all_users_data = auth_repo.get_all_users()
+            user_data = all_users_data.get(current_username)
+            if user_data and user_data.get("full_name"):
+                display_name = user_data["full_name"]
+
         if page_name == "admin" and current_role != "admin":
 
             page.snack_bar = ft.SnackBar(ft.Text("Acceso denegado"))
@@ -189,7 +196,7 @@ async def main(page: ft.Page):
 
         if page_name == "dashboard":
             content_area.content = DashboardPage(
-                user_role=current_role, on_navigate=change_view
+                user_name=display_name, user_role=current_role, on_navigate=change_view
             )
 
         elif page_name == "history":
