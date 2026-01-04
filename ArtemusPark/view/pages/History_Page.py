@@ -63,6 +63,13 @@ class HistoryPage(ft.Container):
             rows=[],
         )
 
+        self.table_content = ft.Column(
+            controls=[self.data_table],
+            scroll=ft.ScrollMode.AUTO,
+            expand=True,
+            horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+        )
+
         self.content = ft.Column(
             scroll=ft.ScrollMode.AUTO, # Enable scrolling for the column
             controls=[
@@ -80,10 +87,7 @@ class HistoryPage(ft.Container):
                 ),
                 ft.Divider(height=20, color="transparent"),
                 ft.Container(
-                    content=ft.Column(
-                        controls=[self.data_table],
-                        scroll=ft.ScrollMode.ADAPTIVE,
-                    ),
+                    content=self.table_content,
                     padding=10,
                     bgcolor=ft.Colors.WHITE,
                     border_radius=12,
@@ -144,14 +148,30 @@ class HistoryPage(ft.Container):
 
         self.data_table.rows.clear() # Limpiar de nuevo por seguridad antes de rellenar
 
-        for log in logs:
-            row = self._create_row(
-                log["time_str"],
-                log["type"],
-                log["location"],
-                str(log["detail"]),
-            )
-            self.data_table.rows.append(row)
+        if not logs:
+            self.table_content.scroll = None
+            self.table_content.alignment = ft.MainAxisAlignment.CENTER
+            self.table_content.controls = [
+                ft.Text(
+                    "No hay datos disponibles para mostrar.",
+                    weight=ft.FontWeight.BOLD,
+                    size=16,
+                    color=ft.Colors.BLACK54,
+                    text_align=ft.TextAlign.CENTER,
+                )
+            ]
+        else:
+            self.table_content.scroll = ft.ScrollMode.AUTO
+            self.table_content.alignment = ft.MainAxisAlignment.START
+            for log in logs:
+                row = self._create_row(
+                    log["time_str"],
+                    log["type"],
+                    log["location"],
+                    str(log["detail"]),
+                )
+                self.data_table.rows.append(row)
+            self.table_content.controls = [self.data_table]
 
         self.update()
 
