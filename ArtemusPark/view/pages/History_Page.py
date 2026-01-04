@@ -71,7 +71,7 @@ class HistoryPage(ft.Container):
         )
 
         self.content = ft.Column(
-            scroll=ft.ScrollMode.AUTO, # Enable scrolling for the column
+            expand=True,
             controls=[
                 header,
                 ft.Tabs(
@@ -95,7 +95,7 @@ class HistoryPage(ft.Container):
                         blur_radius=5,
                         color=ft.Colors.with_opacity(0.05, ft.Colors.BLACK),
                     ),
-                    height=500, # Fixed height for the container
+                    expand=True,
                 ),
             ],
         )

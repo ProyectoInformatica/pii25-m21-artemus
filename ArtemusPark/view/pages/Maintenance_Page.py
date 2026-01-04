@@ -64,7 +64,7 @@ class MaintenancePage(ft.Container):
         )
 
         self.content = ft.Column(
-            scroll=ft.ScrollMode.AUTO,
+            expand=True,
             controls=[
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,

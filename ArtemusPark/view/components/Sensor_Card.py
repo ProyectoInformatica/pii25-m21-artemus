@@ -3,7 +3,7 @@ from ArtemusPark.config.Colors import AppColors
 
 
 class SensorCard(ft.Container):
-    def __init__(self, title: str, icon: str, value: str, unit: str, footer_text: str):
+    def __init__(self, title: str, icon: str, value: str, unit: str):
         super().__init__()
         self.width = 180
 
@@ -34,14 +34,7 @@ class SensorCard(ft.Container):
                         self.value_text,
                         ft.Text(unit, size=12, color=AppColors.TEXT_MUTED),
                     ],
-                ),
-                ft.Text(
-                    footer_text,
-                    size=10,
-                    color=AppColors.TEXT_LIGHT_GREY,
-                    no_wrap=True,
-                    overflow=ft.TextOverflow.ELLIPSIS,
-                ),
+                )
             ],
         )
 

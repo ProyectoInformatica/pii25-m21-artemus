@@ -26,10 +26,10 @@ class DashboardPage(ft.Container):
         self.card_alerts = AlertCard()
         self.card_alerts.expand = 2
 
-        self.card_temp = SensorCard("Temperatura", "🌡", "--", "ºC", "Zona Central")
-        self.card_hum = SensorCard("Humedad", "💧", "--", "%", "Suelo Riego A")
-        self.card_wind = SensorCard("Viento", "💨", "--", "km/h", "Estación Norte")
-        self.card_air = SensorCard("Calidad Aire", "☁️", "--", "ppm", "Sensor MQ-135")
+        self.card_temp = SensorCard("Temperatura", "🌡", "--", "ºC")
+        self.card_hum = SensorCard("Humedad", "💧", "--", "%")
+        self.card_wind = SensorCard("Viento", "💨", "--", "km/h")
+        self.card_air = SensorCard("Calidad Aire", "☁️", "--", "ppm")
 
         for c in [self.card_temp, self.card_hum, self.card_wind, self.card_air]:
             c.expand = 1
@@ -163,7 +163,7 @@ class DashboardPage(ft.Container):
 
     def _build_main_card(self):
         self.txt_sensors_title = ft.Text(
-            "Sensores",
+            "Sensores (Media)",
             size=16,
             weight=ft.FontWeight.BOLD,
             color=AppColors.TEXT_MAIN,
@@ -209,6 +209,7 @@ class DashboardPage(ft.Container):
                                     ft.Container(
                                         expand=1, content=self.chart_component
                                     ),
+                                    ft.Container(height=5),
                                     ft.Container(
                                         expand=1,
                                         bgcolor="white",
