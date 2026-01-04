@@ -28,7 +28,8 @@ class AdminPage(ft.Container):
         self.auth_repo = AuthRepository()
         self.req_repo = RequestsRepository()
         self.simulation_running = False
-        self.current_username = current_username
+        # Guardamos el nombre del usuario actual
+        self.current_username = current_username if current_username else "Admin"
 
         if user_role != "admin":
             self.content = ft.Center(
@@ -186,20 +187,23 @@ class AdminPage(ft.Container):
                     "Perfil de Administrador",
                     ft.Row(
                         [
+                            # Usamos f-string para que el avatar dependa del usuario actual
                             ft.CircleAvatar(
-                                foreground_image_src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff",
+                                foreground_image_src=f"https://ui-avatars.com/api/?name={self.current_username}&background=0D8ABC&color=fff",
                                 radius=30,
                             ),
                             ft.Column(
                                 [
+                                    # Mostramos el nombre del usuario real
                                     ft.Text(
-                                        "Super Admin",
+                                        self.current_username,
                                         weight="bold",
                                         size=16,
                                         color=ft.Colors.BLACK,
                                     ),
                                     ft.Text(
-                                        "admin@artemus.park",
+                                        # Podemos asumir un email ficticio basado en el usuario
+                                        f"{self.current_username.lower()}@artemus.park",
                                         color=ft.Colors.GREY_700,
                                         size=12,
                                     ),
@@ -487,7 +491,7 @@ class AdminPage(ft.Container):
         sensor_checks = []
         if role == "maintenance":
             assigned = user_data.get("assigned_sensors", [])
-            
+
             def on_sensor_change(e):
                 checked_count = sum(1 for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value)
                 if checked_count > 3:
@@ -504,22 +508,22 @@ class AdminPage(ft.Container):
                     )
 
             for s_type, s_list in SENSOR_CONFIG.items():
-                if not s_list: continue
-                
-                sensor_checks.append(ft.Text(f"{s_type.capitalize()}:", weight=ft.FontWeight.BOLD, size=12))
-                
-                for sensor in s_list:
-                    s_id = sensor["id"]
-                    s_name = sensor["name"]
-                    is_checked = s_id in assigned
-                    
-                    cb = ft.Checkbox(
-                        label=f"{s_name} ({s_id})",
-                        value=is_checked,
-                        data=s_id, # Store ID in data
-                        on_change=on_sensor_change,
-                    )
-                    sensor_checks.append(cb)
+                # Reemplazo de continue: Si s_list no está vacío, procesamos
+                if s_list:
+                    sensor_checks.append(ft.Text(f"{s_type.capitalize()}:", weight=ft.FontWeight.BOLD, size=12))
+
+                    for sensor in s_list:
+                        s_id = sensor["id"]
+                        s_name = sensor["name"]
+                        is_checked = s_id in assigned
+
+                        cb = ft.Checkbox(
+                            label=f"{s_name} ({s_id})",
+                            value=is_checked,
+                            data=s_id,  # Store ID in data
+                            on_change=on_sensor_change,
+                        )
+                        sensor_checks.append(cb)
 
             content_controls.append(
                 ft.Column(
@@ -527,7 +531,7 @@ class AdminPage(ft.Container):
                         ft.Text("Lista de Componentes (Selecione ID):", weight="bold"),
                         ft.Container(
                             content=ft.Column(sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO),
-                            height=200, # Limit height for scroll
+                            height=200,  # Limit height for scroll
                             border=ft.border.all(1, ft.Colors.GREY_300),
                             padding=5,
                             border_radius=5
@@ -552,12 +556,11 @@ class AdminPage(ft.Container):
             )
 
             for sup in supervisor_candidates:
-                # Avoid self-reference if role change happened, though unlikely for maint to be admin before
-                if sup == user_payload["username"]:
-                    continue
-                supervisor_checks.append(
-                    ft.Checkbox(label=sup, value=(sup in current_supervisors))
-                )
+                # Reemplazo de continue: Evitar auto-referencia si el rol cambió
+                if sup != user_payload["username"]:
+                    supervisor_checks.append(
+                        ft.Checkbox(label=sup, value=(sup in current_supervisors))
+                    )
 
             content_controls.append(
                 ft.Column(
@@ -857,7 +860,8 @@ class AdminPage(ft.Container):
                 self.txt_energy_value.update()
                 self.txt_energy_detail.update()
             except Exception:
-                pass
+                # Ignoramos errores de actualización de UI si la página ya no está activa
+                ...
             time.sleep(1)
 
     def _build_section_container(self, title, content_control):
