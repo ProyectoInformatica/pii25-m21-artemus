@@ -33,13 +33,13 @@ class SmokeController:
 
             if value > 95:
                 status = "ALARM"
-                msg = f"[{name}] CRITICAL: Fire detected! ({value} density)"
+                msg = f"[{name }] CRITICAL: Fire detected! ({value } density)"
             elif value > 40:
                 status = "WARNING"
-                msg = f"[{name}] Warning: Smoke detected ({value} density)"
+                msg = f"[{name }] Warning: Smoke detected ({value } density)"
             else:
                 status = "CLEAR"
-                msg = f"[{name}] Air is clear ({value} density)"
+                msg = f"[{name }] Air is clear ({value } density)"
 
             data = SmokeModel(value=value, status=status)
 

@@ -78,7 +78,7 @@ class Sidebar(ft.Container):
                             spacing=2,
                             controls=[
                                 ft.Text(
-                                    f"{self.username.upper()} ({self.user_role.upper()})",
+                                    f"{self .username .upper ()} ({self .user_role .upper ()})",
                                     size=12,
                                     weight=ft.FontWeight.BOLD,
                                     color="white",

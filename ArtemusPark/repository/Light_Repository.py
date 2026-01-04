@@ -25,7 +25,7 @@ def save_light_event(event: LightModel) -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     today = datetime.now().strftime("%Y-%m-%d")
-    file_path = DATA_DIR / f"light_{today}.json"
+    file_path = DATA_DIR / f"light_{today }.json"
 
     if file_path.exists():
         try:

@@ -90,7 +90,7 @@ class SensorController:
 
         risk_result = check_wind_risk(data)
         if risk_result.is_risky:
-            alert_msg = f"[WIND ALERT] {risk_result.message}"
+            alert_msg = f"[WIND ALERT] {risk_result .message }"
             print(alert_msg)
             logger.warning(alert_msg)
 
@@ -113,7 +113,7 @@ class SensorController:
 
         if risk_result.is_emergency:
 
-            msg = f"[FIRE EMERGENCY] {risk_result.message}"
+            msg = f"[FIRE EMERGENCY] {risk_result .message }"
             print(msg)
             logger.critical(msg)
 
@@ -123,7 +123,7 @@ class SensorController:
 
         elif risk_result.status == "WARNING":
 
-            msg = f"[SMOKE WARNING] {risk_result.message}"
+            msg = f"[SMOKE WARNING] {risk_result .message }"
             print(msg)
             logger.warning(msg)
 
@@ -138,13 +138,13 @@ class SensorController:
 
             if is_open_time and not self.park_open:
                 self.park_open = True
-                print(f"\n--- PARK OPEN at {hour}:00 ---")
+                print(f"\n--- PARK OPEN at {hour }:00 ---")
             elif not is_open_time and self.park_open:
                 self.park_open = False
-                print(f"\n--- PARK CLOSED at {hour}:00 ---")
+                print(f"\n--- PARK CLOSED at {hour }:00 ---")
 
             print(
-                f"[Real Time: {hour}:00] Park {'OPEN' if self.park_open else 'CLOSED'}"
+                f"[Real Time: {hour }:00] Park {'OPEN'if self .park_open else 'CLOSED'}"
             )
 
             time.sleep(30)
@@ -167,25 +167,25 @@ class SensorController:
             threading.Thread(
                 target=self.humidity_controller.run,
                 daemon=True,
-                args=(f"HumiditySens{sensor_num}",),
+                args=(f"HumiditySens{sensor_num }",),
             ).start()
 
             threading.Thread(
                 target=self.temperature_controller.run,
                 daemon=True,
-                args=(f"TempSens{sensor_num}",),
+                args=(f"TempSens{sensor_num }",),
             ).start()
 
             threading.Thread(
                 target=self.wind_controller.run,
                 daemon=True,
-                args=(f"WindSens{sensor_num}",),
+                args=(f"WindSens{sensor_num }",),
             ).start()
 
             threading.Thread(
                 target=self.smoke_controller.run,
                 daemon=True,
-                args=(f"SmokeSens{sensor_num}",),
+                args=(f"SmokeSens{sensor_num }",),
             ).start()
 
         for i in range(num_light_sensors):
@@ -193,7 +193,7 @@ class SensorController:
             threading.Thread(
                 target=self.light_controller.run,
                 daemon=True,
-                args=(f"LightSens{sensor_num}",),
+                args=(f"LightSens{sensor_num }",),
             ).start()
 
         for i in range(door_sensors):
@@ -201,7 +201,7 @@ class SensorController:
             threading.Thread(
                 target=self.door_controller.run,
                 daemon=True,
-                args=(f"DoorSens{sensor_num}",),
+                args=(f"DoorSens{sensor_num }",),
             ).start()
 
         print("Sensors are now active.")

@@ -152,7 +152,7 @@ class HistoryPage(ft.Container):
         logs.sort(key=lambda x: x["timestamp"], reverse=self.sort_descending)
         logs = logs[:30]
 
-        self.data_table.rows.clear()  # Limpiar de nuevo por seguridad antes de rellenar
+        self.data_table.rows.clear()
 
         if not logs:
             self.table_content.scroll = None

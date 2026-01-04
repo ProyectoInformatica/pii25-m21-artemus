@@ -66,7 +66,7 @@ class MapCard(ft.Container):
                 width=marker_size,
                 height=marker_size,
                 alignment=ft.alignment.center,
-                tooltip=f"{label}: --",
+                tooltip=f"{label }: --",
                 shadow=ft.BoxShadow(blur_radius=6, color=ft.Colors.BLACK26),
                 on_hover=self._on_marker_hover,
                 on_click=self._on_marker_click,
@@ -138,19 +138,19 @@ class MapCard(ft.Container):
         """Actualiza tooltips y estados de los marcadores"""
 
         if "temperature" in data:
-            self._update_marker("temperature", f"{data['temperature']}ºC")
+            self._update_marker("temperature", f"{data ['temperature']}ºC")
 
         if "humidity" in data:
-            self._update_marker("humidity", f"{data['humidity']}%")
+            self._update_marker("humidity", f"{data ['humidity']}%")
 
         if "wind" in data:
-            self._update_marker("wind", f"{data['wind']} km/h")
+            self._update_marker("wind", f"{data ['wind']} km/h")
 
         if "air_quality" in data:
-            self._update_marker("smoke", f"AQI: {data['air_quality']}")
+            self._update_marker("smoke", f"AQI: {data ['air_quality']}")
 
         if "occupancy" in data:
-            self._update_marker("capacity", f"Personas: {data['occupancy']}")
+            self._update_marker("capacity", f"Personas: {data ['occupancy']}")
 
         if "light_is_on" in data and "light_consumption" in data:
             self.update_light_marker_status(

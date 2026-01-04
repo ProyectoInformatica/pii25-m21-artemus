@@ -316,7 +316,7 @@ class LoginPage(ft.Container):
             role = self.auth_repo.authenticate(username, password)
 
             if role:
-                print(f"Login: Acceso concedido a {username} ({role})")
+                print(f"Login: Acceso concedido a {username } ({role })")
                 self.on_login_success(username, role)
             else:
                 self._show_error("Usuario o contraseña incorrectos")
@@ -345,7 +345,7 @@ class LoginPage(ft.Container):
         if self.page:
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text(f"⚠️ {message}", color="white"),
+                    content=ft.Text(f"⚠️ {message }", color="white"),
                     bgcolor=ft.Colors.RED_700,
                 )
             )
@@ -355,7 +355,7 @@ class LoginPage(ft.Container):
         if self.page:
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text(f"✅ {message}", color="white"),
+                    content=ft.Text(f"✅ {message }", color="white"),
                     bgcolor=ft.Colors.GREEN_700,
                 )
             )

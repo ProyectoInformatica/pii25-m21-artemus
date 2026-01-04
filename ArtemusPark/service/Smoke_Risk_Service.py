@@ -21,16 +21,16 @@ def check_smoke_risk(measurement: SmokeModel) -> SmokeRiskResult:
 
     if is_emergency:
         message = (
-            f"EMERGENCY: High smoke density detected ({density}). "
-            f"Status is {status}."
+            f"EMERGENCY: High smoke density detected ({density }). "
+            f"Status is {status }."
         )
     elif status == "WARNING":
         message = (
-            f"CAUTION: Elevated smoke levels ({density}). "
+            f"CAUTION: Elevated smoke levels ({density }). "
             f"Monitor situation closely."
         )
     else:
-        message = f"Air quality is normal (Density: {density})."
+        message = f"Air quality is normal (Density: {density })."
 
     return SmokeRiskResult(
         is_emergency=is_emergency,

@@ -14,10 +14,10 @@ from repository.Smoke_Repository import save_smoke_measurement
 from repository.Door_Repository import save_door_event
 from repository.Light_Repository import save_light_event
 
-# --- Local Imports: Config ---
+
 from config.Sensor_Config import SENSOR_CONFIG
 
-# --- Local Imports: Models ---
+
 from model.Temperature_Model import TemperatureModel
 from model.Humidity_Model import HumidityModel
 from model.Wind_Model import WindModel
@@ -25,7 +25,7 @@ from model.Smoke_Model import SmokeModel
 from model.Door_Model import DoorModel
 from model.Light_Model import LightModel
 
-# --- Local Imports: Views ---
+
 from view.pages.Login_Page import LoginPage
 from view.components.Sidebar import Sidebar
 from view.pages.Dashboard_Page import DashboardPage
@@ -39,7 +39,6 @@ from view.pages.Admin_Page import AdminPage
 def generate_sensor_snapshot(timestamp: float, all_users: list):
     """Genera y guarda un snapshot de datos para todos los sensores configurados."""
 
-    # --- Temperature ---
     for sensor in SENSOR_CONFIG.get("temperature", []):
         temp_val = int(random.uniform(18, 32))
         temp_status = "HOT" if temp_val > 30 else "MILD"
@@ -53,7 +52,6 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    # --- Humidity ---
     for sensor in SENSOR_CONFIG.get("humidity", []):
         hum_val = int(random.uniform(30, 65))
         save_humidity_measurement(
@@ -66,7 +64,6 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    # --- Wind ---
     for sensor in SENSOR_CONFIG.get("wind", []):
         wind_speed = int(random.uniform(0, 25))
         wind_state = "WARNING" if wind_speed > 20 else "SAFE"
@@ -80,7 +77,6 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    # --- Smoke ---
     for sensor in SENSOR_CONFIG.get("smoke", []):
         smoke_val = int(random.uniform(0, 50))
         smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
@@ -94,8 +90,6 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    # --- Door ---
-    # Probability unified to 0.45 per sensor
     for sensor in SENSOR_CONFIG.get("door", []):
         if random.random() < 0.45:
             is_open = True
@@ -112,8 +106,6 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
                 )
             )
 
-    # --- Light ---
-    # Probability unified to 0.8 per sensor
     for sensor in SENSOR_CONFIG.get("light", []):
         if random.random() < 0.8:
             is_on = random.choice([True, False])
@@ -157,7 +149,7 @@ async def main(page: ft.Page):
             try:
                 page.pubsub.send_all("refresh_dashboard")
             except Exception as e:
-                print(f"Error enviando pubsub: {e}")
+                print(f"Error enviando pubsub: {e }")
 
             await asyncio.sleep(3)
 
@@ -177,7 +169,6 @@ async def main(page: ft.Page):
             ts = now - (day * 86400) + random.uniform(0, 86000)
             generate_sensor_snapshot(ts, all_users)
 
-    # seed_historical_data_if_needed()
     page.run_task(sensor_simulation_loop)
 
     def change_view(page_name, data=None):

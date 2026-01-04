@@ -122,7 +122,7 @@ class DashboardPage(ft.Container):
             )
 
             dialog = ft.AlertDialog(
-                title=ft.Text(f"Sensores de {display_title}"),
+                title=ft.Text(f"Sensores de {display_title }"),
                 content=ft.Column(
                     [content],
                     height=300,
@@ -260,7 +260,7 @@ class DashboardPage(ft.Container):
 
     def _build_window_bar(self):
         self.txt_welcome = ft.Text(
-            f"Bienvenido/a {self.user_name}",
+            f"Bienvenido/a {self .user_name }",
             weight=ft.FontWeight.BOLD,
             color=AppColors.TEXT_MUTED,
         )

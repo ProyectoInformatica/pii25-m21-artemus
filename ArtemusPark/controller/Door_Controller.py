@@ -41,7 +41,7 @@ class DoorController:
 
         while self.controller_ref.running:
             if not self.controller_ref.park_open:
-                msg = f"[{readable_name}] Park is CLOSED. Door activity is suspended."
+                msg = f"[{readable_name }] Park is CLOSED. Door activity is suspended."
                 print(msg)
                 logging.info(msg)
                 time.sleep(5)
@@ -60,7 +60,7 @@ class DoorController:
                     direction=direction,
                     username=sim_user,
                 )
-                msg = f"[{readable_name}] Door {'OPEN' if is_open else 'CLOSED'} ({direction}) - User: {sim_user}"
+                msg = f"[{readable_name }] Door {'OPEN'if is_open else 'CLOSED'} ({direction }) - User: {sim_user }"
 
             print(msg)
             logging.info(msg)
@@ -69,4 +69,4 @@ class DoorController:
                 self.on_new_data(data)
             time.sleep(5)
 
-        print(f"[{readable_name}] Door thread stopped.")
+        print(f"[{readable_name }] Door thread stopped.")

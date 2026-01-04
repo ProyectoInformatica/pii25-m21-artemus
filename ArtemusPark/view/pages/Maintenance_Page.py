@@ -29,7 +29,7 @@ class MaintenancePage(ft.Container):
             visible=bool(self.assigned_sensors),
             controls=[
                 ft.Text(
-                    f"⭐ Mis Sensores Asignados ({len(self.assigned_sensors)})",
+                    f"⭐ Mis Sensores Asignados ({len (self .assigned_sensors )})",
                     size=20,
                     weight="bold",
                     color=AppColors.BG_DARK,
@@ -95,7 +95,7 @@ class MaintenancePage(ft.Container):
                     ],
                 ),
                 ft.Divider(height=20, color="transparent"),
-                self.my_sensors_container,  # Insertamos la seccion personalizada aqui
+                self.my_sensors_container,
                 self.grid_devices,
             ],
         )
@@ -179,9 +179,7 @@ class MaintenancePage(ft.Container):
             self.my_sensors_row.controls.clear()
 
         for device in health_data:
-            # device contains: id, name, type, status, is_online, icon, last_seen, last_value
 
-            # Use specific ID matching if available, otherwise fallback (though ID is preferred)
             is_assigned = device["id"] in self.assigned_sensors
 
             card = self._build_device_card(device, highlight=False)
@@ -223,7 +221,7 @@ class MaintenancePage(ft.Container):
         return ft.Container(
             bgcolor=bg_color,
             padding=15,
-            width=240 if highlight else None,  # Fijo para fila horizontal
+            width=240 if highlight else None,
             border_radius=12,
             border=ft.border.all(2 if highlight else 1, border_color),
             shadow=ft.BoxShadow(
@@ -255,15 +253,6 @@ class MaintenancePage(ft.Container):
                                         width=30,
                                         icon_size=20,
                                     ),
-                                    # ft.Icon(
-                                    #     (
-                                    #         ft.Icons.STAR
-                                    #         if highlight
-                                    #         else ft.Icons.FIBER_MANUAL_RECORD
-                                    #     ),
-                                    #     color=ft.Colors.BLUE if highlight else status_color,
-                                    #     size=20,
-                                    # ),
                                 ],
                             ),
                         ],
@@ -280,7 +269,7 @@ class MaintenancePage(ft.Container):
                                 overflow=ft.TextOverflow.ELLIPSIS,
                             ),
                             ft.Text(
-                                f"{status_text} | {last_value}",
+                                f"{status_text } | {last_value }",
                                 color=status_color,
                                 weight="bold",
                                 size=12,
@@ -301,7 +290,7 @@ class MaintenancePage(ft.Container):
                                     ft.Icons.ACCESS_TIME, size=12, color=ft.Colors.GREY
                                 ),
                                 ft.Text(
-                                    f"Último dato: {last_seen}",
+                                    f"Último dato: {last_seen }",
                                     size=10,
                                     color=ft.Colors.GREY_700,
                                 ),

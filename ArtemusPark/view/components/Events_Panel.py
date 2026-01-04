@@ -17,7 +17,7 @@ class EventsPanel(ft.ListView):
         self.controls.clear()
         self.controls.extend([self._create_event_item(e) for e in new_events])
         self.update()
-        print(f"EventsPanel: Updated UI with {len(new_events)} events")
+        print(f"EventsPanel: Updated UI with {len (new_events )} events")
 
     def _create_event_item(self, event: dict):
         """Crea un componente visual para un evento individual."""

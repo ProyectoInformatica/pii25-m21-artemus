@@ -178,7 +178,7 @@ class AdminPage(ft.Container):
         if self.current_username:
             user_data = self.auth_repo.get_all_users().get(self.current_username, {})
             admin_full_name = user_data.get("full_name", admin_full_name)
-            admin_email = f"{self.current_username}@artemus.park"
+            admin_email = f"{self .current_username }@artemus.park"
 
         self.content = ft.ListView(
             spacing=20,
@@ -238,7 +238,7 @@ class AdminPage(ft.Container):
         self.users_table.rows.clear()
         for username, data in users.items():
             is_me = username == self.current_username
-            display_name = f"{username} (Tú)" if is_me else username
+            display_name = f"{username } (Tú)" if is_me else username
 
             if len(display_name) > 24:
                 display_name = display_name[:24] + "..."
@@ -321,17 +321,17 @@ class AdminPage(ft.Container):
         )
 
         dialog = ft.AlertDialog(
-            title=ft.Text(f"Datos de {username}"),
+            title=ft.Text(f"Datos de {username }"),
             content=ft.Column(
                 [
-                    ft.Text(f"Rol: {user_data.get('role', '-')}"),
-                    ft.Text(f"Nombre completo: {user_data.get('full_name', '-')}"),
-                    ft.Text(f"DNI: {user_data.get('dni', '-')}"),
-                    ft.Text(f"Telefono: {user_data.get('phone', '-')}"),
-                    ft.Text(f"Direccion: {user_data.get('address', '-')}"),
-                    ft.Text(f"Sensores asignados: {assigned_text}"),
-                    ft.Text(f"Supervisores: {supervisors_text}"),
-                    ft.Text(f"Subordinados: {subordinates_text}"),
+                    ft.Text(f"Rol: {user_data .get ('role','-')}"),
+                    ft.Text(f"Nombre completo: {user_data .get ('full_name','-')}"),
+                    ft.Text(f"DNI: {user_data .get ('dni','-')}"),
+                    ft.Text(f"Telefono: {user_data .get ('phone','-')}"),
+                    ft.Text(f"Direccion: {user_data .get ('address','-')}"),
+                    ft.Text(f"Sensores asignados: {assigned_text }"),
+                    ft.Text(f"Supervisores: {supervisors_text }"),
+                    ft.Text(f"Subordinados: {subordinates_text }"),
                 ],
                 width=360,
                 tight=True,
@@ -369,7 +369,6 @@ class AdminPage(ft.Container):
             value=user_data.get("role", "user"),
         )
 
-        # Profile fields (mandatory for ALL roles now)
         tf_full_name = ft.TextField(
             label="Nombre Completo", value=user_data.get("full_name", "")
         )
@@ -409,7 +408,6 @@ class AdminPage(ft.Container):
                 )
                 return
 
-            # DNI Validation
             if not self._is_valid_dni(tf_dni.value):
                 self.page.open(
                     ft.SnackBar(
@@ -422,7 +420,6 @@ class AdminPage(ft.Container):
                 )
                 return
 
-            # Phone Validation
             if not tf_phone.value.strip().isdigit() or len(tf_phone.value.strip()) != 9:
                 self.page.open(
                     ft.SnackBar(
@@ -435,7 +432,6 @@ class AdminPage(ft.Container):
                 )
                 return
 
-            # Prepare data payload
             user_payload = {
                 "username": tf_user.value,
                 "password": tf_pass.value,
@@ -449,11 +445,11 @@ class AdminPage(ft.Container):
             }
 
             if dd_role.value == "user":
-                # User role doesn't need technical dialog, save directly
+
                 self._save_final(user_payload)
                 self.page.close(dialog)
             else:
-                # Maintenance/Admin need 2nd step
+
                 self.page.close(dialog)
                 self._open_technical_dialog(user_payload)
 
@@ -497,7 +493,6 @@ class AdminPage(ft.Container):
 
         content_controls = []
 
-        # Sensors (for maintenance)
         sensor_checks = []
         if role == "maintenance":
             assigned = user_data.get("assigned_sensors", [])
@@ -525,7 +520,7 @@ class AdminPage(ft.Container):
 
                 sensor_checks.append(
                     ft.Text(
-                        f"{s_type.capitalize()}:", weight=ft.FontWeight.BOLD, size=12
+                        f"{s_type .capitalize ()}:", weight=ft.FontWeight.BOLD, size=12
                     )
                 )
 
@@ -535,9 +530,9 @@ class AdminPage(ft.Container):
                     is_checked = s_id in assigned
 
                     cb = ft.Checkbox(
-                        label=f"{s_name} ({s_id})",
+                        label=f"{s_name } ({s_id })",
                         value=is_checked,
-                        data=s_id,  # Store ID in data
+                        data=s_id,
                         on_change=on_sensor_change,
                     )
                     sensor_checks.append(cb)
@@ -550,7 +545,7 @@ class AdminPage(ft.Container):
                             content=ft.Column(
                                 sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO
                             ),
-                            height=200,  # Limit height for scroll
+                            height=200,
                             border=ft.border.all(1, ft.Colors.GREY_300),
                             padding=5,
                             border_radius=5,
@@ -560,14 +555,13 @@ class AdminPage(ft.Container):
                 )
             )
 
-        # Supervision/Subordinates logic
         supervisor_checks = []
         subordinate_checks = []
 
         if role == "maintenance":
             supervisor_candidates = [
                 u for u, d in users.items() if d.get("role") == "admin"
-            ]  # Can be supervised by any admin
+            ]
             current_supervisors = (
                 self._get_supervisors_for_user(username, users)
                 if user_payload["is_edit"]
@@ -575,7 +569,7 @@ class AdminPage(ft.Container):
             )
 
             for sup in supervisor_candidates:
-                # Avoid self-reference if role change happened, though unlikely for maint to be admin before
+
                 if sup == user_payload["username"]:
                     continue
                 supervisor_checks.append(
@@ -630,7 +624,7 @@ class AdminPage(ft.Container):
             self.page.close(dialog)
 
         dialog = ft.AlertDialog(
-            title=ft.Text(f"Configuración Técnica ({role})"),
+            title=ft.Text(f"Configuración Técnica ({role })"),
             content=ft.Column(
                 content_controls, height=400, width=350, scroll=ft.ScrollMode.AUTO
             ),
@@ -647,13 +641,12 @@ class AdminPage(ft.Container):
             is_edit = payload["is_edit"]
             original_username = payload.get("original_username")
 
-            # Default empty lists if not present (e.g. user role)
             assigned_sensors = payload.get("assigned_sensors", [])
             selected_supervisors = payload.get("selected_supervisors", [])
             selected_subordinates = payload.get("selected_subordinates", [])
 
             if is_edit:
-                # Use original_username for key update in case username changed (not supported yet fully but good practice)
+
                 target_user = original_username if original_username else username
                 self.auth_repo.update_user(
                     target_user,
@@ -682,13 +675,13 @@ class AdminPage(ft.Container):
 
             if role == "admin":
                 self._sync_subordinates(target_username, selected_subordinates)
-                # Clear supervisors if switching to admin
+
                 self.auth_repo.update_user(target_username, supervisors=[])
             elif role == "maintenance":
-                # Maintenance logic for supervisors
+
                 self._sync_supervisors(target_username, selected_supervisors)
                 self.auth_repo.update_user(target_username, subordinates=[])
-            else:  # User
+            else:
                 self.auth_repo.update_user(
                     target_username, supervisors=[], subordinates=[]
                 )
@@ -703,7 +696,7 @@ class AdminPage(ft.Container):
         except Exception as ex:
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text(f"Error: {str(ex)}", color="white"),
+                    content=ft.Text(f"Error: {str (ex )}", color="white"),
                     bgcolor=ft.Colors.RED_700,
                 )
             )
@@ -747,14 +740,14 @@ class AdminPage(ft.Container):
             self._load_users()
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text(f"Usuario {username} eliminado", color="white"),
+                    content=ft.Text(f"Usuario {username } eliminado", color="white"),
                     bgcolor=ft.Colors.RED_700,
                 )
             )
 
         dialog = ft.AlertDialog(
             title=ft.Text("Confirmar eliminación"),
-            content=ft.Text(f"¿Estás seguro de eliminar a {username}?"),
+            content=ft.Text(f"¿Estás seguro de eliminar a {username }?"),
             actions=[
                 ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
                 ft.ElevatedButton(
@@ -815,13 +808,13 @@ class AdminPage(ft.Container):
             )
             if val > 28:
                 base_load += 200.0
-                reasons.append(f"AC Máximo ({val}ºC)")
+                reasons.append(f"AC Máximo ({val }ºC)")
             elif val > 24:
                 base_load += 100.0
-                reasons.append(f"AC Medio ({val}ºC)")
+                reasons.append(f"AC Medio ({val }ºC)")
             elif val < 15:
                 base_load += 180.0
-                reasons.append(f"Calefacción ({val}ºC)")
+                reasons.append(f"Calefacción ({val }ºC)")
         doors = Door_Repository.load_all_door_events()
         if doors:
             last_door = doors[-1]
@@ -840,7 +833,7 @@ class AdminPage(ft.Container):
             load_data = self._calculate_sensor_load()
             current_kw = load_data["total"]
             current_time_str = datetime.now().strftime("%H:%M:%S")
-            self.txt_energy_value.value = f"{current_kw:.1f} kW"
+            self.txt_energy_value.value = f"{current_kw :.1f} kW"
             self.txt_energy_detail.value = (
                 load_data["details"]
                 if load_data["details"]

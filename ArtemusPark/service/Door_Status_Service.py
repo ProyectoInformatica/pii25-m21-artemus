@@ -20,14 +20,14 @@ def check_door_status(event: DoorModel, park_open: bool) -> DoorStatusResult:
 
     if not park_open and is_open:
         message = (
-            f"Door '{event.name}' is OPEN while park is CLOSED → anomaly detected."
+            f"Door '{event .name }' is OPEN while park is CLOSED → anomaly detected."
         )
         is_anomaly = True
     else:
         message = (
-            f"Door '{event.name}' is "
-            f"{'OPEN' if is_open else 'CLOSED'} (park is "
-            f"{'OPEN' if park_open else 'CLOSED'})."
+            f"Door '{event .name }' is "
+            f"{'OPEN'if is_open else 'CLOSED'} (park is "
+            f"{'OPEN'if park_open else 'CLOSED'})."
         )
         is_anomaly = False
 

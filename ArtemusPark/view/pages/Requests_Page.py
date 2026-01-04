@@ -71,7 +71,7 @@ class RequestsPage(ft.Container):
             ft.Row(
                 [
                     ft.Icon(icon, color=icon_color),
-                    ft.Text(f"Estado: {status_text}", weight="bold", color=icon_color),
+                    ft.Text(f"Estado: {status_text }", weight="bold", color=icon_color),
                     ft.Container(expand=True),
                     ft.Text(
                         datetime.fromtimestamp(req.get("timestamp", 0)).strftime(
@@ -83,11 +83,11 @@ class RequestsPage(ft.Container):
                 ]
             ),
             ft.Text(
-                f"Solicitante: {req.get('user')}",
+                f"Solicitante: {req .get ('user')}",
                 weight="bold",
                 color=ft.Colors.BLACK87,
             ),
-            ft.Text(f"Mensaje: {req.get('message')}", color=ft.Colors.BLACK87),
+            ft.Text(f"Mensaje: {req .get ('message')}", color=ft.Colors.BLACK87),
         ]
 
         if self.user_role == "admin" and status == "PENDING":
@@ -130,7 +130,7 @@ class RequestsPage(ft.Container):
         self.req_repo.update_request_status(req["id"], new_status)
 
         self.page.snack_bar = ft.SnackBar(
-            ft.Text(f"Solicitud marcada como {new_status}")
+            ft.Text(f"Solicitud marcada como {new_status }")
         )
         self.page.snack_bar.open = True
         self.page.update()

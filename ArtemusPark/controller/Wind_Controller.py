@@ -43,7 +43,7 @@ class WindController:
 
             data = WindModel(speed=speed, state=state, label=label)
 
-            msg = f"[{name}] {speed} km/h - {state} ({label})"
+            msg = f"[{name }] {speed } km/h - {state } ({label })"
             print(msg)
             logging.info(msg)
 

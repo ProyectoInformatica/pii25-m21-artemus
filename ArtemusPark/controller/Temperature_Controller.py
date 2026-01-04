@@ -25,13 +25,13 @@ class TemperatureController:
 
             if value > 30:
                 status = "HOT"
-                msg = f"[{name}] Hot weather ({value}°C)"
+                msg = f"[{name }] Hot weather ({value }°C)"
             elif value < 15:
                 status = "COLD"
-                msg = f"[{name}] Cold weather ({value}°C)"
+                msg = f"[{name }] Cold weather ({value }°C)"
             else:
                 status = "MILD"
-                msg = f"[{name}] Mild weather ({value}°C)"
+                msg = f"[{name }] Mild weather ({value }°C)"
 
             data = TemperatureModel(value=value, status=status)
             print(msg)

@@ -25,7 +25,7 @@ def save_door_event(event: DoorModel) -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     today = datetime.now().strftime("%Y-%m-%d")
-    file_path = DATA_DIR / f"door_{today}.json"
+    file_path = DATA_DIR / f"door_{today }.json"
 
     if file_path.exists():
         try:

@@ -51,7 +51,7 @@ class CapacityCard(ft.Container):
                             spacing=0,
                             controls=[
                                 ft.Text(
-                                    f"Max: {self.max_capacity}",
+                                    f"Max: {self .max_capacity }",
                                     size=12,
                                     color=AppColors.TEXT_LIGHT_GREY,
                                 ),
@@ -85,7 +85,7 @@ class CapacityCard(ft.Container):
             percentage = 0
 
         self.txt_value.value = str(current_value)
-        self.txt_percent.value = f"{int(percentage * 100)}%"
+        self.txt_percent.value = f"{int (percentage *100 )}%"
 
         self.progress_bar.value = percentage
 

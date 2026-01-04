@@ -24,7 +24,7 @@ def save_smoke_measurement(measurement: SmokeModel) -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     today = datetime.now().strftime("%Y-%m-%d")
-    file_path = DATA_DIR / f"smoke_{today}.json"
+    file_path = DATA_DIR / f"smoke_{today }.json"
 
     if file_path.exists():
         try:

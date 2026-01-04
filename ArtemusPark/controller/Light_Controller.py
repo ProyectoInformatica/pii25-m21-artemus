@@ -37,7 +37,7 @@ class LightController:
 
             data = LightModel(is_on=should_be_on, status=status, value=value)
 
-            msg = f"[{name}] Light {status} (Real Hour: {current_hour})"
+            msg = f"[{name }] Light {status } (Real Hour: {current_hour })"
             print(msg)
             logging.info(msg)
 

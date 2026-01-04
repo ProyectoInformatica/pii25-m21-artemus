@@ -21,11 +21,13 @@ def check_wind_risk(measurement: WindModel) -> WindRiskResult:
     is_risky = speed > threshold
 
     if is_risky:
-        message = f"Wind speed {speed} km/h is ABOVE risk threshold ({threshold} km/h)."
+        message = (
+            f"Wind speed {speed } km/h is ABOVE risk threshold ({threshold } km/h)."
+        )
     else:
         message = (
-            f"Wind speed {speed} km/h is within safe/normal range "
-            f"(threshold: {threshold} km/h)."
+            f"Wind speed {speed } km/h is within safe/normal range "
+            f"(threshold: {threshold } km/h)."
         )
 
     return WindRiskResult(
