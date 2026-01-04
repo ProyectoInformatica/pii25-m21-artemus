@@ -10,11 +10,12 @@ from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class DashboardPage(ft.Container):
-    def __init__(self, user_role="user", on_navigate=None):
+    def __init__(self, user_name="Usuario", user_role="user", on_navigate=None):
         super().__init__()
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
         self.padding = 18
+        self.user_name = user_name
         self.user_role = user_role
         self.service = DashboardService()
         self.on_navigate = on_navigate
@@ -145,7 +146,7 @@ class DashboardPage(ft.Container):
 
     def _build_window_bar(self):
         self.txt_welcome = ft.Text(
-            f"Bienvenido/a {self.user_role}",
+            f"Bienvenido/a {self.user_name}",
             weight=ft.FontWeight.BOLD,
             color=AppColors.TEXT_MUTED,
         )
