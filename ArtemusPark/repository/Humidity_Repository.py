@@ -22,7 +22,7 @@ def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
 def save_humidity_measurement(measurement: HumidityModel) -> None:
     """Guarda un registro en un archivo JSON diario."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    
+
     today = datetime.now().strftime("%Y-%m-%d")
     file_path = DATA_DIR / f"hum_{today}.json"
 
@@ -42,7 +42,7 @@ def load_all_humidity_measurements() -> List[Dict[str, Any]]:
     """Carga todos los registros de los archivos JSON diarios."""
     if not DATA_DIR.exists():
         return []
-    
+
     all_data = []
     for file_path in sorted(DATA_DIR.glob("hum_*.json")):
         try:
@@ -52,5 +52,5 @@ def load_all_humidity_measurements() -> List[Dict[str, Any]]:
                 all_data.extend(data)
         except json.JSONDecodeError:
             continue
-            
+
     return all_data

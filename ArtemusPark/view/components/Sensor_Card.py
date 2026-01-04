@@ -34,7 +34,7 @@ class SensorCard(ft.Container):
                         self.value_text,
                         ft.Text(unit, size=12, color=AppColors.TEXT_MUTED),
                     ],
-                )
+                ),
             ],
         )
 

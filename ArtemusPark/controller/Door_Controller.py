@@ -22,9 +22,9 @@ class DoorController:
     """
 
     def __init__(
-            self,
-            controller_ref=None,
-            on_new_data: Optional[Callable[[DoorModel], None]] = None,
+        self,
+        controller_ref=None,
+        on_new_data: Optional[Callable[[DoorModel], None]] = None,
     ):
         self.controller_ref = controller_ref
         self.on_new_data = on_new_data
@@ -63,9 +63,13 @@ class DoorController:
                     # 60% probabilidad de entrada (IN), 40% salida (OUT)
                     direction = "IN" if random.random() < 0.6 else "OUT"
                     # Elegimos un usuario al azar si hay lista, si no "unknown"
-                    sim_user = random.choice(self.users_list) if self.users_list else "unknown"
+                    sim_user = (
+                        random.choice(self.users_list) if self.users_list else "unknown"
+                    )
 
-                    log_msg = f"[{readable_name}] Door OPEN ({direction}) - User: {sim_user}"
+                    log_msg = (
+                        f"[{readable_name}] Door OPEN ({direction}) - User: {sim_user}"
+                    )
                 else:
                     # SI SE CIERRA: No hay dirección de flujo ni usuario pasando
                     direction = "CLOSED"  # Usamos un valor neutro que no sea IN ni OUT
@@ -79,7 +83,7 @@ class DoorController:
                     sensor_id=sensor_id,
                     name=readable_name,
                     direction=direction,
-                    username=sim_user
+                    username=sim_user,
                 )
 
                 # Imprimir y guardar log

@@ -387,17 +387,20 @@ class AdminPage(ft.Container):
 
         def handle_first_step_save(e):
             if (
-                    not tf_user.value
-                    or not tf_pass.value
-                    or not dd_role.value
-                    or not tf_full_name.value
-                    or not tf_dni.value
-                    or not tf_phone.value
-                    or not tf_address.value
+                not tf_user.value
+                or not tf_pass.value
+                or not dd_role.value
+                or not tf_full_name.value
+                or not tf_dni.value
+                or not tf_phone.value
+                or not tf_address.value
             ):
                 self.page.open(
                     ft.SnackBar(
-                        content=ft.Text("Todos los campos son obligatorios", color=AppColors.TEXT_WHITE),
+                        content=ft.Text(
+                            "Todos los campos son obligatorios",
+                            color=AppColors.TEXT_WHITE,
+                        ),
                         bgcolor=ft.Colors.RED,
                     )
                 )
@@ -407,8 +410,10 @@ class AdminPage(ft.Container):
             if not self._is_valid_dni(tf_dni.value):
                 self.page.open(
                     ft.SnackBar(
-                        content=ft.Text("DNI inválido. Debe tener 8 números y letra correcta.",
-                                        color=AppColors.TEXT_WHITE),
+                        content=ft.Text(
+                            "DNI inválido. Debe tener 8 números y letra correcta.",
+                            color=AppColors.TEXT_WHITE,
+                        ),
                         bgcolor=ft.Colors.RED,
                     )
                 )
@@ -418,8 +423,10 @@ class AdminPage(ft.Container):
             if not tf_phone.value.strip().isdigit() or len(tf_phone.value.strip()) != 9:
                 self.page.open(
                     ft.SnackBar(
-                        content=ft.Text("Teléfono inválido. Debe contener 9 dígitos numéricos.",
-                                        color=AppColors.TEXT_WHITE),
+                        content=ft.Text(
+                            "Teléfono inválido. Debe contener 9 dígitos numéricos.",
+                            color=AppColors.TEXT_WHITE,
+                        ),
                         bgcolor=ft.Colors.RED,
                     )
                 )
@@ -493,7 +500,9 @@ class AdminPage(ft.Container):
             assigned = user_data.get("assigned_sensors", [])
 
             def on_sensor_change(e):
-                checked_count = sum(1 for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value)
+                checked_count = sum(
+                    1 for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value
+                )
                 if checked_count > 3:
                     e.control.value = False
                     e.control.update()
@@ -510,7 +519,13 @@ class AdminPage(ft.Container):
             for s_type, s_list in SENSOR_CONFIG.items():
                 # Reemplazo de continue: Si s_list no está vacío, procesamos
                 if s_list:
-                    sensor_checks.append(ft.Text(f"{s_type.capitalize()}:", weight=ft.FontWeight.BOLD, size=12))
+                    sensor_checks.append(
+                        ft.Text(
+                            f"{s_type.capitalize()}:",
+                            weight=ft.FontWeight.BOLD,
+                            size=12,
+                        )
+                    )
 
                     for sensor in s_list:
                         s_id = sensor["id"]
@@ -530,11 +545,13 @@ class AdminPage(ft.Container):
                     [
                         ft.Text("Lista de Componentes (Selecione ID):", weight="bold"),
                         ft.Container(
-                            content=ft.Column(sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO),
+                            content=ft.Column(
+                                sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO
+                            ),
                             height=200,  # Limit height for scroll
                             border=ft.border.all(1, ft.Colors.GREY_300),
                             padding=5,
-                            border_radius=5
+                            border_radius=5,
                         ),
                         ft.Divider(),
                     ]
@@ -566,7 +583,8 @@ class AdminPage(ft.Container):
                 ft.Column(
                     [
                         ft.Text(
-                            "¿Por quién va a ser supervisado? (Supervisores):", weight="bold"
+                            "¿Por quién va a ser supervisado? (Supervisores):",
+                            weight="bold",
                         ),
                         ft.Column(supervisor_checks, spacing=0),
                     ]
@@ -594,7 +612,9 @@ class AdminPage(ft.Container):
             )
 
         def save_second_step(e):
-            selected_sensors = [c.data for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value]
+            selected_sensors = [
+                c.data for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value
+            ]
             selected_supervisors = [c.label for c in supervisor_checks if c.value]
             selected_subordinates = [c.label for c in subordinate_checks if c.value]
 
@@ -652,9 +672,7 @@ class AdminPage(ft.Container):
                     phone=payload["phone"],
                     address=payload["address"],
                 )
-                self.auth_repo.update_user(
-                    username, assigned_sensors=assigned_sensors
-                )
+                self.auth_repo.update_user(username, assigned_sensors=assigned_sensors)
 
             target_username = original_username if is_edit else username
             role = payload["role"]
@@ -668,7 +686,9 @@ class AdminPage(ft.Container):
                 self._sync_supervisors(target_username, selected_supervisors)
                 self.auth_repo.update_user(target_username, subordinates=[])
             else:  # User
-                self.auth_repo.update_user(target_username, supervisors=[], subordinates=[])
+                self.auth_repo.update_user(
+                    target_username, supervisors=[], subordinates=[]
+                )
 
             self._load_users()
             self.page.open(
