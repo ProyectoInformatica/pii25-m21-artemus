@@ -58,6 +58,11 @@
         "address": "Paseo de la Castellana 50",
         "supervisors": [
             "admin_super"
+        ],
+        "assigned_sensors": [
+            "temp_01",
+            "hum_01",
+            "door_01"
         ]
     },
     "tech_sarah": {
@@ -69,6 +74,11 @@
         "address": "Gran Via 20",
         "supervisors": [
             "admin_super"
+        ],
+        "assigned_sensors": [
+            "smoke_01",
+            "light_01",
+            "wind_01"
         ]
     },
     "eng_mike": {
