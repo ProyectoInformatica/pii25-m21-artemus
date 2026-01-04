@@ -13,6 +13,7 @@ from repository.Wind_Repository import save_wind_measurement
 from repository.Smoke_Repository import save_smoke_measurement
 from repository.Door_Repository import save_door_event
 from repository.Light_Repository import save_light_event
+
 # --- Local Imports: Config ---
 from config.Sensor_Config import SENSOR_CONFIG
 
@@ -37,18 +38,18 @@ from view.pages.Admin_Page import AdminPage
 
 def generate_sensor_snapshot(timestamp: float, all_users: list):
     """Genera y guarda un snapshot de datos para todos los sensores configurados."""
-    
+
     # --- Temperature ---
     for sensor in SENSOR_CONFIG.get("temperature", []):
         temp_val = int(random.uniform(18, 32))
         temp_status = "HOT" if temp_val > 30 else "MILD"
         save_temperature_measurement(
             TemperatureModel(
-                value=temp_val, 
-                status=temp_status, 
+                value=temp_val,
+                status=temp_status,
                 timestamp=timestamp,
                 sensor_id=sensor["id"],
-                name=sensor["name"]
+                name=sensor["name"],
             )
         )
 
@@ -57,11 +58,11 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
         hum_val = int(random.uniform(30, 65))
         save_humidity_measurement(
             HumidityModel(
-                value=hum_val, 
-                status="NORMAL", 
+                value=hum_val,
+                status="NORMAL",
                 timestamp=timestamp,
                 sensor_id=sensor["id"],
-                name=sensor["name"]
+                name=sensor["name"],
             )
         )
 
@@ -71,11 +72,11 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
         wind_state = "WARNING" if wind_speed > 20 else "SAFE"
         save_wind_measurement(
             WindModel(
-                speed=wind_speed, 
-                state=wind_state, 
-                sensor_id=sensor["id"], 
-                name=sensor["name"], 
-                timestamp=timestamp
+                speed=wind_speed,
+                state=wind_state,
+                sensor_id=sensor["id"],
+                name=sensor["name"],
+                timestamp=timestamp,
             )
         )
 
@@ -85,11 +86,11 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
         smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
         save_smoke_measurement(
             SmokeModel(
-                value=smoke_val, 
-                status=smoke_status, 
+                value=smoke_val,
+                status=smoke_status,
                 timestamp=timestamp,
                 sensor_id=sensor["id"],
-                name=sensor["name"]
+                name=sensor["name"],
             )
         )
 
@@ -119,15 +120,14 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             watts = round(random.uniform(100, 250), 2) if is_on else 0.5
             save_light_event(
                 LightModel(
-                    value=watts, 
-                    status="OK", 
-                    is_on=is_on, 
+                    value=watts,
+                    status="OK",
+                    is_on=is_on,
                     timestamp=timestamp,
                     sensor_id=sensor["id"],
-                    name=sensor["name"]
+                    name=sensor["name"],
                 )
             )
-
 
 
 async def main(page: ft.Page):

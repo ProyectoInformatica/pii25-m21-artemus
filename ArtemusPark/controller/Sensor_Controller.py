@@ -1,6 +1,7 @@
 import logging
 import threading
 import time
+from datetime import datetime
 from typing import List, Optional
 
 
@@ -10,6 +11,7 @@ from ArtemusPark.controller.Wind_Controller import WindController
 from ArtemusPark.controller.Door_Controller import DoorController
 from ArtemusPark.controller.Light_Controller import LightController
 from ArtemusPark.controller.Smoke_Controller import SmokeController
+from ArtemusPark.config.Park_Config import OPEN_HOUR, CLOSE_HOUR
 
 
 from ArtemusPark.model.Humidity_Model import HumidityModel
@@ -36,14 +38,10 @@ logger = logging.getLogger(__name__)
 
 class SensorController:
 
-    OPEN_HOUR = 9
-    CLOSE_HOUR = 18
-
     def __init__(self):
 
         self.running = False
         self.park_open = False
-        self.simulated_hour = 8
 
         self.humidity_history: List[HumidityModel] = []
         self.temperature_history: List[TemperatureModel] = []
@@ -72,11 +70,13 @@ class SensorController:
 
     def _on_humidity(self, data: HumidityModel):
         """Callback al recibir datos de humedad."""
+        self._ensure_timestamp(data)
         self.humidity_history.append(data)
         save_humidity_measurement(data)
 
     def _on_temperature(self, data: TemperatureModel):
         """Callback al recibir datos de temperatura."""
+        self._ensure_timestamp(data)
         self.temperature_history.append(data)
         save_temperature_measurement(data)
 
@@ -84,6 +84,7 @@ class SensorController:
         """
         Callback al recibir datos de viento.
         """
+        self._ensure_timestamp(data)
         self.wind_history.append(data)
         save_wind_measurement(data)
 
@@ -94,14 +95,17 @@ class SensorController:
             logger.warning(alert_msg)
 
     def _on_door(self, data: DoorModel):
+        self._ensure_timestamp(data)
         self.door_history.append(data)
         save_door_event(data)
 
     def _on_light(self, data: LightModel):
+        self._ensure_timestamp(data)
         self.light_history.append(data)
         save_light_event(data)
 
     def _on_smoke(self, data: SmokeModel):
+        self._ensure_timestamp(data)
         self.smoke_history.append(data)
         save_smoke_measurement(data)
 
@@ -123,29 +127,27 @@ class SensorController:
             print(msg)
             logger.warning(msg)
 
+    def _is_open_time(self, hour: int) -> bool:
+        return OPEN_HOUR <= hour < CLOSE_HOUR
+
     def simulate_time_and_status(self):
-        """Hilo que simula la hora y el estado de apertura del parque."""
+        """Actualiza el estado de apertura según la hora real."""
         while self.running:
-            is_open_time = self.OPEN_HOUR <= self.simulated_hour < self.CLOSE_HOUR
+            hour = datetime.now().hour
+            is_open_time = self._is_open_time(hour)
 
             if is_open_time and not self.park_open:
                 self.park_open = True
-                print(f"\n--- PARK OPEN at {self.simulated_hour}:00 ---")
+                print(f"\n--- PARK OPEN at {hour}:00 ---")
             elif not is_open_time and self.park_open:
-
                 self.park_open = False
-                print(f"\n--- PARK CLOSED at {self.simulated_hour}:00 ---")
+                print(f"\n--- PARK CLOSED at {hour}:00 ---")
 
             print(
-                f"[Simulated Time: {self.simulated_hour}:00] "
-                f"Park {'OPEN' if self.park_open else 'CLOSED'}"
+                f"[Real Time: {hour}:00] Park {'OPEN' if self.park_open else 'CLOSED'}"
             )
 
-            self.simulated_hour += 1
-            if self.simulated_hour >= 24:
-                self.simulated_hour = 0
-
-            time.sleep(1)
+            time.sleep(30)
 
     def start(self):
         """Inicia los sensores y el reloj del parque."""
@@ -203,6 +205,10 @@ class SensorController:
             ).start()
 
         print("Sensors are now active.")
+
+    def _ensure_timestamp(self, data):
+        if not getattr(data, "timestamp", None):
+            data.timestamp = time.time()
 
     def stop(self):
         """Detiene la simulación."""

@@ -63,7 +63,7 @@ class TempChart(ft.Container):
                 ),
                 ft.Container(height=20),
                 self.chart,
-            ]
+            ],
         )
 
     def update_data(self, chart_data: list):

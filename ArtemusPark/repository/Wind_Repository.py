@@ -22,7 +22,7 @@ def _serialize_measurement(measurement: WindModel) -> Dict[str, Any]:
 def save_wind_measurement(measurement: WindModel) -> None:
     """Guarda un registro en un archivo JSON diario."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    
+
     today = datetime.now().strftime("%Y-%m-%d")
     file_path = DATA_DIR / f"wind_{today}.json"
 
@@ -42,7 +42,7 @@ def load_all_wind_measurements() -> List[Dict[str, Any]]:
     """Carga todos los registros de los archivos JSON diarios."""
     if not DATA_DIR.exists():
         return []
-    
+
     all_data = []
     for file_path in sorted(DATA_DIR.glob("wind_*.json")):
         try:
@@ -52,5 +52,5 @@ def load_all_wind_measurements() -> List[Dict[str, Any]]:
                 all_data.extend(data)
         except json.JSONDecodeError:
             continue
-            
+
     return all_data

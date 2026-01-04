@@ -58,6 +58,7 @@ class AuthRepository:
                 "phone": "600555555",
                 "address": "Paseo de la Castellana 50",
                 "supervisors": ["admin_super"],
+                "assigned_sensors": ["temp_01", "hum_01", "door_01"],
             },
             "tech_sarah": {
                 "password": "cables99",
@@ -67,6 +68,7 @@ class AuthRepository:
                 "phone": "600666666",
                 "address": "Gran Via 20",
                 "supervisors": ["admin_super"],
+                "assigned_sensors": ["smoke_01", "light_01", "wind_01"],
             },
             "eng_mike": {
                 "password": "wrench77",

@@ -110,7 +110,7 @@ class MapCard(ft.Container):
             "occupancy": "capacity",
         }
         key = key_map.get(sensor_type, sensor_type)
-        
+
         if key in self.markers:
             marker = self.markers[key]
             if has_data:
@@ -121,7 +121,6 @@ class MapCard(ft.Container):
             else:
                 marker.bgcolor = ft.Colors.GREY
             marker.update()
-
 
     def update_light_marker_status(self, is_on: bool, consumption: float):
         """Actualiza el marcador de luces y el texto de consumo."""

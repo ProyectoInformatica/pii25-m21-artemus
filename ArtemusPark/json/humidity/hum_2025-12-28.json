@@ -1,0 +1,302 @@
+[
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766876400.0,
+        "value": 30,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766876400.0,
+        "value": 52,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766877300.0,
+        "value": 32,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766877300.0,
+        "value": 52,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766878200.0,
+        "value": 60,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766878200.0,
+        "value": 48,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766879100.0,
+        "value": 51,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766879100.0,
+        "value": 42,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766880000.0,
+        "value": 56,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766880000.0,
+        "value": 35,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766880900.0,
+        "value": 42,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766880900.0,
+        "value": 39,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766881800.0,
+        "value": 52,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766881800.0,
+        "value": 42,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766882700.0,
+        "value": 56,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766882700.0,
+        "value": 57,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766883600.0,
+        "value": 32,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766883600.0,
+        "value": 57,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766884500.0,
+        "value": 44,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766884500.0,
+        "value": 37,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766885400.0,
+        "value": 34,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766885400.0,
+        "value": 54,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766886300.0,
+        "value": 64,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766886300.0,
+        "value": 48,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766887200.0,
+        "value": 36,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766887200.0,
+        "value": 62,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766888100.0,
+        "value": 52,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766888100.0,
+        "value": 63,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766889000.0,
+        "value": 33,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766889000.0,
+        "value": 52,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766889900.0,
+        "value": 41,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766889900.0,
+        "value": 49,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766890800.0,
+        "value": 50,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766890800.0,
+        "value": 41,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766891700.0,
+        "value": 34,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766891700.0,
+        "value": 47,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766892600.0,
+        "value": 31,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766892600.0,
+        "value": 53,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766893500.0,
+        "value": 48,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766893500.0,
+        "value": 63,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766894400.0,
+        "value": 62,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766894400.0,
+        "value": 33,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766895300.0,
+        "value": 47,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766895300.0,
+        "value": 46,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766896200.0,
+        "value": 55,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766896200.0,
+        "value": 30,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766897100.0,
+        "value": 46,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766897100.0,
+        "value": 54,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_01",
+        "timestamp": 1766898000.0,
+        "value": 39,
+        "status": "NORMAL"
+    },
+    {
+        "sensor_id": "hum_02",
+        "timestamp": 1766898000.0,
+        "value": 58,
+        "status": "NORMAL"
+    }
+]

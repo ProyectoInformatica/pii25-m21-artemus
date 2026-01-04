@@ -15,6 +15,7 @@ class MaintenancePage(ft.Container):
         self.current_username = current_username
         self.auth_repo = AuthRepository()
         self.req_repo = RequestsRepository()
+        self._is_mounted = False
 
         self.assigned_sensors = []
         self.current_role = None
@@ -101,15 +102,18 @@ class MaintenancePage(ft.Container):
 
     def did_mount(self):
         """Inicia suscripción y carga datos iniciales."""
+        self._is_mounted = True
         self.page.pubsub.subscribe(self._on_message)
         self.update_data()
 
     def will_unmount(self):
         """Limpia suscripciones."""
-        self.page.pubsub.unsubscribe_all()
+        self._is_mounted = False
 
     def _on_message(self, message):
         if message == "refresh_dashboard":
+            if not self._is_mounted or not self.page:
+                return
             self.update_data()
 
     def _open_request_dialog(self, e):
@@ -153,6 +157,10 @@ class MaintenancePage(ft.Container):
             return
 
         self.req_repo.create_request(self.current_username, msg)
+        try:
+            self.page.pubsub.send_all({"topic": "requests_updated"})
+        except Exception:
+            pass
         self.page.close(self.dlg_request)
 
         self.page.snack_bar = ft.SnackBar(
@@ -172,7 +180,7 @@ class MaintenancePage(ft.Container):
 
         for device in health_data:
             # device contains: id, name, type, status, is_online, icon, last_seen, last_value
-            
+
             # Use specific ID matching if available, otherwise fallback (though ID is preferred)
             is_assigned = device["id"] in self.assigned_sensors
 
@@ -189,7 +197,7 @@ class MaintenancePage(ft.Container):
 
     def _build_device_card(self, device, highlight=False):
         """Crea la tarjeta visual para un dispositivo."""
-        
+
         name = device["name"]
         status_text = device["status"]
         icon = device["icon"]
@@ -240,7 +248,9 @@ class MaintenancePage(ft.Container):
                                         icon=ft.Icons.INFO_OUTLINE,
                                         icon_color=ft.Colors.GREY_600,
                                         tooltip="Ver detalles",
-                                        on_click=lambda e: self._show_sensor_details_dialog(device),
+                                        on_click=lambda e: self._show_sensor_details_dialog(
+                                            device
+                                        ),
                                         height=30,
                                         width=30,
                                         icon_size=20,
@@ -254,7 +264,7 @@ class MaintenancePage(ft.Container):
                                     #     color=ft.Colors.BLUE if highlight else status_color,
                                     #     size=20,
                                     # ),
-                                ]
+                                ],
                             ),
                         ],
                     ),
@@ -262,18 +272,18 @@ class MaintenancePage(ft.Container):
                         spacing=2,
                         controls=[
                             ft.Text(
-                                name, 
-                                weight="bold", 
-                                size=14, 
+                                name,
+                                weight="bold",
+                                size=14,
                                 color=ft.Colors.BLACK,
                                 max_lines=2,
-                                overflow=ft.TextOverflow.ELLIPSIS
+                                overflow=ft.TextOverflow.ELLIPSIS,
                             ),
                             ft.Text(
-                                f"{status_text} | {last_value}", 
-                                color=status_color, 
-                                weight="bold", 
-                                size=12
+                                f"{status_text} | {last_value}",
+                                color=status_color,
+                                weight="bold",
+                                size=12,
                             ),
                         ],
                     ),
@@ -304,50 +314,64 @@ class MaintenancePage(ft.Container):
 
     def _show_sensor_details_dialog(self, device):
         """Muestra un diálogo con toda la información del sensor."""
-        
+
         detail_content = ft.Column(
             tight=True,
             spacing=10,
             controls=[
-                ft.Row([
-                    ft.Icon(device["icon"], size=30, color=ft.Colors.BLUE_GREY),
-                    ft.Text(device["name"], size=18, weight="bold", expand=True)
-                ]),
+                ft.Row(
+                    [
+                        ft.Icon(device["icon"], size=30, color=ft.Colors.BLUE_GREY),
+                        ft.Text(device["name"], size=18, weight="bold", expand=True),
+                    ]
+                ),
                 ft.Divider(),
-                ft.Row([
-                    ft.Text("ID del Sensor:", weight="bold", width=120),
-                    ft.Text(device["id"], selectable=True, font_family="monospace")
-                ]),
-                ft.Row([
-                    ft.Text("Tipo:", weight="bold", width=120),
-                    ft.Text(device["type"].capitalize())
-                ]),
-                ft.Row([
-                    ft.Text("Estado:", weight="bold", width=120),
-                    ft.Container(
-                        content=ft.Text(device["status"], color="white", size=12),
-                        bgcolor=ft.Colors.GREEN if device["is_online"] else ft.Colors.RED,
-                        padding=ft.padding.symmetric(horizontal=8, vertical=2),
-                        border_radius=4
-                    )
-                ]),
-                ft.Row([
-                    ft.Text("Último Valor:", weight="bold", width=120),
-                    ft.Text(device.get("last_value", "--"), weight="bold", size=16)
-                ]),
-                ft.Row([
-                    ft.Text("Última Señal:", weight="bold", width=120),
-                    ft.Text(device["last_seen"])
-                ]),
-            ]
+                ft.Row(
+                    [
+                        ft.Text("ID del Sensor:", weight="bold", width=120),
+                        ft.Text(device["id"], selectable=True, font_family="monospace"),
+                    ]
+                ),
+                ft.Row(
+                    [
+                        ft.Text("Tipo:", weight="bold", width=120),
+                        ft.Text(device["type"].capitalize()),
+                    ]
+                ),
+                ft.Row(
+                    [
+                        ft.Text("Estado:", weight="bold", width=120),
+                        ft.Container(
+                            content=ft.Text(device["status"], color="white", size=12),
+                            bgcolor=(
+                                ft.Colors.GREEN
+                                if device["is_online"]
+                                else ft.Colors.RED
+                            ),
+                            padding=ft.padding.symmetric(horizontal=8, vertical=2),
+                            border_radius=4,
+                        ),
+                    ]
+                ),
+                ft.Row(
+                    [
+                        ft.Text("Último Valor:", weight="bold", width=120),
+                        ft.Text(device.get("last_value", "--"), weight="bold", size=16),
+                    ]
+                ),
+                ft.Row(
+                    [
+                        ft.Text("Última Señal:", weight="bold", width=120),
+                        ft.Text(device["last_seen"]),
+                    ]
+                ),
+            ],
         )
 
         dlg = ft.AlertDialog(
             title=ft.Text("Detalles del Dispositivo"),
             content=ft.Container(content=detail_content, width=400),
-            actions=[
-                ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dlg))
-            ],
+            actions=[ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dlg))],
             actions_alignment=ft.MainAxisAlignment.END,
         )
         self.page.open(dlg)
