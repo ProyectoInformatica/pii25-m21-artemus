@@ -110,7 +110,6 @@ class HistoryPage(ft.Container):
     def will_unmount(self):
         """2. Se ejecuta al salir: Nos desconectamos."""
         self._is_mounted = False
-        self.page.pubsub.unsubscribe_all()
 
     def _on_message(self, message):
         """3. Escuchamos el 'grito' del main.py"""

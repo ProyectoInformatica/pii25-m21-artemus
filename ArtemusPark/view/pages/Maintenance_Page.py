@@ -15,6 +15,7 @@ class MaintenancePage(ft.Container):
         self.current_username = current_username
         self.auth_repo = AuthRepository()
         self.req_repo = RequestsRepository()
+        self._is_mounted = False
 
         self.assigned_sensors = []
         self.current_role = None
@@ -101,15 +102,18 @@ class MaintenancePage(ft.Container):
 
     def did_mount(self):
         """Inicia suscripción y carga datos iniciales."""
+        self._is_mounted = True
         self.page.pubsub.subscribe(self._on_message)
         self.update_data()
 
     def will_unmount(self):
         """Limpia suscripciones."""
-        self.page.pubsub.unsubscribe_all()
+        self._is_mounted = False
 
     def _on_message(self, message):
         if message == "refresh_dashboard":
+            if not self._is_mounted or not self.page:
+                return
             self.update_data()
 
     def _open_request_dialog(self, e):
@@ -153,6 +157,10 @@ class MaintenancePage(ft.Container):
             return
 
         self.req_repo.create_request(self.current_username, msg)
+        try:
+            self.page.pubsub.send_all({"topic": "requests_updated"})
+        except Exception:
+            pass
         self.page.close(self.dlg_request)
 
         self.page.snack_bar = ft.SnackBar(

@@ -22,6 +22,7 @@ class DashboardPage(ft.Container):
         self.user_role = user_role
         self.service = DashboardService()
         self.on_navigate = on_navigate
+        self._is_mounted = False
 
         self.card_capacity = CapacityCard(max_capacity=2000)
         self.card_capacity.expand = 2
@@ -149,6 +150,7 @@ class DashboardPage(ft.Container):
 
     def did_mount(self):
         """Suscribe a eventos y verifica estado inicial."""
+        self._is_mounted = True
         self._clock_running = True
         self.page.run_task(self._clock_loop)
         self.page.pubsub.subscribe(self._on_message)
@@ -159,13 +161,15 @@ class DashboardPage(ft.Container):
 
     def will_unmount(self):
         """Desuscribe eventos."""
+        self._is_mounted = False
         self._clock_running = False
-        self.page.pubsub.unsubscribe_all()
 
     def _on_message(self, message):
         """Gestor de mensajes centralizado"""
 
         if message == "refresh_dashboard":
+            if not self._is_mounted or not self.page:
+                return
 
             data = self.service.get_latest_sensor_data()
             if data:

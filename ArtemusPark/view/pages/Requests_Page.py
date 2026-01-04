@@ -19,7 +19,7 @@ class RequestsPage(ft.Container):
 
         self.requests_column = ft.Column(spacing=10, scroll=ft.ScrollMode.AUTO)
 
-        title = "Gestión de Solicitudes" if user_role == "admin" else "Mis Solicitudes"
+        title = "Gestión de Solicitudes" if user_role == "admin" else "Solicitudes"
 
         self.content = ft.Column(
             [
@@ -136,3 +136,7 @@ class RequestsPage(ft.Container):
         self.page.snack_bar.open = True
         self.page.update()
         self._load_requests()
+        try:
+            self.page.pubsub.send_all({"topic": "requests_updated"})
+        except Exception:
+            pass
