@@ -65,6 +65,6 @@ class DoorController:
 
             if self.on_new_data:
                 self.on_new_data(data)
-        time.sleep(5)
+            time.sleep(5)
 
         print(f"[{readable_name}] Door thread stopped.")

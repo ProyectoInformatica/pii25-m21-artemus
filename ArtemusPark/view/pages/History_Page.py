@@ -15,6 +15,7 @@ class HistoryPage(ft.Container):
         self.service = DashboardService()
         self.range_limits = (28, 35)
         self.sort_descending = False
+        self._is_mounted = False
 
         self.sort_button = ft.IconButton(
             icon=ft.Icons.ARROW_UPWARD,
@@ -102,16 +103,20 @@ class HistoryPage(ft.Container):
 
     def did_mount(self):
         """1. Se ejecuta al entrar: Nos suscribimos a los avisos."""
+        self._is_mounted = True
         self.page.pubsub.subscribe(self._on_message)
         self.load_data()
 
     def will_unmount(self):
         """2. Se ejecuta al salir: Nos desconectamos."""
+        self._is_mounted = False
         self.page.pubsub.unsubscribe_all()
 
     def _on_message(self, message):
         """3. Escuchamos el 'grito' del main.py"""
         if message == "refresh_dashboard":
+            if not self._is_mounted or not self.page:
+                return
             self.load_data()
 
     def _toggle_sort(self, e):

@@ -1,4 +1,6 @@
+import asyncio
 import flet as ft
+from datetime import datetime
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.view.components.Temp_Chart import TempChart
 from ArtemusPark.view.components.Sensor_Card import SensorCard
@@ -7,6 +9,7 @@ from ArtemusPark.view.components.Capacity_Card import CapacityCard
 from ArtemusPark.view.components.Alert_Card import AlertCard
 from ArtemusPark.view.components.Map_Card import MapCard
 from ArtemusPark.service.Dashboard_Service import DashboardService
+from ArtemusPark.config.Park_Config import OPEN_HOUR, CLOSE_HOUR
 
 
 class DashboardPage(ft.Container):
@@ -146,6 +149,8 @@ class DashboardPage(ft.Container):
 
     def did_mount(self):
         """Suscribe a eventos y verifica estado inicial."""
+        self._clock_running = True
+        self.page.run_task(self._clock_loop)
         self.page.pubsub.subscribe(self._on_message)
         self._on_message("refresh_dashboard")
 
@@ -154,6 +159,7 @@ class DashboardPage(ft.Container):
 
     def will_unmount(self):
         """Desuscribe eventos."""
+        self._clock_running = False
         self.page.pubsub.unsubscribe_all()
 
     def _on_message(self, message):
@@ -238,16 +244,61 @@ class DashboardPage(ft.Container):
             weight=ft.FontWeight.BOLD,
             color=AppColors.TEXT_MUTED,
         )
+        now = datetime.now()
+        self.clock_icon = ft.Icon(ft.Icons.WB_SUNNY, size=18)
+        self.txt_clock = ft.Text(
+            now.strftime("%H:%M:%S"),
+            weight=ft.FontWeight.BOLD,
+            size=18,
+        )
+        self.clock_container = ft.Container(
+            padding=ft.padding.symmetric(horizontal=14, vertical=8),
+            border_radius=999,
+            content=ft.Row(
+                spacing=8,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                controls=[self.clock_icon, self.txt_clock],
+            ),
+        )
+        self._update_clock_pill(now)
         self.txt_dashboard = ft.Text(
             "Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED
         )
         return ft.Row(
             controls=[
                 self.txt_welcome,
+                self.clock_container,
                 self.txt_dashboard,
             ],
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
         )
+
+    async def _clock_loop(self) -> None:
+        while self._clock_running:
+            now = datetime.now()
+            self.txt_clock.value = now.strftime("%H:%M:%S")
+            self._update_clock_pill(now)
+            try:
+                self.clock_container.update()
+            except Exception:
+                pass
+            await asyncio.sleep(1)
+
+    def _update_clock_pill(self, now: datetime) -> None:
+        hour = now.hour
+        if OPEN_HOUR <= hour < CLOSE_HOUR:
+            self.clock_icon.name = ft.Icons.WB_SUNNY
+            self.clock_icon.color = ft.Colors.ORANGE
+            self.clock_container.bgcolor = ft.Colors.AMBER_50
+            self.clock_container.border = ft.border.all(1, ft.Colors.AMBER_200)
+            self.txt_clock.color = ft.Colors.BLACK87
+        else:
+            self.clock_icon.name = ft.Icons.NIGHTLIGHT_ROUND
+            self.clock_icon.color = ft.Colors.BLUE_200
+            self.clock_container.bgcolor = ft.Colors.INDIGO_900
+            self.clock_container.border = ft.border.all(1, ft.Colors.INDIGO_800)
+            self.txt_clock.color = ft.Colors.WHITE
 
     def _build_main_card(self):
         self.txt_sensors_title = ft.Text(

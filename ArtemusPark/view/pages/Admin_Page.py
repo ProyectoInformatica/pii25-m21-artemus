@@ -173,6 +173,13 @@ class AdminPage(ft.Container):
             expand=1, spacing=20, controls=[emergency_section, energy_section]
         )
 
+        admin_full_name = "Super Admin"
+        admin_email = "admin@artemus.park"
+        if self.current_username:
+            user_data = self.auth_repo.get_all_users().get(self.current_username, {})
+            admin_full_name = user_data.get("full_name", admin_full_name)
+            admin_email = f"{self.current_username}@artemus.park"
+
         self.content = ft.ListView(
             spacing=20,
             controls=[
@@ -193,13 +200,13 @@ class AdminPage(ft.Container):
                             ft.Column(
                                 [
                                     ft.Text(
-                                        "Super Admin",
+                                        admin_full_name,
                                         weight="bold",
                                         size=16,
                                         color=ft.Colors.BLACK,
                                     ),
                                     ft.Text(
-                                        "admin@artemus.park",
+                                        admin_email,
                                         color=ft.Colors.GREY_700,
                                         size=12,
                                     ),
