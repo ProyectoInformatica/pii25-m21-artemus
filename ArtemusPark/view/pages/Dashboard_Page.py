@@ -34,7 +34,7 @@ class DashboardPage(ft.Container):
         for c in [self.card_temp, self.card_hum, self.card_wind, self.card_air]:
             c.expand = 1
 
-        self.card_map = MapCard()
+        self.card_map = MapCard(on_sensor_click=self._handle_sensor_click)
         self.chart_component = TempChart()
         self.panel_events = EventsPanel(self.service.get_recent_events())
 
@@ -44,6 +44,83 @@ class DashboardPage(ft.Container):
             scroll=ft.ScrollMode.AUTO,
             controls=[self._build_window_bar(), self.main_card_container],
         )
+
+    def _handle_sensor_click(self, sensor_type):
+        """Maneja el clic en los sensores del mapa y muestra detalles."""
+        type_map = {
+            "lights": "light",
+            "capacity": "door",
+            "smoke": "smoke",
+            "temperature": "temperature",
+            "humidity": "humidity",
+            "wind": "wind"
+        }
+
+        target_type = type_map.get(sensor_type, sensor_type)
+
+        title_map = {
+            "light": "Iluminación",
+            "door": "Accesos (Puertas)",
+            "smoke": "Calidad del Aire",
+            "temperature": "Temperatura",
+            "humidity": "Humedad",
+            "wind": "Viento"
+        }
+
+        display_title = title_map.get(target_type, target_type.capitalize())
+
+        all_sensors = self.service.get_sensors_health_status()
+        filtered_sensors = [s for s in all_sensors if s["type"] == target_type]
+
+        rows = []
+        for s in filtered_sensors:
+            rows.append(
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(s["name"])),
+                        ft.DataCell(
+                            ft.Container(
+                                content=ft.Text(s["status"], size=12, color="white"),
+                                bgcolor=ft.Colors.GREEN if s["is_online"] else ft.Colors.RED,
+                                padding=5,
+                                border_radius=5
+                            )
+                        ),
+                        ft.DataCell(ft.Text(str(s["last_value"]))),
+                        ft.DataCell(ft.Text(s["last_seen"])),
+                    ]
+                )
+            )
+
+        if not rows:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text("No hay sensores de ese tipo", color=ft.Colors.WHITE),
+                    bgcolor=ft.Colors.RED,
+                )
+            )
+        else:
+             content = ft.DataTable(
+                columns=[
+                    ft.DataColumn(ft.Text("Nombre")),
+                    ft.DataColumn(ft.Text("Estado")),
+                    ft.DataColumn(ft.Text("Valor")),
+                    ft.DataColumn(ft.Text("Últ. Act.")),
+                ],
+                rows=rows,
+                border=ft.border.all(1, ft.Colors.GREY_300),
+                vertical_lines=ft.border.BorderSide(1, ft.Colors.GREY_200),
+                horizontal_lines=ft.border.BorderSide(1, ft.Colors.GREY_200),
+             )
+
+             dialog = ft.AlertDialog(
+                title=ft.Text(f"Sensores de {display_title}"),
+                content=ft.Column([content], height=300, width=650, scroll=ft.ScrollMode.AUTO, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                actions=[
+                    ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dialog))
+                ],
+             )
+             self.page.open(dialog)
 
     def _build_sensor_row(self, name, status, bg_color):
         return ft.Container(
@@ -86,11 +163,22 @@ class DashboardPage(ft.Container):
 
             data = self.service.get_latest_sensor_data()
             if data:
-                self.card_temp.update_value(data.get("temperature", 0))
-                self.card_hum.update_value(data.get("humidity", 0))
-                self.card_wind.update_value(data.get("wind", 0))
-                self.card_air.update_value(data.get("air_quality", 0))
                 self.card_capacity.update_occupancy(data.get("occupancy", 0))
+
+            avg_data = self.service.get_average_sensor_data()
+            if avg_data:
+                def update_sensor_ui(card, map_key, value):
+                    if value is None:
+                        card.update_value("--")
+                        self.card_map.update_marker_status_by_type(map_key, False)
+                    else:
+                        card.update_value(value)
+                        self.card_map.update_marker_status_by_type(map_key, True)
+
+                update_sensor_ui(self.card_temp, "temperature", avg_data.get("temperature"))
+                update_sensor_ui(self.card_hum, "humidity", avg_data.get("humidity"))
+                update_sensor_ui(self.card_wind, "wind", avg_data.get("wind"))
+                update_sensor_ui(self.card_air, "air_quality", avg_data.get("air_quality"))
 
                 self.card_map.update_sensor_data(data)
 

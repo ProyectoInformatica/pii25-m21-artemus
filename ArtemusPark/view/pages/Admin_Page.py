@@ -6,6 +6,7 @@ from datetime import datetime
 from flet.core.types import MainAxisAlignment
 
 from ArtemusPark.config.Colors import AppColors
+from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
 from ArtemusPark.service.Dashboard_Service import DashboardService
 from ArtemusPark.repository import (
     Light_Repository,
@@ -486,18 +487,10 @@ class AdminPage(ft.Container):
         sensor_checks = []
         if role == "maintenance":
             assigned = user_data.get("assigned_sensors", [])
-            sensor_options = [
-                "temperature",
-                "humidity",
-                "wind",
-                "smoke",
-                "light",
-                "door",
-            ]
-
+            
             def on_sensor_change(e):
-                checked = [c for c in sensor_checks if c.value]
-                if len(checked) > 3:
+                checked_count = sum(1 for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value)
+                if checked_count > 3:
                     e.control.value = False
                     e.control.update()
                     self.page.open(
@@ -510,20 +503,35 @@ class AdminPage(ft.Container):
                         )
                     )
 
-            for s in sensor_options:
-                sensor_checks.append(
-                    ft.Checkbox(
-                        label=s.capitalize(),
-                        value=(s in assigned),
+            for s_type, s_list in SENSOR_CONFIG.items():
+                if not s_list: continue
+                
+                sensor_checks.append(ft.Text(f"{s_type.capitalize()}:", weight=ft.FontWeight.BOLD, size=12))
+                
+                for sensor in s_list:
+                    s_id = sensor["id"]
+                    s_name = sensor["name"]
+                    is_checked = s_id in assigned
+                    
+                    cb = ft.Checkbox(
+                        label=f"{s_name} ({s_id})",
+                        value=is_checked,
+                        data=s_id, # Store ID in data
                         on_change=on_sensor_change,
                     )
-                )
+                    sensor_checks.append(cb)
 
             content_controls.append(
                 ft.Column(
                     [
-                        ft.Text("Lista de Componentes:", weight="bold"),
-                        ft.Column(sensor_checks, spacing=0),
+                        ft.Text("Lista de Componentes (Selecione ID):", weight="bold"),
+                        ft.Container(
+                            content=ft.Column(sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO),
+                            height=200, # Limit height for scroll
+                            border=ft.border.all(1, ft.Colors.GREY_300),
+                            padding=5,
+                            border_radius=5
+                        ),
                         ft.Divider(),
                     ]
                 )
@@ -583,7 +591,7 @@ class AdminPage(ft.Container):
             )
 
         def save_second_step(e):
-            selected_sensors = [c.label.lower() for c in sensor_checks if c.value]
+            selected_sensors = [c.data for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value]
             selected_supervisors = [c.label for c in supervisor_checks if c.value]
             selected_subordinates = [c.label for c in subordinate_checks if c.value]
 

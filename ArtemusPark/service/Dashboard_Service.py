@@ -444,3 +444,45 @@ class DashboardService:
         if isinstance(last, dict):
             return last.get(key, default)
         return getattr(last, key, default)
+
+    def get_average_sensor_data(self) -> Dict[str, Any]:
+        """Obtiene el promedio de los datos de todos los sensores."""
+        avg_data = {}
+
+        temps = Temperature_Repository.load_all_temperature_measurements()
+        if temps:
+            avg_data["temperature"] = round(sum(
+                (item.get("value", 0) if isinstance(item, dict) else item.value)
+                for item in temps
+            ) / len(temps))
+        else:
+            avg_data["temperature"] = None
+
+        hums = Humidity_Repository.load_all_humidity_measurements()
+        if hums:
+            avg_data["humidity"] = round(sum(
+                (item.get("value", 0) if isinstance(item, dict) else item.value)
+                for item in hums
+            ) / len(hums))
+        else:
+            avg_data["humidity"] = None
+
+        winds = Wind_Repository.load_all_wind_measurements()
+        if winds:
+            avg_data["wind"] = round(sum(
+                (item.get("speed", 0) if isinstance(item, dict) else item.speed)
+                for item in winds
+            ) / len(winds))
+        else:
+            avg_data["wind"] = None
+
+        smokes = Smoke_Repository.load_all_smoke_measurements()
+        if smokes:
+            avg_data["air_quality"] = round(sum(
+                (item.get("value", 0) if isinstance(item, dict) else item.value)
+                for item in smokes
+            ) / len(smokes))
+        else:
+            avg_data["air_quality"] = None
+
+        return avg_data
