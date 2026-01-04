@@ -1,11 +1,12 @@
 import json
 from pathlib import Path
 from typing import List, Dict, Any
+from datetime import datetime
 from ArtemusPark.model.Humidity_Model import HumidityModel
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_FILE = BASE_DIR / "json" / "humidity_measurements.json"
+DATA_DIR = BASE_DIR / "json" / "humidity"
 
 
 def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
@@ -18,26 +19,37 @@ def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
 
 
 def save_humidity_measurement(measurement: HumidityModel) -> None:
-    """Guarda un registro en el archivo JSON."""
-    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    """Guarda un registro en un archivo JSON diario."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    
+    today = datetime.now().strftime("%Y-%m-%d")
+    file_path = DATA_DIR / f"hum_{today}.json"
 
-    if DATA_FILE.exists():
+    if file_path.exists():
         try:
-            data = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+            data = json.loads(file_path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             data = []
     else:
         data = []
 
     data.append(_serialize(measurement))
-    DATA_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    file_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
 def load_all_humidity_measurements() -> List[Dict[str, Any]]:
-    """Carga todos los registros del archivo JSON."""
-    if not DATA_FILE.exists():
+    """Carga todos los registros de los archivos JSON diarios."""
+    if not DATA_DIR.exists():
         return []
-    try:
-        return json.loads(DATA_FILE.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return []
+    
+    all_data = []
+    for file_path in sorted(DATA_DIR.glob("hum_*.json")):
+        try:
+            file_content = file_path.read_text(encoding="utf-8")
+            data = json.loads(file_content)
+            if isinstance(data, list):
+                all_data.extend(data)
+        except json.JSONDecodeError:
+            continue
+            
+    return all_data

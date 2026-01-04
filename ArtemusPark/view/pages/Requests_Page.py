@@ -34,7 +34,6 @@ class RequestsPage(ft.Container):
 
     def _load_requests(self):
         reqs = self.req_repo.get_all_requests()
-        # Sort by timestamp desc
         reqs.sort(key=lambda x: x.get("timestamp", 0), reverse=True)
 
         if self.user_role != "admin":
@@ -130,10 +129,6 @@ class RequestsPage(ft.Container):
     def _handle_request(self, req, new_status):
         self.req_repo.update_request_status(req["id"], new_status)
 
-        # If accepted and it's a sensor change, we might want to auto-open user dialog or just mark done.
-        # Ideally admin should go to user management to assign sensors.
-        # We can add a hint or button to jump to user management if we had better navigation context.
-        # For now, just update status.
 
         self.page.snack_bar = ft.SnackBar(
             ft.Text(f"Solicitud marcada como {new_status}")

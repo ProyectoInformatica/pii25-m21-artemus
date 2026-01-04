@@ -1,6 +1,8 @@
 import logging
 import time
+import json
 import flet as ft
+from pathlib import Path
 from typing import Dict, Any, List
 from datetime import datetime
 
@@ -139,6 +141,133 @@ class DashboardService:
 
         combined.sort(key=lambda x: str(x.get("timestamp", "")), reverse=True)
         return combined[:15]
+
+    def get_history_by_date(self, date_str: str) -> List[Dict[str, Any]]:
+        """Carga el historial de una fecha específica desde los archivos JSON."""
+        history = []
+        base_dir = Path(__file__).resolve().parent.parent / "json"
+        
+        sources = [
+            ("temperature", "temp", "Temperatura", "value"),
+            ("humidity", "hum", "Humedad", "value"),
+            ("wind", "wind", "Viento", "speed"),
+            ("smoke", "smoke", "Calidad Aire", "value"),
+            ("door", "door", "Puerta", "name"),
+            ("light", "light", "Luz", "value"),
+        ]
+
+        def load_file(subdir, prefix):
+            file_path = base_dir / subdir / f"{prefix}_{date_str}.json"
+            if file_path.exists():
+                try:
+                    return json.loads(file_path.read_text(encoding="utf-8"))
+                except:
+                    return []
+            return []
+
+        for subdir, prefix, type_label, detail_key in sources:
+            data_list = load_file(subdir, prefix)
+            for item in data_list:
+                ts = item.get("timestamp", 0)
+                val = item.get(detail_key, "--")
+                status = item.get("status", "Info")
+                
+                if type_label == "Puerta":
+                    status = "Abierta" if item.get("is_open") else "Cerrada"
+                elif type_label == "Luz":
+                    status = "ON" if item.get("is_on") else "OFF"
+
+                try:
+                    time_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+                except:
+                    time_str = "Error fecha"
+
+                history.append(
+                    {
+                        "timestamp": ts,
+                        "time_str": time_str,
+                        "type": type_label,
+                        "location": "Zona Parque",
+                        "detail": f"{val}",
+                        "status": str(status),
+                    }
+                )
+
+        history.sort(key=lambda x: x["timestamp"], reverse=True)
+        return history
+
+    def get_history_by_range(self, min_days: int, max_days: int) -> List[Dict[str, Any]]:
+        """
+        Carga el historial filtrando los archivos JSON existentes cuya fecha 
+        caiga dentro del rango de días relativos a hoy.
+        min_days: Días atrás mínimos (ej. 6).
+        max_days: Días atrás máximos (ej. 8).
+        """
+        history = []
+        base_dir = Path(__file__).resolve().parent.parent / "json"
+        today = datetime.now().date()
+
+        sources = [
+            ("temperature", "temp", "Temperatura", "value"),
+            ("humidity", "hum", "Humedad", "value"),
+            ("wind", "wind", "Viento", "speed"),
+            ("smoke", "smoke", "Calidad Aire", "value"),
+            ("door", "door", "Puerta", "name"),
+            ("light", "light", "Luz", "value"),
+        ]
+
+        for subdir, prefix, type_label, detail_key in sources:
+            dir_path = base_dir / subdir
+            if not dir_path.exists():
+                continue
+            
+            for file_path in dir_path.glob(f"{prefix}_*.json"):
+                try:
+                    file_date_str = file_path.stem.replace(f"{prefix}_", "")
+                    file_date = datetime.strptime(file_date_str, "%Y-%m-%d").date()
+
+                    days_diff = (today - file_date).days
+
+                    if min_days <= days_diff <= max_days:
+                        content = json.loads(file_path.read_text(encoding="utf-8"))
+                        if isinstance(content, list):
+                            for item in content:
+                                ts = item.get("timestamp", 0)
+                                val = item.get(detail_key, "--")
+                                status = item.get("status", "Info")
+                                
+                                if type_label == "Puerta":
+                                    status = "Abierta" if item.get("is_open") else "Cerrada"
+                                elif type_label == "Luz":
+                                    status = "ON" if item.get("is_on") else "OFF"
+                                
+                                try:
+                                    time_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+                                except:
+                                    time_str = "Error fecha"
+                                
+                                history.append({
+                                    "timestamp": ts,
+                                    "time_str": time_str,
+                                    "type": type_label,
+                                    "location": "Zona Parque",
+                                    "detail": f"{val}",
+                                    "status": str(status),
+                                })
+                        else:
+                            logging.warning(f"  File {file_path.name} content is not a list. Skipping.")
+                except ValueError as ve:
+                    logging.error(f"Error al parsear la fecha del archivo {file_path.name}: {ve}")
+                    continue
+                except json.JSONDecodeError as jde:
+                    logging.error(f"Error al decodificar JSON de {file_path.name}: {jde}")
+                    continue
+                except Exception as e:
+                    logger.error(f"Error procesando archivo {file_path}: {e}")
+                    continue
+
+        history.sort(key=lambda x: x["timestamp"], reverse=True)
+        return history
 
     def get_all_history_logs(self) -> List[Dict[str, Any]]:
         """Recopila el historial completo de todos los sensores."""

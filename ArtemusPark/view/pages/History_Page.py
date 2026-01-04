@@ -1,5 +1,6 @@
 import time
 import flet as ft
+from datetime import datetime, timedelta
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.service.Dashboard_Service import DashboardService
 
@@ -12,7 +13,15 @@ class HistoryPage(ft.Container):
         self.bgcolor = AppColors.BG_MAIN
 
         self.service = DashboardService()
-        self.selected_range_days = 30
+        self.range_limits = (28, 35)
+        self.sort_descending = False
+
+        self.sort_button = ft.IconButton(
+            icon=ft.Icons.ARROW_UPWARD,
+            tooltip="Orden: Más antiguo primero",
+            on_click=self._toggle_sort,
+            icon_color=ft.Colors.BLUE,
+        )
 
         header = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -25,22 +34,11 @@ class HistoryPage(ft.Container):
                             weight="bold",
                             color=ft.Colors.BLACK,
                         ),
-                        ft.Container(
-                            content=ft.Text(
-                                "LIVE", size=10, color=ft.Colors.WHITE, weight="bold"
-                            ),
-                            bgcolor=ft.Colors.RED_400,
-                            padding=ft.padding.symmetric(horizontal=6, vertical=2),
-                            border_radius=4,
-                            margin=ft.margin.only(left=10),
-                        ),
                     ]
                 ),
-                ft.OutlinedButton(
-                    "Exportar CSV",
-                    icon=ft.Icons.DOWNLOAD,
-                    style=ft.ButtonStyle(color=ft.Colors.BLUE),
-                ),
+                ft.Row([
+                    self.sort_button,
+                ]),
             ],
         )
 
@@ -61,13 +59,12 @@ class HistoryPage(ft.Container):
                 ft.DataColumn(
                     ft.Text("Valor/Detalle", color=ft.Colors.BLACK, weight="bold")
                 ),
-                ft.DataColumn(ft.Text("Estado", color=ft.Colors.BLACK, weight="bold")),
             ],
             rows=[],
         )
 
         self.content = ft.Column(
-            scroll=ft.ScrollMode.AUTO,
+            scroll=ft.ScrollMode.AUTO, # Enable scrolling for the column
             controls=[
                 header,
                 ft.Tabs(
@@ -83,7 +80,10 @@ class HistoryPage(ft.Container):
                 ),
                 ft.Divider(height=20, color="transparent"),
                 ft.Container(
-                    content=self.data_table,
+                    content=ft.Column(
+                        controls=[self.data_table],
+                        scroll=ft.ScrollMode.ADAPTIVE,
+                    ),
                     padding=10,
                     bgcolor=ft.Colors.WHITE,
                     border_radius=12,
@@ -91,6 +91,7 @@ class HistoryPage(ft.Container):
                         blur_radius=5,
                         color=ft.Colors.with_opacity(0.05, ft.Colors.BLACK),
                     ),
+                    height=500, # Fixed height for the container
                 ),
             ],
         )
@@ -109,82 +110,66 @@ class HistoryPage(ft.Container):
         if message == "refresh_dashboard":
             self.load_data()
 
-    def load_data(self):
-        """Pide el historial al servicio y rellena la tabla"""
+    def _toggle_sort(self, e):
+        self.sort_descending = not self.sort_descending
+        if self.sort_descending:
+            self.sort_button.icon = ft.Icons.ARROW_DOWNWARD
+            self.sort_button.tooltip = "Orden: Más reciente primero"
+        else:
+            self.sort_button.icon = ft.Icons.ARROW_UPWARD
+            self.sort_button.tooltip = "Orden: Más antiguo primero"
+        self.sort_button.update()
+        self.load_data()
 
-        logs = self.service.get_all_history_logs()
-        now = time.time()
-        threshold = now - (self.selected_range_days * 86400)
-        logs = [log for log in logs if log.get("timestamp", 0) >= threshold]
-
+    def _on_range_change(self, e):
+        index = e.control.selected_index
         self.data_table.rows.clear()
+        self.update()
+        
+        if index == 0:
+            self.range_limits = (28, 35)
+        elif index == 1:
+            self.range_limits = (6, 8)
+        else:
+            self.range_limits = (0, 2)
+            
+        self.load_data()
 
-        for log in logs[:30]:
+    def load_data(self):
+        """Pide el historial al servicio y rellena la tabla con datos reales según el rango."""
+        logs = self.service.get_history_by_range(*self.range_limits)
+
+        logs.sort(key=lambda x: x["timestamp"], reverse=self.sort_descending)
+        logs = logs[:30]
+
+        self.data_table.rows.clear() # Limpiar de nuevo por seguridad antes de rellenar
+
+        for log in logs:
             row = self._create_row(
                 log["time_str"],
                 log["type"],
                 log["location"],
                 str(log["detail"]),
-                log["status"],
             )
             self.data_table.rows.append(row)
 
         self.update()
 
-    def _on_range_change(self, e):
-        index = e.control.selected_index
-        if index == 0:
-            self.selected_range_days = 30
-        elif index == 1:
-            self.selected_range_days = 7
-        else:
-            self.selected_range_days = 1
-        self.load_data()
-
-    def _create_row(self, time, type_e, loc, detail, status):
+    def _create_row(self, time, type_e, loc, detail):
         """Crea una fila de datos para la tabla."""
-        status_upper = str(status).upper()
 
-        if status_upper in ["ALERTA", "WARNING", "HOT", "OFFLINE", "CERRADA"]:
-            color_bg = ft.Colors.RED_50
-            color_txt = ft.Colors.RED
-        elif status_upper in [
-            "NORMAL",
-            "SAFE",
-            "CLEAR",
-            "SUCCESS",
-            "OK",
-            "ON",
-            "ABIERTA",
-        ]:
-            color_bg = ft.Colors.GREEN_50
-            color_txt = ft.Colors.GREEN
-        else:
-            color_bg = ft.Colors.BLUE_50
-            color_txt = ft.Colors.BLUE
-
+        
         return ft.DataRow(
             cells=[
                 ft.DataCell(ft.Text(time, size=12, color=ft.Colors.BLACK)),
                 ft.DataCell(
                     ft.Row(
                         [
-                            ft.Icon(ft.Icons.CIRCLE, size=8, color=color_txt),
                             ft.Text(type_e, color=ft.Colors.BLACK),
                         ]
                     )
                 ),
                 ft.DataCell(ft.Text(loc, color=ft.Colors.BLACK)),
                 ft.DataCell(ft.Text(detail, color=ft.Colors.BLACK)),
-                ft.DataCell(
-                    ft.Container(
-                        content=ft.Text(
-                            status, size=10, color=color_txt, weight="bold"
-                        ),
-                        bgcolor=color_bg,
-                        padding=ft.padding.symmetric(horizontal=8, vertical=4),
-                        border_radius=10,
-                    )
-                ),
             ]
         )
