@@ -1,4 +1,3 @@
-
 SENSOR_CONFIG = {
     "temperature": [
         {"id": "temp_01", "name": "Sensor Temperatura Zona Norte"},
@@ -23,5 +22,5 @@ SENSOR_CONFIG = {
     "light": [
         {"id": "light_01", "name": "Iluminación Paseo Central"},
         {"id": "light_02", "name": "Iluminación Parking"},
-    ]
+    ],
 }

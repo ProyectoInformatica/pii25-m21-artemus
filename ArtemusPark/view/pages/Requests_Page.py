@@ -129,7 +129,6 @@ class RequestsPage(ft.Container):
     def _handle_request(self, req, new_status):
         self.req_repo.update_request_status(req["id"], new_status)
 
-
         self.page.snack_bar = ft.SnackBar(
             ft.Text(f"Solicitud marcada como {new_status}")
         )

@@ -21,13 +21,13 @@ class DoorController:
     """
 
     def __init__(
-            self,
-            controller_ref=None,
-            on_new_data: Optional[Callable[[DoorModel], None]] = None,
+        self,
+        controller_ref=None,
+        on_new_data: Optional[Callable[[DoorModel], None]] = None,
     ):
         self.controller_ref = controller_ref
         self.on_new_data = on_new_data
-        
+
         self.auth_repo = AuthRepository()
         self.users_list = list(self.auth_repo.get_all_users().keys())
 
@@ -49,14 +49,16 @@ class DoorController:
             else:
                 is_open = bool(random.randint(0, 1))
                 direction = "IN" if random.random() < 0.6 else "OUT"
-                sim_user = random.choice(self.users_list) if self.users_list else "unknown"
+                sim_user = (
+                    random.choice(self.users_list) if self.users_list else "unknown"
+                )
 
                 data = DoorModel(
                     is_open=is_open,
                     sensor_id=sensor_id,
                     name=readable_name,
                     direction=direction,
-                    username=sim_user
+                    username=sim_user,
                 )
                 msg = f"[{readable_name}] Door {'OPEN' if is_open else 'CLOSED'} ({direction}) - User: {sim_user}"
 

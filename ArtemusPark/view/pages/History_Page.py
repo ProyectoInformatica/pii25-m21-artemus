@@ -37,9 +37,11 @@ class HistoryPage(ft.Container):
                         ),
                     ]
                 ),
-                ft.Row([
-                    self.sort_button,
-                ]),
+                ft.Row(
+                    [
+                        self.sort_button,
+                    ]
+                ),
             ],
         )
 
@@ -133,14 +135,14 @@ class HistoryPage(ft.Container):
         index = e.control.selected_index
         self.data_table.rows.clear()
         self.update()
-        
+
         if index == 0:
             self.range_limits = (28, 35)
         elif index == 1:
             self.range_limits = (6, 8)
         else:
             self.range_limits = (0, 2)
-            
+
         self.load_data()
 
     def load_data(self):
@@ -150,7 +152,7 @@ class HistoryPage(ft.Container):
         logs.sort(key=lambda x: x["timestamp"], reverse=self.sort_descending)
         logs = logs[:30]
 
-        self.data_table.rows.clear() # Limpiar de nuevo por seguridad antes de rellenar
+        self.data_table.rows.clear()  # Limpiar de nuevo por seguridad antes de rellenar
 
         if not logs:
             self.table_content.scroll = None
@@ -182,7 +184,6 @@ class HistoryPage(ft.Container):
     def _create_row(self, time, type_e, loc, detail):
         """Crea una fila de datos para la tabla."""
 
-        
         return ft.DataRow(
             cells=[
                 ft.DataCell(ft.Text(time, size=12, color=ft.Colors.BLACK)),

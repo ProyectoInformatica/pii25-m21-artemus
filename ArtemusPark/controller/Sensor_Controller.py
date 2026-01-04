@@ -143,7 +143,9 @@ class SensorController:
                 self.park_open = False
                 print(f"\n--- PARK CLOSED at {hour}:00 ---")
 
-            print(f"[Real Time: {hour}:00] Park {'OPEN' if self.park_open else 'CLOSED'}")
+            print(
+                f"[Real Time: {hour}:00] Park {'OPEN' if self.park_open else 'CLOSED'}"
+            )
 
             time.sleep(30)
 

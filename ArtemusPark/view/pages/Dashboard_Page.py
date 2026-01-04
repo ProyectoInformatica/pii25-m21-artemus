@@ -57,7 +57,7 @@ class DashboardPage(ft.Container):
             "smoke": "smoke",
             "temperature": "temperature",
             "humidity": "humidity",
-            "wind": "wind"
+            "wind": "wind",
         }
 
         target_type = type_map.get(sensor_type, sensor_type)
@@ -68,7 +68,7 @@ class DashboardPage(ft.Container):
             "smoke": "Calidad del Aire",
             "temperature": "Temperatura",
             "humidity": "Humedad",
-            "wind": "Viento"
+            "wind": "Viento",
         }
 
         display_title = title_map.get(target_type, target_type.capitalize())
@@ -85,9 +85,11 @@ class DashboardPage(ft.Container):
                         ft.DataCell(
                             ft.Container(
                                 content=ft.Text(s["status"], size=12, color="white"),
-                                bgcolor=ft.Colors.GREEN if s["is_online"] else ft.Colors.RED,
+                                bgcolor=(
+                                    ft.Colors.GREEN if s["is_online"] else ft.Colors.RED
+                                ),
                                 padding=5,
-                                border_radius=5
+                                border_radius=5,
                             )
                         ),
                         ft.DataCell(ft.Text(str(s["last_value"]))),
@@ -99,12 +101,14 @@ class DashboardPage(ft.Container):
         if not rows:
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text("No hay sensores de ese tipo", color=ft.Colors.WHITE),
+                    content=ft.Text(
+                        "No hay sensores de ese tipo", color=ft.Colors.WHITE
+                    ),
                     bgcolor=ft.Colors.RED,
                 )
             )
         else:
-             content = ft.DataTable(
+            content = ft.DataTable(
                 columns=[
                     ft.DataColumn(ft.Text("Nombre")),
                     ft.DataColumn(ft.Text("Estado")),
@@ -115,16 +119,23 @@ class DashboardPage(ft.Container):
                 border=ft.border.all(1, ft.Colors.GREY_300),
                 vertical_lines=ft.border.BorderSide(1, ft.Colors.GREY_200),
                 horizontal_lines=ft.border.BorderSide(1, ft.Colors.GREY_200),
-             )
+            )
 
-             dialog = ft.AlertDialog(
+            dialog = ft.AlertDialog(
                 title=ft.Text(f"Sensores de {display_title}"),
-                content=ft.Column([content], height=300, width=650, scroll=ft.ScrollMode.AUTO, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+                content=ft.Column(
+                    [content],
+                    height=300,
+                    width=650,
+                    scroll=ft.ScrollMode.AUTO,
+                    tight=True,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                ),
                 actions=[
                     ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dialog))
                 ],
-             )
-             self.page.open(dialog)
+            )
+            self.page.open(dialog)
 
     def _build_sensor_row(self, name, status, bg_color):
         return ft.Container(
@@ -177,6 +188,7 @@ class DashboardPage(ft.Container):
 
             avg_data = self.service.get_average_sensor_data()
             if avg_data:
+
                 def update_sensor_ui(card, map_key, value):
                     if value is None:
                         card.update_value("--")
@@ -185,10 +197,14 @@ class DashboardPage(ft.Container):
                         card.update_value(value)
                         self.card_map.update_marker_status_by_type(map_key, True)
 
-                update_sensor_ui(self.card_temp, "temperature", avg_data.get("temperature"))
+                update_sensor_ui(
+                    self.card_temp, "temperature", avg_data.get("temperature")
+                )
                 update_sensor_ui(self.card_hum, "humidity", avg_data.get("humidity"))
                 update_sensor_ui(self.card_wind, "wind", avg_data.get("wind"))
-                update_sensor_ui(self.card_air, "air_quality", avg_data.get("air_quality"))
+                update_sensor_ui(
+                    self.card_air, "air_quality", avg_data.get("air_quality")
+                )
 
                 self.card_map.update_sensor_data(data)
 
