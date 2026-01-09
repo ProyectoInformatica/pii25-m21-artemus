@@ -43,4 +43,5 @@ class AlertCard(ft.Container):
             self.bgcolor = AppColors.BG_CARD
             self.border = ft.border.all(1, ft.Colors.GREY_300)
 
-        self.update()
+        if self.page:
+            self.update()

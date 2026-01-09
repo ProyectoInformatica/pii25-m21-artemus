@@ -16,7 +16,8 @@ class EventsPanel(ft.ListView):
         """Actualiza la lista de eventos en el panel."""
         self.controls.clear()
         self.controls.extend([self._create_event_item(e) for e in new_events])
-        self.update()
+        if self.page:
+            self.update()
         print(f"EventsPanel: Updated UI with {len (new_events )} events")
 
     def _create_event_item(self, event: dict):

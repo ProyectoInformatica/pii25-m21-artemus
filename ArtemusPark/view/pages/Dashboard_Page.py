@@ -178,10 +178,10 @@ class DashboardPage(ft.Container):
     def _on_message(self, message):
         """Gestor de mensajes centralizado"""
 
-        if message == "refresh_dashboard":
-            if not self._is_mounted or not self.page:
-                return
+        if not self._is_mounted or not self.page:
+            return
 
+        if message == "refresh_dashboard":
             data = self.service.get_latest_sensor_data()
             if data:
                 self.card_capacity.update_occupancy(data.get("occupancy", 0))
