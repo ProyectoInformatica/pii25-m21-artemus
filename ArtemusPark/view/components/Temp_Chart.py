@@ -5,6 +5,7 @@ class TempChart(ft.Container):
     def __init__(self):
         super().__init__()
 
+        # --- TU ESTILO ORIGINAL ---
         self.expand = True
         self.constraints = ft.BoxConstraints(min_height=400)
         self.bgcolor = "#ffffff"
@@ -12,12 +13,13 @@ class TempChart(ft.Container):
         self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.padding = 20
 
+        # --- DATOS INICIALES (Con referencia para poder editar luego) ---
         self.main_line = ft.LineChartData(
             data_points=[
                 ft.LineChartDataPoint(0, 0),
             ],
             stroke_width=3,
-            color="#2563eb",
+            color="#2563eb",  # Tu azul
             curved=True,
             stroke_cap_round=True,
             below_line_bgcolor="#1a2563eb",
@@ -38,16 +40,15 @@ class TempChart(ft.Container):
                     ft.ChartAxisLabel(value=0, label=ft.Text("Inicio", size=10)),
                     ft.ChartAxisLabel(value=5, label=ft.Text("Actual", size=10)),
                 ],
-                labels_size=40,
+                labels_size=20,
             ),
             tooltip_bgcolor="#111827",
             min_y=15,
-            max_y=35,
+            max_y=35,  # Ajustado para rango 20-30ºC
             expand=True,
         )
 
         self.content = ft.Column(
-            expand=True,
             controls=[
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -58,16 +59,16 @@ class TempChart(ft.Container):
                             weight=ft.FontWeight.BOLD,
                             color="#6b7280",
                         ),
-                        ft.Text("Actualmente", size=12, color="#9ca3af"),
+                        ft.Text("Última hora", size=12, color="#9ca3af"),
                     ],
                 ),
                 ft.Container(height=20),
                 self.chart,
-            ],
+            ]
         )
 
+    # --- MÉTODO PARA RECIBIR DATOS DEL SERVICE ---
     def update_data(self, chart_data: list):
-        """Actualiza los puntos del gráfico con nuevos datos."""
         if not chart_data:
             return
 
@@ -75,7 +76,7 @@ class TempChart(ft.Container):
         for p in chart_data:
             new_points.append(
                 ft.LineChartDataPoint(
-                    x=p["x"], y=p["y"], tooltip=f"{p ['y']}°C\n{p .get ('tooltip','')}"
+                    x=p["x"], y=p["y"], tooltip=f"{p['y']}°C\n{p.get('tooltip', '')}"
                 )
             )
 

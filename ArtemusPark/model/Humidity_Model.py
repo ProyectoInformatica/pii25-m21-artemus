@@ -4,10 +4,6 @@ from dataclasses import dataclass, field
 
 @dataclass
 class HumidityModel:
-    """Modelo de datos para sensores de humedad."""
-
-    value: int
-    status: str
-    sensor_id: str
-    name: str = ""
+    value: int  # %
+    status: str  # "LOW" | "NORMAL" | "HIGH"
     timestamp: float = field(default_factory=time.time)

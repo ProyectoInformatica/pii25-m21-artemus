@@ -19,19 +19,18 @@ class TemperatureController:
         self.on_new_data = on_new_data
 
     def run(self, name):
-        """Simula el sensor de temperatura."""
         while True:
             value = random.randint(-5, 40)
 
             if value > 30:
                 status = "HOT"
-                msg = f"[{name }] Hot weather ({value }°C)"
+                msg = f"[{name}] Hot weather ({value}°C)"
             elif value < 15:
                 status = "COLD"
-                msg = f"[{name }] Cold weather ({value }°C)"
+                msg = f"[{name}] Cold weather ({value}°C)"
             else:
                 status = "MILD"
-                msg = f"[{name }] Mild weather ({value }°C)"
+                msg = f"[{name}] Mild weather ({value}°C)"
 
             data = TemperatureModel(value=value, status=status)
             print(msg)

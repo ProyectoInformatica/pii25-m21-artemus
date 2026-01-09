@@ -1,15 +1,10 @@
 from dataclasses import dataclass, field
 import time
-from typing import Optional
 
 
 @dataclass
 class DoorModel:
-    """Modelo de datos para eventos de puertas."""
-
-    is_open: bool
-    sensor_id: str
-    name: str
-    direction: str
-    username: Optional[str] = None
+    is_open: bool  # True = Abierta, False = Cerrada
+    name: str  # Nombre del sensor (ej. "Acceso Principal")
+    direction: str  # <--- NUEVO CAMPO: "IN" | "OUT" | "BOTH"
     timestamp: float = field(default_factory=time.time)

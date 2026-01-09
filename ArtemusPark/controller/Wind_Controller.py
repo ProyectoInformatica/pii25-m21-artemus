@@ -26,7 +26,7 @@ class WindController:
 
     def run(self, name: str):
         """
-        Simula un anemómetro (velocidad viento en km/h).
+        Emulate an anemometer (wind speed in km/h).
         """
         while True:
             speed = random.randint(0, 60)
@@ -43,7 +43,7 @@ class WindController:
 
             data = WindModel(speed=speed, state=state, label=label)
 
-            msg = f"[{name }] {speed } km/h - {state } ({label })"
+            msg = f"[{name}] {speed} km/h - {state} ({label})"
             print(msg)
             logging.info(msg)
 

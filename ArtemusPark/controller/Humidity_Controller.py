@@ -17,19 +17,18 @@ class HumidityController:
         self.on_new_data = on_new_data
 
     def run(self, name):
-        """Simula el sensor de humedad."""
         while True:
             value = random.randint(0, 100)
 
             if value < 30:
                 status = "LOW"
-                msg = f"[{name }] Low humidity ({value }%) → irrigation ON"
+                msg = f"[{name}] Low humidity ({value}%) → irrigation ON"
             elif value < 70:
                 status = "NORMAL"
-                msg = f"[{name }] Normal humidity ({value }%) → irrigation OFF"
+                msg = f"[{name}] Normal humidity ({value}%) → irrigation OFF"
             else:
                 status = "HIGH"
-                msg = f"[{name }] High humidity ({value }%) → irrigation OFF"
+                msg = f"[{name}] High humidity ({value}%) → irrigation OFF"
 
             data = HumidityModel(value=value, status=status)
             print(msg)

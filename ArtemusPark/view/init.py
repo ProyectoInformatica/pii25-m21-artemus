@@ -1,7 +1,6 @@
 import time
 from ArtemusPark.controller.Sensor_Controller import SensorController
 
-
 controller = SensorController()
 controller.start()
 

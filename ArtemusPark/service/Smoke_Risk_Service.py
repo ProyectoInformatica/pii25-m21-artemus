@@ -12,25 +12,26 @@ class SmokeRiskResult:
 
 def check_smoke_risk(measurement: SmokeModel) -> SmokeRiskResult:
     """
-    Evalúa la medición de humo para determinar riesgo inmediato.
+    Evaluate the smoke measurement to determine immediate risk.
     """
     density = measurement.value
-    status = measurement.status
+    status = measurement.status  # "CLEAR", "WARNING", "ALARM"
 
+    # Define risk based on the status determined by the controller
     is_emergency = status == "ALARM"
 
     if is_emergency:
         message = (
-            f"EMERGENCY: High smoke density detected ({density }). "
-            f"Status is {status }."
+            f"EMERGENCY: High smoke density detected ({density}). "
+            f"Status is {status}."
         )
     elif status == "WARNING":
         message = (
-            f"CAUTION: Elevated smoke levels ({density }). "
+            f"CAUTION: Elevated smoke levels ({density}). "
             f"Monitor situation closely."
         )
     else:
-        message = f"Air quality is normal (Density: {density })."
+        message = f"Air quality is normal (Density: {density})."
 
     return SmokeRiskResult(
         is_emergency=is_emergency,
