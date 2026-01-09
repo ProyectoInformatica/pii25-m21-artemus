@@ -1,0 +1,302 @@
+[
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764831600.0,
+        "value": 28,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764831600.0,
+        "value": 29,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764831600.0,
+        "value": 28,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764832500.0,
+        "value": 26,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764832500.0,
+        "value": 22,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764832500.0,
+        "value": 22,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764833400.0,
+        "value": 23,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764833400.0,
+        "value": 19,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764833400.0,
+        "value": 22,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764834300.0,
+        "value": 25,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764834300.0,
+        "value": 20,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764834300.0,
+        "value": 18,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764835200.0,
+        "value": 19,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764835200.0,
+        "value": 31,
+        "status": "HOT"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764835200.0,
+        "value": 29,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764836100.0,
+        "value": 26,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764836100.0,
+        "value": 26,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764836100.0,
+        "value": 25,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764837000.0,
+        "value": 20,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764837000.0,
+        "value": 19,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764837000.0,
+        "value": 21,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764837900.0,
+        "value": 24,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764837900.0,
+        "value": 27,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764837900.0,
+        "value": 30,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764838800.0,
+        "value": 27,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764838800.0,
+        "value": 19,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764838800.0,
+        "value": 29,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764839700.0,
+        "value": 27,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764839700.0,
+        "value": 25,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764839700.0,
+        "value": 19,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764840600.0,
+        "value": 28,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764840600.0,
+        "value": 24,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764840600.0,
+        "value": 18,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764841500.0,
+        "value": 31,
+        "status": "HOT"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764841500.0,
+        "value": 18,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764841500.0,
+        "value": 25,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764842400.0,
+        "value": 23,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764842400.0,
+        "value": 29,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764842400.0,
+        "value": 30,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764843300.0,
+        "value": 25,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764843300.0,
+        "value": 22,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764843300.0,
+        "value": 19,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764844200.0,
+        "value": 21,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764844200.0,
+        "value": 29,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764844200.0,
+        "value": 21,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764845100.0,
+        "value": 30,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764845100.0,
+        "value": 23,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_03",
+        "timestamp": 1764845100.0,
+        "value": 22,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_01",
+        "timestamp": 1764846000.0,
+        "value": 30,
+        "status": "MILD"
+    },
+    {
+        "sensor_id": "temp_02",
+        "timestamp": 1764846000.0,
+        "value": 22,
+        "status": "MILD"
+    }
+]

@@ -1,0 +1,80 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.venv
+venv/
+ENV/
+env/
+*.log
+
+# --- Flet / UI cache ---
+.flet/
+.flet-build/
+*.db
+*.sqlite3
+
+# --- IDEs y editores ---
+.vscode/
+.idea/
+/ArtemusPark/.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# --- Archivos del sistema ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Configuración del entorno IoT ---
+config.json
+*.json.bak
+*.cfg
+*.ini
+
+# --- Arduino / Raspberry Pi ---
+*.hex
+*.elf
+*.bin
+*.o
+*.d
+*.lst
+
+# --- Documentación y recursos temporales ---
+/__MACOSX/
+/tmp/
+/*.pdf
+/*.docx
+/*.odt
+/*.xlsx
+/*.pptx
+
+# --- Datos generados ---
+*.csv
+*.dat
+*.log
+*.tmp
+
+# --- Tests y coverage ---
+.coverage
+htmlcov/
+*.py,cover
+.cache
+nosetests.xml
+coverage.xml
+.pytest_cache/
+
+# --- Repositorios y dependencias externas ---
+node_modules/
+package-lock.json
+*.spec
