@@ -43,4 +43,5 @@ class SensorCard(ft.Container):
         Actualiza el número y refresca la tarjeta.
         """
         self.value_text.value = str(new_value)
-        self.update()
+        if self.page:
+            self.update()

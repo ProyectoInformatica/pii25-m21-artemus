@@ -133,7 +133,8 @@ class Sidebar(ft.Container):
 
     def set_active(self, key):
         self._apply_active_state(key)
-        self.update()
+        if self.page:
+            self.update()
 
     def _handle_click(self, e):
         """Maneja el evento de clic en un botón de navegación."""
@@ -143,7 +144,8 @@ class Sidebar(ft.Container):
         self.on_nav_change(clicked_key)
 
         self._apply_active_state(clicked_key)
-        self.update()
+        if self.page:
+            self.update()
 
     def _apply_active_state(self, clicked_key):
         for control in self.content_column.controls:
@@ -165,7 +167,8 @@ class Sidebar(ft.Container):
         badge = self.badge_controls.get("requests")
         if badge is not None:
             badge.visible = self.has_pending_requests
-            try:
-                badge.update()
-            except Exception:
-                pass
+            if badge.page:
+                try:
+                    badge.update()
+                except Exception:
+                    pass

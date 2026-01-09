@@ -111,9 +111,10 @@ class MaintenancePage(ft.Container):
         self._is_mounted = False
 
     def _on_message(self, message):
+        if not self._is_mounted or not self.page:
+            return
+
         if message == "refresh_dashboard":
-            if not self._is_mounted or not self.page:
-                return
             self.update_data()
 
     def _open_request_dialog(self, e):
@@ -167,7 +168,8 @@ class MaintenancePage(ft.Container):
             content=ft.Text("Solicitud enviada correctamente"), bgcolor="green"
         )
         self.page.snack_bar.open = True
-        self.page.update()
+        if self.page:
+            self.page.update()
 
     def update_data(self):
         """Consulta el estado de salud y regenera las tarjetas"""

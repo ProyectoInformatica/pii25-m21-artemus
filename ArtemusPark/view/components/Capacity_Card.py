@@ -96,4 +96,5 @@ class CapacityCard(ft.Container):
         else:
             self.progress_bar.color = ft.Colors.BLUE
 
-        self.update()
+        if self.page:
+            self.update()
