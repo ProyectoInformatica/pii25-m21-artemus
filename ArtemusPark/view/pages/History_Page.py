@@ -115,9 +115,10 @@ class HistoryPage(ft.Container):
 
     def _on_message(self, message):
         """3. Escuchamos el 'grito' del main.py"""
+        if not self._is_mounted or not self.page:
+            return
+
         if message == "refresh_dashboard":
-            if not self._is_mounted or not self.page:
-                return
             self.load_data()
 
     def _toggle_sort(self, e):
