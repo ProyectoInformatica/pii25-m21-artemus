@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Any
 
-from repository.Temperature_Repository import (
+from ArtemusPark.repository.Temperature_Repository import (
     load_all_temperature_measurements,
 )
 
@@ -19,7 +19,7 @@ class TemperatureMetrics:
 
 def compute_temperature_metrics() -> TemperatureMetrics:
     """
-    Compute statistics for temperature based on stored measurements.
+    Calcula estadísticas de temperatura basadas en mediciones almacenadas.
     """
     records: List[Dict[str, Any]] = load_all_temperature_measurements()
     if not records:

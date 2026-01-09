@@ -3,7 +3,7 @@ import random
 import time
 from typing import Callable, Optional
 
-from model.Smoke_Model import SmokeModel
+from ArtemusPark.model.Smoke_Model import SmokeModel
 
 logging.basicConfig(
     filename="smoke_controller.log",
@@ -22,24 +22,24 @@ class SmokeController:
         self.on_new_data = on_new_data
 
     def run(self, name: str):
-        # Validation to ensure we can access the running flag
+        """Simula el detector de humo."""
         if not self.controller_ref:
             logging.error("SmokeController needs controller_ref to run.")
             return
 
         while self.controller_ref.running:
-            # Simulate smoke density (0-100)
+
             value = random.randint(0, 100)
 
             if value > 95:
                 status = "ALARM"
-                msg = f"[{name}] CRITICAL: Fire detected! ({value} density)"
+                msg = f"[{name }] CRITICAL: Fire detected! ({value } density)"
             elif value > 40:
                 status = "WARNING"
-                msg = f"[{name}] Warning: Smoke detected ({value} density)"
+                msg = f"[{name }] Warning: Smoke detected ({value } density)"
             else:
                 status = "CLEAR"
-                msg = f"[{name}] Air is clear ({value} density)"
+                msg = f"[{name }] Air is clear ({value } density)"
 
             data = SmokeModel(value=value, status=status)
 

@@ -3,7 +3,9 @@ import random
 import time
 from typing import Callable, Optional
 
-from model.Door_Model import DoorModel
+from ArtemusPark.model.Door_Model import DoorModel
+from ArtemusPark.repository.Auth_Repository import AuthRepository
+from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
 
 logging.basicConfig(
     filename="door_controller.log",
@@ -14,7 +16,7 @@ logging.basicConfig(
 
 class DoorController:
     """
-    Controller: ejecuta la lógica de sensores de puerta.
+    Controlador: ejecuta la lógica de sensores de puerta.
     Usa callbacks tipo on_new_data para entregar DoorModel al SensorController.
     """
 
@@ -23,29 +25,48 @@ class DoorController:
         controller_ref=None,
         on_new_data: Optional[Callable[[DoorModel], None]] = None,
     ):
-        self.controller_ref = controller_ref  # Para leer running y park_open
-        self.on_new_data = on_new_data  # Callback con DoorModel
+        self.controller_ref = controller_ref
+        self.on_new_data = on_new_data
 
-    def run(self, name: str):
+        self.auth_repo = AuthRepository()
+        self.users_list = list(self.auth_repo.get_all_users().keys())
+
+    def run(self, sensor_id: str):
         """Bucle que simula el sensor de puerta."""
+        readable_name = sensor_id
+        for sensor in SENSOR_CONFIG.get("door", []):
+            if sensor["id"] == sensor_id:
+                readable_name = sensor["name"]
+                break
 
         while self.controller_ref.running:
-            # Si el parque está cerrado → todas las puertas deben considerarse cerradas
             if not self.controller_ref.park_open:
-                data = DoorModel(is_open=False, name=name)
-                msg = f"[{name}] Park is CLOSED → Door forced CLOSED."
+                msg = f"[{readable_name }] Park is CLOSED. Door activity is suspended."
+                print(msg)
+                logging.info(msg)
+                time.sleep(5)
+                continue
             else:
-                # Parque abierto → lecturas reales simuladas
                 is_open = bool(random.randint(0, 1))
-                data = DoorModel(is_open=is_open, name=name)
-                msg = f"[{name}] Door {'OPEN' if is_open else 'CLOSED'}"
+                direction = "IN" if random.random() < 0.6 else "OUT"
+                sim_user = (
+                    random.choice(self.users_list) if self.users_list else "unknown"
+                )
+
+                data = DoorModel(
+                    is_open=is_open,
+                    sensor_id=sensor_id,
+                    name=readable_name,
+                    direction=direction,
+                    username=sim_user,
+                )
+                msg = f"[{readable_name }] Door {'OPEN'if is_open else 'CLOSED'} ({direction }) - User: {sim_user }"
 
             print(msg)
             logging.info(msg)
 
             if self.on_new_data:
                 self.on_new_data(data)
-
             time.sleep(5)
 
-        print(f"[{name}] Door thread stopped.")
+        print(f"[{readable_name }] Door thread stopped.")

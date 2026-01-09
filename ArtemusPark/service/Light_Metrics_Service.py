@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Any
 
-from repository.Light_Repository import load_all_light_events
+from ArtemusPark.repository.Light_Repository import load_all_light_events
 
 
 @dataclass
@@ -14,7 +14,7 @@ class LightMetrics:
 
 def compute_light_metrics() -> LightMetrics:
     """
-    Compute statistics for light usage based on stored events.
+    Calcula estadísticas de uso de luz basadas en eventos almacenados.
     """
     records: List[Dict[str, Any]] = load_all_light_events()
     if not records:
@@ -25,14 +25,11 @@ def compute_light_metrics() -> LightMetrics:
             off_count=0,
         )
 
-    # Calculate average intensity (value)
     values = [int(r["value"]) for r in records]
     count = len(values)
     total_value = sum(values)
     avg_intensity = total_value / count if count > 0 else None
 
-    # Count ON vs OFF states
-    # Asumimos que "is_on" está guardado como booleano en el JSON
     on_count = sum(1 for r in records if r.get("is_on") is True)
     off_count = sum(1 for r in records if r.get("is_on") is False)
 

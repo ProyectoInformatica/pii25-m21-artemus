@@ -3,8 +3,8 @@ import random
 import time
 from typing import Callable, Optional
 
-from model.Wind_Model import WindModel
-from config.Wind_Config import RISK_THRESHOLD_KMH, WARNING_THRESHOLD_KMH
+from ArtemusPark.model.Wind_Model import WindModel
+from ArtemusPark.config.Wind_Config import RISK_THRESHOLD_KMH, WARNING_THRESHOLD_KMH
 
 logging.basicConfig(
     filename="wind_controller.log",
@@ -26,7 +26,7 @@ class WindController:
 
     def run(self, name: str):
         """
-        Emulate an anemometer (wind speed in km/h).
+        Simula un anemómetro (velocidad viento en km/h).
         """
         while True:
             speed = random.randint(0, 60)
@@ -43,7 +43,7 @@ class WindController:
 
             data = WindModel(speed=speed, state=state, label=label)
 
-            msg = f"[{name}] {speed} km/h - {state} ({label})"
+            msg = f"[{name }] {speed } km/h - {state } ({label })"
             print(msg)
             logging.info(msg)
 

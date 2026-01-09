@@ -14,9 +14,8 @@ class PlaceholderPage(ft.Container):
             padding=20,
             alignment=ft.alignment.center,
             content=ft.Column(
-                # CORRECCIÓN AQUI:
-                alignment=ft.MainAxisAlignment.CENTER,  # Eje vertical (Main Axis)
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,  # Eje horizontal (Cross Axis)
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
                     ft.Text(title, size=20, weight=ft.FontWeight.BOLD, color="#111827"),
                     ft.Text(

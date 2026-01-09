@@ -1,0 +1,352 @@
+[
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766876400.0,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_laura"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766879100.0,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "igomez"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766880000.0,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_maria"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766886300.0,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_carlos"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766887200.0,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_maria"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766895300.0,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_pedro"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766895300.0,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "admin_alpha"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766897100.0,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "admin_super"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766876884.859617,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_luis"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766876987.890844,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "admin_alpha"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766876665.940269,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "eng_mike"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766876975.038544,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_carlos"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766877622.836469,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_laura"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766877331.90026,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "admin_super"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766878753.587381,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_carlos"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766878868.532433,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_demo"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766878287.775179,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "client_ana"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766878750.320669,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "maint_joe"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766880405.843299,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "adminpablito"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766880036.19062,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "admin1"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766880771.175564,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "adminpablito"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766880071.187207,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_demo"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766880495.823664,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "boss_artemus"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766880725.507646,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_luis"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766880979.887745,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "adminpablito"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766881118.686597,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_sofia"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766881661.433297,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_laura"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766881703.291241,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_pedro"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766882096.889679,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_demo"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766882030.56615,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "eng_mike"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766878083.64754,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "admin_super"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766877764.462715,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "maint_joe"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766878502.550564,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "client_ana"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766878227.313232,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "tech_sarah"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766878681.971081,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "admin_super"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766878385.334164,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_luis"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766878805.434117,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "adminpablito"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766878652.105467,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "maint_joe"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766878432.370867,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "boss_artemus"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766878576.394661,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_demo"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766879641.196177,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_luis"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766879670.516405,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "eng_mike"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766879178.287381,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "admin_super"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766879878.487528,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_sofia"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766879178.290511,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_luis"
+    },
+    {
+        "sensor_id": "door_02",
+        "timestamp": 1766879440.398061,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_carlos"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766881423.00125,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "boss_artemus"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766881089.475857,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "user_sofia"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766881421.614754,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "boss_artemus"
+    },
+    {
+        "sensor_id": "door_01",
+        "timestamp": 1766881138.699508,
+        "is_open": true,
+        "direction": "OUT",
+        "username": "boss_artemus"
+    }
+]

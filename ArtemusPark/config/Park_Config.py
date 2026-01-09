@@ -1,0 +1,2 @@
+OPEN_HOUR = 9
+CLOSE_HOUR = 18

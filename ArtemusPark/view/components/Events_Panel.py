@@ -3,29 +3,24 @@ from flet import Container, Row, Icon, Text, Icons, Colors
 from datetime import datetime
 
 
-# CAMBIO 1: Heredamos de ListView en lugar de Column para mejor scroll
 class EventsPanel(ft.ListView):
     def __init__(self, events: list):
         super().__init__()
-        self.expand = True  # Ocupar todo el espacio disponible
+        self.expand = True
         self.spacing = 10
-        self.padding = ft.padding.only(
-            right=10, bottom=10
-        )  # Un poco de aire para el scrollbar
+        self.padding = ft.padding.only(right=10, bottom=10)
 
-        # CAMBIO 2: Eliminamos self.constraints y self.scroll manual.
-        # ListView ya hace scroll automáticamente.
-
-        # Carga inicial de controles
         self.controls = [self._create_event_item(e) for e in events]
 
     def update_events(self, new_events: list):
+        """Actualiza la lista de eventos en el panel."""
         self.controls.clear()
         self.controls.extend([self._create_event_item(e) for e in new_events])
         self.update()
-        print(f"EventsPanel: Updated UI with {len(new_events)} events")
+        print(f"EventsPanel: Updated UI with {len (new_events )} events")
 
     def _create_event_item(self, event: dict):
+        """Crea un componente visual para un evento individual."""
         raw_ts = event.get("timestamp")
 
         if isinstance(raw_ts, (float, int)):
@@ -34,23 +29,21 @@ class EventsPanel(ft.ListView):
             except Exception:
                 time_str = "--:--"
         elif isinstance(raw_ts, str):
-            # Cortar cadena ISO si viene como texto
-            # Manejo robusto por si no hay 'T'
+
             time_str = raw_ts.split("T")[-1][:5] if "T" in raw_ts else raw_ts[-8:-3]
         else:
             time_str = "--:--"
 
-        evt_type = event.get("type", "unknown").lower()  # Aseguramos minúsculas
+        evt_type = event.get("type", "unknown").lower()
 
-        # Mapeo de iconos y colores
         if "temp" in evt_type:
             icon = Icons.THERMOSTAT
             color = Colors.ORANGE
-        elif "hum" in evt_type:  # humedad
+        elif "hum" in evt_type:
             icon = Icons.WATER_DROP
             color = Colors.BLUE
         elif "light" in evt_type:
-            icon = Icons.LIGHTBULB  # Icono corregido
+            icon = Icons.LIGHTBULB
             color = Colors.YELLOW_700
         elif "door" in evt_type:
             icon = Icons.DOOR_SLIDING
