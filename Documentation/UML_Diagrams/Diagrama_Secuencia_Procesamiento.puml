@@ -1,0 +1,99 @@
+@startuml ArtemusPark_Sequence_Diagram
+
+!theme cerulean-outline
+skinparam sequenceMessageAlign center
+skinparam sequenceArrowThickness 2
+skinparam participantPadding 20
+
+title Diagrama de Secuencia - Flujo de Datos de Sensor a Base de Datos
+
+actor "Sensor Fisico" as Sensor
+participant "SensorController" as Controller
+participant "Servicio Riesgos" as RiskSvc
+participant "Repositorio" as Repo
+participant "Base de Datos" as DB
+participant "Dashboard" as View
+
+== Inicializacion ==
+
+Sensor -> Controller: Enviar datos
+activate Controller
+
+== Procesamiento ==
+
+Controller -> Controller: Validar timestamp
+Controller -> Controller: Crear modelo de datos
+Controller -> Controller: Anadir a historial
+
+par Guardar Datos
+    Controller -> Repo: save_measurement(data)
+    activate Repo
+    
+    Repo -> Repo: Serializar
+    Repo -> DB: INSERT
+    activate DB
+    DB --> Repo: OK (id)
+    deactivate DB
+    
+    Repo --> Controller: OK
+    deactivate Repo
+
+    Controller -> RiskSvc: check_risk(data)
+    activate RiskSvc
+    
+    RiskSvc -> RiskSvc: Comparar umbrales
+    
+    alt Emergencia
+        RiskSvc --> Controller: is_emergency=true
+        Controller -> Controller: Activar protocolo
+        Controller -> Controller: Forzar puertas
+        Controller -> Repo: Crear alerta critica
+        activate Repo
+        Repo -> DB: INSERT INTO alerts
+        activate DB
+        DB --> Repo: OK
+        deactivate DB
+        deactivate Repo
+        
+    else Advertencia
+        RiskSvc --> Controller: is_risky=true
+        Controller -> Repo: Crear alerta warning
+        activate Repo
+        Repo -> DB: INSERT INTO alerts
+        activate DB
+        DB --> Repo: OK
+        deactivate DB
+        deactivate Repo
+        
+    else Normal
+        RiskSvc --> Controller: is_risky=false
+    end
+    
+    deactivate RiskSvc
+end
+
+== Actualizar Vista ==
+
+Controller -> View: notify_update(data)
+activate View
+
+alt Alerta critica
+    View -> View: Mostrar alerta ROJA
+    View -> View: Sonido alarma
+else Alerta warning
+    View -> View: Mostrar advertencia AMARILLA
+else Normal
+    View -> View: Actualizar graficos
+end
+
+View --> Controller: OK
+deactivate View
+
+deactivate Controller
+
+== Ciclo ==
+
+Sensor -> Sensor: Esperar 3-5 segundos
+Sensor -> Controller: Siguiente medicion
+
+@enduml

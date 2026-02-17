@@ -1,0 +1,125 @@
+@startuml ArtemusPark_Database_ER_Updated
+
+!theme cerulean-outline
+skinparam linetype ortho
+skinparam classBackgroundColor<<Entity>> LightBlue
+skinparam classBackgroundColor<<Audit>> LightPink
+
+title Modelo Entidad-Relacion - Base de Datos IoT con Auditoria
+
+' ==================== ENTIDADES PRINCIPALES ====================
+
+entity "users" as Users <<Entity>> {
+    * id : UUID <<PK>>
+    --
+    * username : VARCHAR(50) <<UNIQUE>>
+    * password_hash : VARCHAR(255)
+    * role : ENUM('admin', 'technician', 'viewer')
+    * full_name : VARCHAR(100)
+    email : VARCHAR(100) <<UNIQUE>>
+    dni : VARCHAR(20) <<UNIQUE>>
+    phone : VARCHAR(20)
+    is_active : BOOLEAN DEFAULT TRUE
+    last_login : TIMESTAMP
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "sensors" as Sensors <<Entity>> {
+    * id : UUID <<PK>>
+    --
+    * sensor_id : VARCHAR(50) <<UNIQUE>>
+    * sensor_type : ENUM('temperature', 'humidity', 'wind', 'smoke', 'light', 'door')
+    * name : VARCHAR(100)
+    location : VARCHAR(255)
+    description : TEXT
+    unit : VARCHAR(20)
+    min_threshold : DECIMAL(10,2)
+    max_threshold : DECIMAL(10,2)
+    warning_threshold : DECIMAL(10,2)
+    emergency_threshold : DECIMAL(10,2)
+    is_active : BOOLEAN DEFAULT TRUE
+    created_at : TIMESTAMP
+}
+
+entity "sensor_readings" as Readings <<Entity>> {
+    * id : UUID <<PK>>
+    --
+    * sensor_id : UUID <<FK>>
+    * measured_at : TIMESTAMP
+    * value : DECIMAL(10,2)
+    * status : ENUM('normal', 'warning', 'critical')
+    --
+    ' Campos de auditoria (CRUD)
+    is_corrected : BOOLEAN DEFAULT FALSE
+    original_value : DECIMAL(10,2)
+    corrected_at : TIMESTAMP
+    corrected_by : UUID <<FK>>
+    correction_reason : TEXT
+    --
+    metadata : JSON
+    received_at : TIMESTAMP
+    created_at : TIMESTAMP
+}
+
+entity "alerts" as Alerts <<Entity>> {
+    * id : UUID <<PK>>
+    --
+    * sensor_id : UUID <<FK>>
+    * alert_type : ENUM('fire', 'wind', 'temperature', 'humidity', 'system')
+    * severity : ENUM('low', 'medium', 'high', 'critical')
+    * message : TEXT
+    * is_resolved : BOOLEAN DEFAULT FALSE
+    resolved_at : TIMESTAMP
+    resolved_by : UUID <<FK>>
+    resolution_notes : TEXT
+    created_at : TIMESTAMP
+}
+
+entity "audit_log" as AuditLog <<Audit>> {
+    * id : UUID <<PK>>
+    --
+    * table_name : VARCHAR(50)
+    * record_id : UUID
+    * action : ENUM('INSERT', 'UPDATE', 'DELETE')
+    * old_values : JSON
+    * new_values : JSON
+    * performed_by : UUID <<FK>>
+    * performed_at : TIMESTAMP
+    * ip_address : INET
+    * user_agent : TEXT
+}
+
+' ==================== RELACIONES ====================
+
+' Usuarios
+Users ||--o{ Readings : "corrected_by"
+Users ||--o{ Alerts : "resolved_by"
+Users ||--o{ AuditLog : "performed_by"
+
+' Sensores
+Sensors ||--o{ Readings : "sensor_id"
+Sensors ||--o{ Alerts : "sensor_id"
+
+' Notas importantes
+note right of Readings
+  **Campos de Auditoria:**
+  - is_corrected: Marca si fue editado
+  - original_value: Valor original
+  - corrected_by: Usuario que corrigio
+  - correction_reason: Motivo del cambio
+  
+  **Triggers:**
+  - Auto-insert en audit_log
+  - ON UPDATE/DELETE
+end note
+
+note bottom of AuditLog
+  **Tabla de Auditoria:**
+  - Registra TODOS los cambios CRUD
+  - JSON con valores antes/después
+  - IP y user agent para trazabilidad
+  - No se puede modificar (append-only)
+end note
+
+@enduml

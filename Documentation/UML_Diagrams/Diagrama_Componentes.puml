@@ -1,0 +1,149 @@
+@startuml ArtemusPark_Component_Diagram_Updated
+
+!theme cerulean-outline
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+title Diagrama de Componentes - Arquitectura IoT con CRUD
+
+package "Capa IoT - Dispositivos" #E0E0E0 {
+    
+    node "Sensor Temperatura" as TempSensor #FFE0B2
+    node "Sensor Humedad" as HumSensor #FFE0B2
+    node "Anemometro" as WindSensor #FFE0B2
+    node "Detector Humo" as SmokeSensor #FFCCBC
+    node "Sensor Luz" as LightSensor #FFE0B2
+    node "Control Acceso" as DoorSensor #FFE0B2
+}
+
+package "Capa IoT - Gateway" #BBDEFB {
+    
+    component "MQTT Broker" as MQTTBroker <<Infrastructure>>
+    component "MQTT Subscriber" as MQTTSub <<Infrastructure>>
+    component "Message Handler" as MsgHandler <<Infrastructure>>
+}
+
+package "Capa de Aplicacion - Casos de Uso" #FFF9C4 {
+    
+    component "ReceiveSensorData\nUseCase" as ReceiveUC <<UseCase>>
+    component "GetSensorHistory\nUseCase" as HistoryUC <<UseCase>>
+    component "UpdateSensorReading\nUseCase" as UpdateUC <<UseCase>>
+    component "DeleteSensorReading\nUseCase" as DeleteUC <<UseCase>>
+    component "ProcessAlert\nUseCase" as AlertUC <<UseCase>>
+}
+
+package "Capa de Dominio - Servicios" #C8E6C9 {
+    
+    component "SensorService" as SensorService <<Service>>
+    component "AlertService" as AlertService <<Service>>
+    component "AuthService" as AuthService <<Service>>
+}
+
+package "Capa de Infraestructura - Repositorios" #FFECB3 {
+    
+    component "SensorRepository\n(PostgreSQL)" as SensorRepo <<Repository>>
+    component "UserRepository" as UserRepo <<Repository>>
+    component "AlertRepository" as AlertRepo <<Repository>>
+}
+
+package "Capa de Datos" #ECEFF1 {
+    
+    database "PostgreSQL" as PostgreSQL <<Database>> {
+        portin sensor_data
+        portin user_data
+        portin alert_data
+    }
+    
+    storage "Redis Cache" as Redis <<Cache>>
+}
+
+package "Capa de Presentacion" #E1BEE7 {
+    
+    component "DashboardController" as DashboardCtrl <<Controller>>
+    component "SensorAdminController" as AdminCtrl <<Controller>>
+    
+    component "DashboardViewModel" as DashboardVM <<ViewModel>>
+    component "SensorListViewModel" as SensorVM <<ViewModel>>
+    
+    component "DashboardView\n(Flet)" as DashboardView <<View>>
+    component "SensorDataTable\n(CRUD)" as DataTable <<View>>
+    component "EditReadingDialog" as EditDialog <<View>>
+}
+
+' Flujo IoT: Sensores -> MQTT -> Handler
+TempSensor --> MQTTBroker : MQTT
+HumSensor --> MQTTBroker : MQTT
+WindSensor --> MQTTBroker : MQTT
+SmokeSensor --> MQTTBroker : MQTT
+LightSensor --> MQTTBroker : MQTT
+DoorSensor --> MQTTBroker : MQTT
+
+MQTTBroker --> MQTTSub : Subscribe
+MQTTSub --> MsgHandler : on_message
+
+' Handler -> Casos de Uso
+MsgHandler ..> ReceiveUC : <<llama>>
+
+' Casos de Uso -> Servicios
+ReceiveUC ..> SensorService : <<usa>>
+HistoryUC ..> SensorService : <<usa>>
+UpdateUC ..> SensorService : <<usa>>
+DeleteUC ..> SensorService : <<usa>>
+AlertUC ..> AlertService : <<usa>>
+
+UpdateUC ..> AuthService : <<autoriza>>
+DeleteUC ..> AuthService : <<autoriza>>
+
+' Servicios -> Repositorios
+SensorService ..> SensorRepo : <<persiste>>
+AlertService ..> AlertRepo : <<persiste>>
+AuthService ..> UserRepo : <<consulta>>
+
+' Repositorios -> BD
+SensorRepo --> sensor_data : SQL/ORM
+UserRepo --> user_data : SQL/ORM
+AlertRepo --> alert_data : SQL/ORM
+
+' Cache
+SensorRepo ..> Redis : <<cache>>
+
+' Presentacion: Controllers -> Casos de Uso
+DashboardCtrl ..> ReceiveUC : <<usa>>
+DashboardCtrl ..> HistoryUC : <<usa>>
+AdminCtrl ..> UpdateUC : <<usa>>
+AdminCtrl ..> DeleteUC : <<usa>>
+
+' Controllers -> ViewModels
+DashboardCtrl ..> DashboardVM : <<actualiza>>
+AdminCtrl ..> SensorVM : <<actualiza>>
+
+' ViewModels -> Views
+DashboardView ..> DashboardVM : <<observa>>
+DataTable ..> SensorVM : <<observa>>
+
+' Views -> Controllers
+DataTable ..> AdminCtrl : <<notifica>>
+EditDialog ..> AdminCtrl : <<confirma>>
+
+' Flujo de actualizacion: BD -> View
+PostgreSQL ..> DashboardVM : <<notifica_cambio>>
+
+note right of ReceiveUC
+  Flujo automatico:
+  1. Sensor envia dato
+  2. MQTT lo recibe
+  3. UseCase procesa
+  4. Guarda en BD
+  5. Actualiza UI
+end note
+
+note right of UpdateUC
+  Flujo CRUD:
+  1. Usuario edita en tabla
+  2. Controller recibe
+  3. UseCase autoriza
+  4. Actualiza BD
+  5. Refresca vista
+end note
+
+@enduml

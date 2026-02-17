@@ -1,0 +1,154 @@
+@startuml ArtemusPark_Package_Diagram_Updated
+
+!theme cerulean-outline
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+title Diagrama de Paquetes - Arquitectura IoT Actualizada
+
+package "ArtemusPark" as Root #FFFFFF {
+    
+    package "core" as CorePkg #F5F5F5 {
+        class "Exceptions" as Exceptions <<Core>>
+        class "Validators" as Validators <<Core>>
+        class "Constants" as Constants <<Core>>
+    }
+    
+    package "domain" as DomainPkg #E8F5E9 {
+        
+        package "models" as ModelsPkg #C8E6C9 {
+            class "SensorReading" as SensorReading <<Entity>>
+            class "User" as User <<Entity>>
+            class "Alert" as Alert <<Entity>>
+            class "SensorConfig" as SensorConfigDomain <<Entity>>
+        }
+        
+        package "repositories" as RepoInterfacesPkg #A5D6A7 {
+            interface "ISensorRepository" as ISensorRepo <<Interface>>
+            interface "IUserRepository" as IUserRepo <<Interface>>
+            interface "IAlertRepository" as IAlertRepo <<Interface>>
+        }
+        
+        package "services" as DomainServicesPkg #81C784 {
+            class "SensorService" as SensorService <<Service>>
+            class "AlertService" as AlertService <<Service>>
+            class "UserService" as UserService <<Service>>
+        }
+    }
+    
+    package "infrastructure" as InfraPkg #E3F2FD {
+        
+        package "database" as DBPkg #BBDEFB {
+            class "DatabaseConnection" as DBConnection <<Infrastructure>>
+            class "ConnectionPool" as ConnPool <<Infrastructure>>
+            
+            package "repositories" as DBReposPkg #90CAF9 {
+                class "PostgresSensorRepository" as PostgresSensorRepo <<Repository>>
+                class "PostgresUserRepository" as PostgresUserRepo <<Repository>>
+                class "PostgresAlertRepository" as PostgresAlertRepo <<Repository>>
+            }
+            
+            package "migrations" as MigrationsPkg #64B5F6
+        }
+        
+        package "mqtt" as MQTTPkg #90CAF9 {
+            class "MQTTClient" as MQTTClient <<Infrastructure>>
+            class "MQTTSubscriber" as MQTTSub <<Infrastructure>>
+            class "MQTTHandler" as MQTTHandler <<Infrastructure>>
+        }
+        
+        package "cache" as CachePkg #64B5F6 {
+            class "RedisClient" as RedisClient <<Infrastructure>>
+            class "CacheManager" as CacheManager <<Infrastructure>>
+        }
+    }
+    
+    package "application" as AppPkg #FFF9C4 {
+        
+        package "dto" as DTOPkg #FFF59D {
+            class "SensorReadingDTO" as SensorDTO <<DTO>>
+            class "CreateReadingDTO" as CreateDTO <<DTO>>
+            class "UpdateReadingDTO" as UpdateDTO <<DTO>>
+            class "AlertDTO" as AlertDTO <<DTO>>
+        }
+        
+        package "use_cases" as UseCasesPkg #FFF176 {
+            class "ReceiveSensorDataUseCase" as ReceiveUC <<UseCase>>
+            class "GetSensorHistoryUseCase" as HistoryUC <<UseCase>>
+            class "UpdateSensorReadingUseCase" as UpdateUC <<UseCase>>
+            class "DeleteSensorReadingUseCase" as DeleteUC <<UseCase>>
+            class "ProcessAlertUseCase" as AlertUC <<UseCase>>
+        }
+        
+        package "mappers" as MappersPkg #FFEE58 {
+            class "SensorMapper" as SensorMapper <<Mapper>>
+            class "AlertMapper" as AlertMapper <<Mapper>>
+        }
+    }
+    
+    package "presentation" as PresPkg #F3E5F5 {
+        
+        package "controllers" as ControllersPkg #E1BEE7 {
+            class "DashboardController" as DashboardCtrl <<Controller>>
+            class "SensorAdminController" as SensorAdminCtrl <<Controller>>
+            class "AlertController" as AlertCtrl <<Controller>>
+        }
+        
+        package "viewmodels" as ViewModelsPkg #CE93D8 {
+            class "DashboardViewModel" as DashboardVM <<ViewModel>>
+            class "SensorListViewModel" as SensorListVM <<ViewModel>>
+            class "AlertViewModel" as AlertVM <<ViewModel>>
+        }
+        
+        package "views" as ViewsPkg #BA68C8 {
+            class "DashboardView" as DashboardView <<View>>
+            class "SensorDataTable" as SensorTable <<View>>
+            class "AlertPanel" as AlertPanel <<View>>
+            class "EditReadingDialog" as EditDialog <<View>>
+        }
+    }
+}
+
+' Relaciones Domain
+SensorReading ..> ISensorRepo : <<usa>>
+SensorService ..> ISensorRepo : <<usa>>
+SensorService ..> SensorReading : <<maneja>>
+
+' Relaciones Infrastructure
+PostgresSensorRepo ..|> ISensorRepo : <<implementa>>
+PostgresSensorRepo ..> DBConnection : <<usa>>
+MQTTSub ..> MQTTClient : <<usa>>
+MQTTHandler ..> MQTTSub : <<usa>>
+
+' Relaciones Application
+ReceiveUC ..> SensorService : <<usa>>
+UpdateUC ..> SensorService : <<usa>>
+DeleteUC ..> SensorService : <<usa>>
+HistoryUC ..> SensorService : <<usa>>
+SensorMapper ..> SensorReading : <<mapea>>
+SensorMapper ..> SensorDTO : <<crea>>
+
+' Relaciones Presentation
+DashboardCtrl ..> ReceiveUC : <<usa>>
+DashboardCtrl ..> UpdateUC : <<usa>>
+DashboardCtrl ..> DeleteUC : <<usa>>
+DashboardCtrl ..> HistoryUC : <<usa>>
+DashboardCtrl ..> DashboardVM : <<actualiza>>
+DashboardView ..> DashboardCtrl : <<notifica>>
+DashboardView ..> DashboardVM : <<observa>>
+SensorTable ..> EditDialog : <<abre>>
+
+' Flujo IoT
+MQTTHandler ..> ReceiveUC : <<llama>>
+
+' Leyenda
+legend right
+  |= Capa |= Color |= Descripción |
+  | Core | Gris | Utilidades y constantes |
+  | Domain | Verde | Lógica de negocio pura |
+  | Infrastructure | Azul | Implementaciones técnicas |
+  | Application | Amarillo | Casos de uso |
+  | Presentation | Morado | UI y controladores |
+endlegend
+
+@enduml

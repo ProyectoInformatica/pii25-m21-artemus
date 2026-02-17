@@ -1,0 +1,136 @@
+@startuml ArtemusPark_Deployment_Diagram
+
+!theme cerulean-outline
+skinparam componentStyle rectangle
+
+title Diagrama de Despliegue - Infraestructura Artemus Park
+
+node "Cliente Web/Móvil" as Client {
+    component "Navegador\nWeb" as Browser
+    component "App\nMóvil" as MobileApp
+}
+
+node "Servidor Web\n(Nginx/Apache)" as WebServer #LightBlue {
+    component "Reverse Proxy\nNginx" as Nginx
+    component "Static Files\nCSS/JS/Images" as StaticFiles
+    component "Load Balancer" as LoadBalancer
+}
+
+node "Servidor de Aplicación 1" as AppServer1 #LightGreen {
+    component "Python\nApplication" as App1
+    component "Flet\nGUI Framework" as Flet1
+    component "Gunicorn\nWSGI Server" as Gunicorn1
+}
+
+node "Servidor de Aplicación 2" as AppServer2 #LightGreen {
+    component "Python\nApplication" as App2
+    component "Flet\nGUI Framework" as Flet2
+    component "Gunicorn\nWSGI Server" as Gunicorn2
+}
+
+node "Servidor de Base de Datos" as DBServer #LightYellow {
+    database "PostgreSQL\n14+" as PostgreSQL {
+        database "artemus_park" as MainDB
+        storage "Tablespaces\n particionados" as Tablespaces
+        storage "WAL Logs" as WAL
+    }
+    
+    component "PgBouncer\nConnection Pool" as PgBouncer
+    component "Backup\npg_dump" as Backup
+}
+
+node "Servidor de Cache" as CacheServer #LightCoral {
+    database "Redis" as Redis {
+        storage "Session Store" as Sessions
+        storage "Cache de\nConsultas" as QueryCache
+        storage "Realtime\nPub/Sub" as PubSub
+    }
+}
+
+node "Servidor de Mensajería" as MQServer #LightPink {
+    queue "RabbitMQ/\nApache Kafka" as MessageQueue {
+        queue "sensor.data" as SensorQueue
+        queue "alerts.critical" as AlertQueue
+        queue "maintenance.tasks" as TaskQueue
+    }
+}
+
+node "Servidor de Monitoreo" as MonitorServer #EEEEEE {
+    component "Prometheus\nMetrics" as Prometheus
+    component "Grafana\nDashboards" as Grafana
+    component "ELK Stack\n(Logs)" as ELK
+}
+
+node "Sensores IoT" as IoTDevices #DDDDDD {
+    node "Sensores de\nTemperatura" as TempSensors
+    node "Sensores de\nHumedad" as HumiditySensors
+    node "Anemómetros" as WindSensors
+    node "Detectores\nde Humo" as SmokeSensors
+    node "Sensores de\nIluminación" as LightSensors
+    node "Control de\nAccesos" as DoorSensors
+    
+    component "Gateway\nIoT" as IoTGateway
+}
+
+node "Storage" as Storage #LightGray {
+    database "Backups\nAutomáticos" as Backups
+    storage "Archivos JSON\nHistóricos" as JSONHistory
+    storage "Documentos\ny Reportes" as Documents
+}
+
+cloud "Servicios Externos" as ExternalServices #SkyBlue {
+    component "Email Service\n(SendGrid/AWS SES)" as EmailService
+    component "SMS Gateway\n(Twilio)" as SMSService
+    component "Cloud Storage\n(S3/Azure Blob)" as CloudStorage
+    component "Auth0/\nFirebase Auth" as ExternalAuth
+}
+
+' Conexiones del Cliente
+Browser --> Nginx : HTTPS/443
+MobileApp --> Nginx : HTTPS/443
+
+' Load Balancer a Servidores de App
+Nginx --> LoadBalancer
+LoadBalancer --> Gunicorn1 : HTTP/8001
+LoadBalancer --> Gunicorn2 : HTTP/8002
+
+' Servidores de App a Base de Datos
+Gunicorn1 --> PgBouncer : PostgreSQL/6432
+Gunicorn2 --> PgBouncer : PostgreSQL/6432
+PgBouncer --> PostgreSQL : PostgreSQL/5432
+
+' Conexiones a Cache
+App1 --> Redis : Redis/6379
+App2 --> Redis : Redis/6379
+
+' Mensajería
+App1 --> MessageQueue : AMQP/5672
+App2 --> MessageQueue : AMQP/5672
+
+' Sensores IoT
+TempSensors --> IoTGateway : MQTT/1883
+HumiditySensors --> IoTGateway : MQTT/1883
+WindSensors --> IoTGateway : MQTT/1883
+SmokeSensors --> IoTGateway : MQTT/1883
+LightSensors --> IoTGateway : MQTT/1883
+DoorSensors --> IoTGateway : MQTT/1883
+
+IoTGateway --> MessageQueue : MQTT/1883
+IoTGateway --> App1 : HTTP/REST
+
+' Monitoreo
+Prometheus --> App1 : Metrics/9090
+Prometheus --> App2 : Metrics/9090
+Prometheus --> PostgreSQL : Metrics/9100
+Grafana --> Prometheus : HTTP/3000
+
+' Servicios Externos
+App1 --> EmailService : HTTPS/443
+App1 --> SMSService : HTTPS/443
+App1 --> CloudStorage : HTTPS/443
+
+' Backups
+PostgreSQL --> Backups : pg_dump
+Backups --> CloudStorage : rsync/HTTPS
+
+@enduml

@@ -1,0 +1,96 @@
+@startuml ArtemusPark_Activity_Auth_Diagram_Enhanced
+
+!theme cerulean-outline
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam linetype ortho
+
+' Estilos personalizados
+skinparam activity {
+    BackgroundColor<<Admin>> #E1BEE7
+    BorderColor<<Admin>> #8E24AA
+
+    BackgroundColor<<Tech>> #FFF9C4
+    BorderColor<<Tech>> #FBC02D
+
+    BackgroundColor<<Client>> #E1F5FE
+    BorderColor<<Client>> #0288D1
+
+    BackgroundColor<<Error>> #FFCDD2
+    BorderColor<<Error>> #D32F2F
+}
+
+title Diagrama de Actividad - Flujo de Autenticación y Gestión
+
+|#E3F2FD|Usuario|
+start
+
+repeat :Ingresar credenciales;
+
+|#F3E5F5|Sistema de Seguridad|
+:Validar credenciales;
+
+backward: Mostrar error de\nautenticación; <<Error>>
+
+repeat while (¿Credenciales válidas?) is (No) not (Sí)
+
+:Obtener rol y permisos;
+:Generar token de sesión;
+
+|#E8F5E9|Aplicación / Paneles|
+:Cargar configuración de usuario;
+
+switch (Rol del Usuario?)
+
+case ( Administrador )
+    partition "Panel de Administración" {
+        :Cargar Dashboard Completo <<Admin>>;
+        note right: Visibilidad total\nde sensores y usuarios
+
+        fork
+            :Gestión de Usuarios;
+            if (¿Acción?) then (Crear)
+                :Registrar nuevo usuario;
+            else (Modificar)
+                :Actualizar perfil;
+            endif
+        fork again
+            :Asignación de Sensores;
+        fork again
+            :Reportes Avanzados;
+        end fork
+    }
+
+case ( Técnico )
+    partition "Panel Técnico" {
+        :Cargar Sensores Asignados <<Tech>>;
+
+        fork
+            :Gestionar Solicitudes;
+            if (¿Nueva?) then (Sí)
+                :Crear Ticket Mantenimiento;
+                :Asignar Prioridad;
+            else (Actualizar)
+                :Cambiar Estado Ticket;
+            endif
+        fork again
+            :Registrar Calibración;
+        end fork
+    }
+
+case ( Cliente/Visitante )
+    partition "Panel Informativo" {
+        :Cargar Vista General <<Client>>;
+        :Ver Estado de Aforo;
+        :Solicitar Visita/Acceso;
+    }
+
+endswitch
+
+|Usuario|
+:Realizar operaciones;
+:Cerrar sesión;
+
+stop
+
+@enduml

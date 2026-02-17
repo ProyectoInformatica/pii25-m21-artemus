@@ -1,0 +1,57 @@
+@startuml ArtemusPark_State_Diagram_Alerts
+
+!theme cerulean-outline
+
+title Diagrama de Estados - Ciclo de Vida de Alertas
+
+[*] --> Detection : Sensor detecta
+
+state Detection {
+    [*] --> Validating
+    Validating : Verificar umbral
+    Validating --> Creating : Umbral excedido
+    Validating --> [*] : Valor normal
+    
+    Creating : Crear registro
+    Creating --> Pending : Alerta creada
+}
+
+Detection --> Pending
+
+Pending : Estado inicial
+Pending : - Notificación enviada
+Pending : - Visible en dashboard
+
+Pending --> Acknowledged : Técnico reconoce
+Pending --> Escalated : Timeout (30min)
+
+Acknowledged : Técnico asignado
+Acknowledged : - En investigación
+Acknowledged --> InProgress : Inicia trabajo
+Acknowledged --> Resolved : Falsa alarma
+
+Escalated : Nivel superior
+Escalated : - Notificar manager
+Escalated --> Acknowledged : Técnico toma control
+Escalated --> Critical : Emergencia confirmada
+
+Critical : Estado crítico
+Critical : - Activar protocolo emergencia
+Critical : - Notificar a todos
+Critical --> InProgress : Respuesta iniciada
+Critical --> Resolved : Emergencia controlada
+
+InProgress : Trabajando en solución
+InProgress : - Actualizar cada 15min
+InProgress --> Resolved : Problema solucionado
+InProgress --> Escalated : No puede resolver
+
+Resolved : Cerrada
+Resolved : - Documentar solución
+Resolved --> [*]
+
+Resolved --> Reopened : Problema persiste
+Reopened : Reapertura
+Reopened --> InProgress : Continuar trabajo
+
+@enduml

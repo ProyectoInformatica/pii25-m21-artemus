@@ -1,0 +1,95 @@
+@startuml ArtemusPark_Activity_Sensors_Enhanced
+
+!theme cerulean-outline
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam linetype ortho
+
+' Estilos de los carriles
+skinparam swimlane {
+    TitleFontColor #FFFFFF
+    TitleFontSize 14
+    BorderColor #546E7A
+}
+
+title Flujo de Procesamiento de Datos de Sensores
+
+|#455A64|Sensor (Hardware)|
+start
+:Capturar medición <&pulse>;
+:Generar timestamp;
+:Enviar datos al Controlador <&wifi>;
+
+|#FFF9C4|Controlador (Backend)|
+:Recibir payload;
+:Validar integridad y timestamp;
+
+if (¿Datos válidos?) then (No)
+    :Loguear error;
+    detach
+else (Sí)
+    :Normalizar datos en memoria;
+endif
+
+fork
+    |#FFECB3|Repositorio (Persistencia)|
+    :Determinar archivo diario (JSON) <&file>;
+
+    if (¿Archivo existe?) then (No)
+        :Inicializar nuevo array [];
+    else (Sí)
+        :Cargar contenido existente;
+    endif
+
+    :Append nueva medición;
+    :Serializar y escribir en disco <&data-transfer>;
+
+fork again
+    |#FCE4EC|Servicio de Riesgos|
+    :Evaluar métricas recibidas;
+
+    switch (Tipo de Sensor?)
+
+    case ( Humo )
+        if (Nivel > 45?) then (CRÍTICO)
+            :Set Estado: **EMERGENCIA** <&fire>;
+            :Flag: critical_alert = true;
+        elseif (Nivel > 30?) then (ALTO)
+            :Set Estado: ADVERTENCIA <&warning>;
+        else
+            :Set Estado: NORMAL;
+        endif
+
+    case ( Viento )
+        if (Velocidad > 80km/h?) then (RIESGO)
+            :Set Estado: ALERTA VIENTO <&cloud>;
+            :Flag: wind_alert = true;
+        else
+            :Set Estado: NORMAL;
+        endif
+
+    case ( Otros )
+        :Validación estándar;
+
+    endswitch
+end fork
+
+|#FFF9C4|Controlador (Backend)|
+:Sincronizar resultados (Fork Join);
+
+if (¿Hay Emergencia Activa?) then (Sí <&bell>)
+    partition "Protocolo de Seguridad" {
+        :Notificar Administradores (Push/SMS);
+        :Forzar apertura de puertas <&lock-open>;
+        :Activar sirenas locales;
+    }
+endif
+
+|#E1BEE7|Vista (Dashboard)|
+:Recibir evento WebSocket;
+:Actualizar gráficas en tiempo real <&graph>;
+:Mostrar notificaciones (Toast);
+
+stop
+
+@enduml

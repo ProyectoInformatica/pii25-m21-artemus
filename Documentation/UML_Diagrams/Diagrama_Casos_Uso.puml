@@ -1,0 +1,141 @@
+@startuml ArtemusPark_UseCase_Updated
+
+!theme cerulean-outline
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+skinparam usecase {
+    BackgroundColor<<Monitoring>> LightBlue
+    BackgroundColor<<Emergency>> LightCoral
+    BackgroundColor<<Admin>> LightGreen
+    BackgroundColor<<Maintenance>> LightYellow
+    BackgroundColor<<CRUD>> LightPink
+    BackgroundColor<<IoT>> LightGray
+}
+
+skinparam actor {
+    BackgroundColor<<Admin>> LightGreen
+    BackgroundColor<<Maintenance>> LightYellow
+}
+
+title Diagrama de Casos de Uso - Sistema IoT con Operaciones CRUD
+
+' Actores
+actor "Administrador" as Admin <<Admin>>
+actor "Tecnico de\nMantenimiento" as Tech <<Maintenance>>
+actor "Usuario\nVisualizador" as Viewer
+actor "Sensor IoT" as Sensor <<IoT>>
+
+' Sistema principal
+rectangle "Sistema de Gestion Artemus Park" {
+    
+    ' Casos de uso de Ingesta IoT (Automatico)
+    package "Ingesta de Datos IoT" as IoTPkg <<IoT>> {
+        usecase "Recibir datos\npor MQTT" as UC_Receive <<IoT>>
+        usecase "Validar\nesquema" as UC_Validate <<IoT>>
+        usecase "Persistir en\nbase de datos" as UC_Persist <<IoT>>
+        usecase "Evaluar\numbrales" as UC_Evaluate <<IoT>>
+        usecase "Generar\nalertas" as UC_Alert <<Emergency>>
+    }
+    
+    ' Casos de uso de Monitoreo
+    package "Monitoreo de Sensores" as MonitoringPkg {
+        usecase "Visualizar\nDashboard" as UC_Dashboard <<Monitoring>>
+        usecase "Ver datos\ntiempo real" as UC_RealTime <<Monitoring>>
+        usecase "Consultar\nhistorial" as UC_History <<Monitoring>>
+        usecase "Filtrar por\nrango fecha" as UC_Filter <<Monitoring>>
+        usecase "Exportar\ndatos" as UC_Export <<Monitoring>>
+    }
+    
+    ' Casos de uso CRUD (NUEVOS)
+    package "Gestion de Datos (CRUD)" as CRUDPkg <<CRUD>> {
+        usecase "Crear lectura\nmanual" as UC_Create <<CRUD>>
+        usecase "Ver detalle\nlectura" as UC_Read <<CRUD>>
+        usecase "Editar\nlectura" as UC_Update <<CRUD>>
+        usecase "Eliminar\nlectura" as UC_Delete <<CRUD>>
+        usecase "Corregir valor\nanomalo" as UC_Correct <<CRUD>>
+        usecase "Ver auditoria\ncambios" as UC_Audit <<CRUD>>
+    }
+    
+    ' Casos de uso de Emergencia
+    package "Gestion de Emergencias" as EmergencyPkg {
+        usecase "Detectar riesgo" as UC_DetectRisk <<Emergency>>
+        usecase "Activar\nprotocolo" as UC_Emergency <<Emergency>>
+        usecase "Notificar\nalertas" as UC_Notify <<Emergency>>
+        usecase "Resolver\nalerta" as UC_ResolveAlert <<Emergency>>
+    }
+    
+    ' Casos de uso de Administracion
+    package "Administracion del Sistema" as AdminPkg {
+        usecase "Gestionar\nusuarios" as UC_ManageUsers <<Admin>>
+        usecase "Asignar\npermisos" as UC_Permissions <<Admin>>
+        usecase "Configurar\nsensores" as UC_ConfigSensors <<Admin>>
+        usecase "Configurar\numbrales" as UC_Thresholds <<Admin>>
+        usecase "Generar\nreportes" as UC_Reports <<Admin>>
+    }
+    
+    ' Casos de uso de Mantenimiento
+    package "Mantenimiento" as MaintPkg {
+        usecase "Ver sensores\nasignados" as UC_MySensors <<Maintenance>>
+        usecase "Crear\nsolicitud" as UC_CreateRequest <<Maintenance>>
+        usecase "Actualizar\nsolicitud" as UC_UpdateRequest <<Maintenance>>
+    }
+}
+
+' Relaciones IoT (Flujo automatico)
+Sensor --> UC_Receive
+UC_Receive ..> UC_Validate : <<include>>
+UC_Validate ..> UC_Persist : <<include>>
+UC_Persist ..> UC_Evaluate : <<include>>
+UC_Evaluate ..> UC_Alert : <<extend>> [si excede umbral]
+
+' CRUD - Administrador tiene acceso completo
+Admin --> UC_Create
+Admin --> UC_Read
+Admin --> UC_Update
+Admin --> UC_Delete
+Admin --> UC_Correct
+Admin --> UC_Audit
+
+' CRUD - Tecnico puede corregir
+Tech --> UC_Read
+Tech --> UC_Update
+Tech --> UC_Correct
+
+' Visualizacion solo lectura
+Viewer --> UC_Dashboard
+Viewer --> UC_RealTime
+Viewer --> UC_History
+Viewer --> UC_Read
+Viewer --> UC_Export
+
+' Administrador acceso completo
+Admin --> UC_Dashboard
+Admin --> UC_History
+Admin --> UC_Filter
+Admin --> UC_Export
+Admin --> UC_ManageUsers
+Admin --> UC_Permissions
+Admin --> UC_ConfigSensors
+Admin --> UC_Thresholds
+Admin --> UC_Reports
+Admin --> UC_Emergency
+Admin --> UC_ResolveAlert
+
+' Tecnico
+Tech --> UC_Dashboard
+Tech --> UC_MySensors
+Tech --> UC_CreateRequest
+Tech --> UC_UpdateRequest
+Tech --> UC_ResolveAlert
+
+' Relaciones <<include>>
+UC_Update ..> UC_Audit : <<include>>
+UC_Delete ..> UC_Audit : <<include>>
+UC_Correct ..> UC_Update : <<include>>
+UC_Dashboard ..> UC_RealTime : <<include>>
+
+' Relaciones <<extend>>
+UC_Filter .right.> UC_History : <<extend>>
+
+@enduml

@@ -1,0 +1,119 @@
+@startuml ArtemusPark_Sequence_CRUD
+
+!theme cerulean-outline
+skinparam sequenceMessageAlign center
+skinparam sequenceArrowThickness 2
+
+title Diagrama de Secuencia - Operacion CRUD: Usuario Actualiza Lectura
+
+actor "Usuario" as User
+participant "SensorDataTable\n(View)" as Table
+participant "EditReadingDialog\n(View)" as Dialog
+participant "SensorAdmin\nController" as Controller
+participant "UpdateSensorReading\nUseCase" as UpdateUC
+participant "AuthService" as Auth
+participant "SensorService" as Service
+participant "SensorRepository" as Repo
+participant "PostgreSQL" as DB
+participant "SensorList\nViewModel" as VM
+
+== 1. Usuario Inicia Edicion ==
+
+User -> Table: Clic en fila -> Editar
+activate Table
+
+Table -> Table: Obtener reading seleccionado
+Table -> Dialog: show(reading_data)
+activate Dialog
+
+Dialog --> User: Mostrar formulario edicion
+
+== 2. Usuario Confirma Edicion ==
+
+User -> Dialog: Ingresar nuevo valor
+User -> Dialog: Clic "Guardar"
+
+Dialog -> Dialog: validate()
+
+alt Datos validos
+    Dialog -> Controller: on_user_corrects_reading(reading_id, new_value)
+    activate Controller
+    
+    == 3. Autorizacion ==
+    
+    Controller -> UpdateUC: execute(reading_id, data, current_user)
+    activate UpdateUC
+    
+    UpdateUC -> Auth: check_permission(user, "sensor_reading", "update")
+    activate Auth
+    Auth --> UpdateUC: boolean (tiene permiso?)
+    deactivate Auth
+    
+    opt Sin permiso
+        UpdateUC --> Controller: AuthorizationError
+        Controller --> Dialog: Error: "Sin permisos"
+        Dialog --> User: Mostrar error
+    end
+    
+    == 4. Actualizacion ==
+    
+    UpdateUC -> Service: correct_reading(reading_id, new_value, user)
+    activate Service
+    
+    Service -> Repo: read_by_id(reading_id)
+    activate Repo
+    Repo -> DB: SELECT * FROM sensor_readings WHERE id = ?
+    activate DB
+    DB --> Repo: Row
+    Repo --> Service: SensorReading
+    deactivate DB
+    deactivate Repo
+    
+    Service -> Service: Marcar como corregido
+    Service -> Service: Set corrected_by = user.id
+    Service -> Service: Set corrected_at = now()
+    
+    Service -> Repo: update(reading_id, {value: new_value, is_corrected: true, ...})
+    activate Repo
+    Repo -> DB: UPDATE sensor_readings SET value = ?, ... WHERE id = ?
+    activate DB
+    DB --> Repo: OK (1 row affected)
+    Repo --> Service: True
+    deactivate DB
+    deactivate Repo
+    
+    Service --> UpdateUC: OK
+    deactivate Service
+    
+    == 5. Confirmacion ==
+    
+    UpdateUC --> Controller: {status: "updated", id: reading_id}
+    deactivate UpdateUC
+    
+    Controller -> VM: update_reading(reading_id, new_value)
+    activate VM
+    VM -> VM: Actualizar lista observable
+    VM --> Controller: OK
+    deactivate VM
+    
+    Controller --> Dialog: {status: "success"}
+    deactivate Controller
+    
+    Dialog --> User: Mostrar "Actualizado correctamente"
+    Dialog --> Dialog: close()
+    deactivate Dialog
+    
+    == 6. Refrescar Vista ==
+    
+    Table -> VM: Observar cambios
+    VM -> Table: Notificar actualizacion
+    Table -> Table: refresh()
+    Table --> User: Mostrar valor actualizado (marcado como corregido)
+    
+else Datos invalidos
+    Dialog --> User: Mostrar error validacion
+end
+
+deactivate Table
+
+@enduml

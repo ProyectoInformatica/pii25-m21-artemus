@@ -1,0 +1,82 @@
+@startuml ArtemusPark_Package_Diagram_Simple
+
+!theme cerulean-outline
+skinparam packageStyle rectangle
+
+title Diagrama de Paquetes - Vista Simplificada
+
+package "Config" #E3F2FD {
+    [Sensor_Config]
+    [Park_Config]
+    [Colors]
+}
+
+package "Models" #E8F5E9 {
+    [Temperature_Model]
+    [Humidity_Model]
+    [Wind_Model]
+    [Smoke_Model]
+    [Light_Model]
+    [Door_Model]
+}
+
+package "Controllers" #FFF9C4 {
+    [Sensor_Controller]
+    [Temperature_Controller]
+    [Humidity_Controller]
+    [Wind_Controller]
+    [Smoke_Controller]
+    [Light_Controller]
+    [Door_Controller]
+}
+
+package "Repositories" #FFECB3 {
+    [Temperature_Repository]
+    [Humidity_Repository]
+    [Wind_Repository]
+    [Smoke_Repository]
+    [Light_Repository]
+    [Door_Repository]
+    [Auth_Repository]
+}
+
+package "Services" #FCE4EC {
+    [Wind_Risk_Service]
+    [Smoke_Risk_Service]
+}
+
+package "View" #F3E5F5 {
+    package "Pages" #E1BEE7 {
+        [Dashboard_Page]
+        [Login_Page]
+        [Admin_Page]
+    }
+    package "Components" #CE93D8 {
+        [Sensor_Card]
+        [Alert_Card]
+        [Sidebar]
+    }
+}
+
+package "Database" #ECEFF1 {
+    [Connection]
+    [Models_DB]
+}
+
+' Relaciones
+Controllers --> Models
+Controllers --> Repositories
+Controllers --> Services
+Controllers --> Config
+
+Repositories --> Models
+Repositories --> Database
+
+View --> Controllers
+View --> Models
+
+Services --> Models
+
+Database --> Models
+
+@enduml

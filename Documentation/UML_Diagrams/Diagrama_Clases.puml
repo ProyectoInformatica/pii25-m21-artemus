@@ -1,0 +1,344 @@
+@startuml ArtemusPark_Class_Diagram
+
+!theme cerulean-outline
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+title Diagrama de Clases - Sistema IoT con Operaciones CRUD
+
+' ==================== DOMAIN MODELS ====================
+package "Domain Models" #E8F5E9 {
+    
+    class SensorReading <<Entity>> {
+        +id: Optional[str]
+        +sensor_id: str
+        +sensor_type: str
+        +value: float
+        +unit: str
+        +timestamp: datetime
+        +status: str
+        +is_corrected: bool
+        +corrected_at: Optional[datetime]
+        +corrected_by: Optional[str]
+        +created_at: datetime
+        +metadata: dict
+        +correct(new_value: float, user_id: str)
+        +mark_as_alert(level: str)
+        +to_dict(): dict
+    }
+    
+    class User <<Entity>> {
+        +id: str
+        +username: str
+        +email: str
+        +role: UserRole
+        +full_name: str
+        +is_active: bool
+        +created_at: datetime
+        +can_edit_readings(): bool
+        +can_delete_readings(): bool
+    }
+    
+    class Alert <<Entity>> {
+        +id: str
+        +sensor_id: str
+        +alert_type: str
+        +severity: AlertSeverity
+        +message: str
+        +is_resolved: bool
+        +created_at: datetime
+        +resolved_at: Optional[datetime]
+        +resolved_by: Optional[str]
+        +resolve(user_id: str)
+    }
+    
+    enum UserRole <<Enum>> {
+        ADMIN
+        TECHNICIAN
+        VIEWER
+    }
+    
+    enum AlertSeverity <<Enum>> {
+        LOW
+        MEDIUM
+        HIGH
+        CRITICAL
+    }
+    
+    SensorReading "0..*" --> "1" User : corrected_by
+    Alert "0..*" --> "1" User : resolved_by
+    User::role ..> UserRole
+    Alert::severity ..> AlertSeverity
+}
+
+' ==================== REPOSITORY INTERFACES ====================
+package "Repository Interfaces" #A5D6A7 {
+    
+    interface ISensorRepository <<Interface>> {
+        +create(reading: SensorReading): str
+        +read_by_id(id: str): Optional[SensorReading]
+        +read_by_sensor(sensor_id: str, start: datetime, end: datetime): List[SensorReading]
+        +update(id: str, data: dict): bool
+        +delete(id: str): bool
+        +exists(id: str): bool
+    }
+    
+    interface IUserRepository <<Interface>> {
+        +find_by_username(username: str): Optional[User]
+        +find_by_id(id: str): Optional[User]
+        +save(user: User): str
+        +update(user: User): bool
+    }
+    
+    interface IAlertRepository <<Interface>> {
+        +create(alert: Alert): str
+        +find_active(): List[Alert]
+        +resolve(id: str, user_id: str): bool
+        +find_by_sensor(sensor_id: str): List[Alert]
+    }
+}
+
+' ==================== DOMAIN SERVICES ====================
+package "Domain Services" #81C784 {
+    
+    class SensorService <<Service>> {
+        -repository: ISensorRepository
+        -alert_service: AlertService
+        +process_reading(raw_data: dict): SensorReading
+        +get_sensor_history(sensor_id: str, hours: int): List[SensorReading]
+        +correct_reading(reading_id: str, new_value: float, user: User)
+        +delete_reading(reading_id: str, user: User): bool
+        +validate_reading(data: dict): bool
+        -calculate_status(value: float, sensor_type: str): str
+    }
+    
+    class AlertService <<Service>> {
+        -repository: IAlertRepository
+        +evaluate_thresholds(reading: SensorReading): Optional[Alert]
+        +get_active_alerts(): List[Alert]
+        +resolve_alert(alert_id: str, user: User)
+        +process_window_data(sensor_id: str, window: List[SensorReading])
+    }
+    
+    class AuthService <<Service>> {
+        -user_repo: IUserRepository
+        +authenticate(username: str, password: str): Optional[User]
+        +authorize(user: User, action: str): bool
+        +check_permission(user: User, resource: str, operation: str): bool
+    }
+    
+    SensorService ..> SensorReading : <<crea>>
+    SensorService ..> ISensorRepository : <<usa>>
+    SensorService ..> AlertService : <<notifica>>
+    AlertService ..> IAlertRepository : <<usa>>
+    AlertService ..> Alert : <<crea>>
+    AuthService ..> IUserRepository : <<usa>>
+}
+
+' ==================== INFRASTRUCTURE ====================
+package "Infrastructure" #BBDEFB {
+    
+    class DatabaseConnection <<Infrastructure>> {
+        -pool: asyncpg.Pool
+        +connect(dsn: str)
+        +acquire(): AsyncContextManager
+        +close()
+    }
+    
+    class PostgresSensorRepository <<Repository>> {
+        -connection: DatabaseConnection
+        +create(reading: SensorReading): str
+        +read_by_id(id: str): Optional[SensorReading]
+        +read_by_sensor(sensor_id: str, start: datetime, end: datetime): List[SensorReading]
+        +update(id: str, data: dict): bool
+        +delete(id: str): bool
+        -row_to_entity(row: dict): SensorReading
+    }
+    
+    class MQTTClient <<Infrastructure>> {
+        -client: paho.mqtt.client
+        -broker: str
+        +connect()
+        +subscribe(topic: str, callback)
+        +publish(topic: str, payload: str)
+    }
+    
+    class MQTTSubscriber <<Infrastructure>> {
+        -client: MQTTClient
+        -topics: List[str]
+        -handler: callable
+        +start()
+        +stop()
+        +on_message(callback)
+    }
+    
+    class RedisCache <<Infrastructure>> {
+        -client: redis.Redis
+        +get(key: str): Optional[str]
+        +set(key: str, value: str, ttl: int)
+        +delete(key: str)
+        +exists(key: str): bool
+    }
+    
+    PostgresSensorRepository ..|> ISensorRepository : <<implementa>>
+    PostgresSensorRepository ..> DatabaseConnection : <<usa>>
+    PostgresSensorRepository ..> SensorReading : <<mapea>>
+    MQTTSubscriber ..> MQTTClient : <<usa>>
+}
+
+' ==================== APPLICATION (USE CASES) ====================
+package "Application Use Cases" #FFF176 {
+    
+    class ReceiveSensorDataUseCase <<UseCase>> {
+        -sensor_service: SensorService
+        -alert_service: AlertService
+        +execute(raw_data: dict): SensorReadingDTO
+        -validate_payload(data: dict): bool
+        -enrich_data(data: dict): dict
+    }
+    
+    class GetSensorHistoryUseCase <<UseCase>> {
+        -sensor_service: SensorService
+        +execute(sensor_id: str, hours: int): List[SensorReadingDTO]
+        +execute_with_filters(sensor_id: str, filters: dict): List[SensorReadingDTO]
+    }
+    
+    class UpdateSensorReadingUseCase <<UseCase>> {
+        -sensor_service: SensorService
+        -auth_service: AuthService
+        +execute(reading_id: str, new_data: UpdateReadingDTO, user: User)
+        +validate_permission(user: User): bool
+    }
+    
+    class DeleteSensorReadingUseCase <<UseCase>> {
+        -sensor_service: SensorService
+        -auth_service: AuthService
+        +execute(reading_id: str, user: User): bool
+        +soft_delete(reading_id: str, user: User): bool
+    }
+    
+    class ProcessAlertUseCase <<UseCase>> {
+        -alert_service: AlertService
+        +evaluate_and_create(reading: SensorReading)
+        +resolve_alert(alert_id: str, user: User)
+    }
+    
+    ReceiveSensorDataUseCase ..> SensorService : <<usa>>
+    UpdateSensorReadingUseCase ..> SensorService : <<usa>>
+    UpdateSensorReadingUseCase ..> AuthService : <<autoriza>>
+    DeleteSensorReadingUseCase ..> SensorService : <<usa>>
+    GetSensorHistoryUseCase ..> SensorService : <<usa>>
+}
+
+' ==================== DTOs ====================
+package "DTOs" #FFF59D {
+    
+    class SensorReadingDTO <<DTO>> {
+        +id: str
+        +sensor_id: str
+        +value: float
+        +unit: str
+        +timestamp: str
+        +status: str
+        +is_corrected: bool
+        +formatted_value(): str
+    }
+    
+    class UpdateReadingDTO <<DTO>> {
+        +value: float
+        +reason: Optional[str]
+    }
+    
+    class AlertDTO <<DTO>> {
+        +id: str
+        +sensor_id: str
+        +message: str
+        +severity: str
+        +created_at: str
+    }
+}
+
+' ==================== PRESENTATION ====================
+package "Presentation" #E1BEE7 {
+    
+    class DashboardController <<Controller>> {
+        -receive_use_case: ReceiveSensorDataUseCase
+        -history_use_case: GetSensorHistoryUseCase
+        -update_use_case: UpdateSensorReadingUseCase
+        -delete_use_case: DeleteSensorReadingUseCase
+        -view_model: DashboardViewModel
+        +on_sensor_data_received(raw_data: dict)
+        +on_user_requests_history(sensor_id: str)
+        +on_user_corrects_reading(reading_id: str, new_value: float)
+        +on_user_deletes_reading(reading_id: str)
+        +on_refresh_requested()
+    }
+    
+    class DashboardViewModel <<ViewModel>> {
+        -readings: Observable[List[SensorReadingDTO]]
+        -alerts: Observable[List[AlertDTO]]
+        -selected_sensor: Observable[Optional[str]]
+        -is_loading: Observable[bool]
+        +add_reading(reading: SensorReadingDTO)
+        +update_reading(reading_id: str, new_value: float)
+        +remove_reading(reading_id: str)
+        +set_history(readings: List[SensorReadingDTO])
+        +notify_update()
+        +show_error(message: str)
+        +show_success(message: str)
+    }
+    
+    class SensorDataTable <<View>> {
+        -controller: DashboardController
+        -view_model: DashboardViewModel
+        -data_rows: List[DataRow]
+        +render()
+        +on_edit_click(reading_id: str)
+        +on_delete_click(reading_id: str)
+        +show_edit_dialog(reading: SensorReadingDTO)
+        +refresh()
+    }
+    
+    class EditReadingDialog <<View>> {
+        -reading_id: str
+        -current_value: float
+        -new_value_field: TextField
+        -reason_field: TextField
+        +show()
+        +on_save(callback)
+        +on_cancel()
+        +validate(): bool
+    }
+    
+    DashboardController ..> ReceiveSensorDataUseCase : <<usa>>
+    DashboardController ..> UpdateSensorReadingUseCase : <<usa>>
+    DashboardController ..> DeleteSensorReadingUseCase : <<usa>>
+    DashboardController ..> DashboardViewModel : <<actualiza>>
+    SensorDataTable ..> DashboardController : <<notifica>>
+    SensorDataTable ..> DashboardViewModel : <<observa>>
+    SensorDataTable ..> EditReadingDialog : <<abre>>
+}
+
+' ==================== MAPPERS ====================
+package "Mappers" #FFEE58 {
+    
+    class SensorMapper <<Mapper>> {
+        +to_entity(dto: SensorReadingDTO): SensorReading
+        +to_dto(entity: SensorReading): SensorReadingDTO
+        +to_dict(entity: SensorReading): dict
+        +from_dict(data: dict): SensorReading
+    }
+    
+    class AlertMapper <<Mapper>> {
+        +to_dto(entity: Alert): AlertDTO
+    }
+    
+    SensorMapper ..> SensorReading : <<mapea>>
+    SensorMapper ..> SensorReadingDTO : <<mapea>>
+}
+
+' ==================== FLUJO PRINCIPAL ====================
+' IoT -> MQTT -> UseCase -> Service -> Repository -> BD
+MQTTSubscriber ..> ReceiveSensorDataUseCase : <<llama>>
+
+@enduml

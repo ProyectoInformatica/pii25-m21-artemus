@@ -1,0 +1,104 @@
+@startuml ArtemusPark_Sequence_Diagram_IoT
+
+!theme cerulean-outline
+skinparam sequenceMessageAlign center
+skinparam sequenceArrowThickness 2
+
+title Diagrama de Secuencia - Flujo IoT Automatico (Sensor -> BD -> UI)
+
+actor "Sensor IoT" as Sensor
+participant "MQTT\nBroker" as MQTT
+participant "MQTT\nSubscriber" as Subscriber
+participant "ReceiveSensorData\nUseCase" as ReceiveUC
+participant "SensorService" as Service
+participant "SensorRepository" as Repo
+participant "PostgreSQL" as DB
+participant "Dashboard\nViewModel" as VM
+participant "Dashboard\nView" as View
+
+== 1. Recepcion de Datos ==
+
+Sensor -> MQTT: Publicar: sensores/temperatura/temp_01
+activate MQTT
+
+MQTT -> Subscriber: Deliver message
+activate Subscriber
+
+Subscriber -> Subscriber: Parsear payload JSON
+Subscriber -> Subscriber: Validar esquema
+
+== 2. Procesamiento ==
+
+Subscriber -> ReceiveUC: execute(payload)
+activate ReceiveUC
+
+ReceiveUC -> ReceiveUC: Enriquecer datos
+ReceiveUC -> ReceiveUC: Agregar timestamp server
+
+ReceiveUC -> Service: process_reading(data)
+activate Service
+
+Service -> Service: Validar rango valores
+Service -> Service: Calcular status (normal/warning/critical)
+
+== 3. Persistencia ==
+
+Service -> Repo: create(reading)
+activate Repo
+
+Repo -> Repo: Mapear a row SQL
+Repo -> DB: INSERT INTO sensor_readings
+activate DB
+
+DB --> Repo: RETURNING id
+Repo --> Service: reading_id
+
+deactivate DB
+deactivate Repo
+
+Service -> Service: Evaluar alertas
+
+opt Si es alerta
+    Service -> Service: create_alert()
+    Service -> Repo: save(alert)
+    Repo -> DB: INSERT INTO alerts
+end
+
+Service --> ReceiveUC: SensorReading (con ID)
+deactivate Service
+
+ReceiveUC --> Subscriber: SensorReadingDTO
+
+deactivate ReceiveUC
+
+== 4. Actualizacion UI ==
+
+Subscriber -> VM: add_reading(dto)
+activate VM
+
+VM -> VM: Actualizar estado observable
+VM -> View: notify_update()
+activate View
+
+alt Es alerta
+    View -> View: Mostrar banner ROJO
+    View -> View: Sonido notificacion
+else Normal
+    View -> View: Actualizar grafico
+    View -> View: Actualizar tabla
+end
+
+View --> VM: OK
+
+deactivate View
+deactivate VM
+
+deactivate Subscriber
+deactivate MQTT
+
+== 5. Ciclo Continuo ==
+
+Sensor -> Sensor: Sleep 5 segundos
+Sensor -> MQTT: Siguiente medicion
+
+@enduml
