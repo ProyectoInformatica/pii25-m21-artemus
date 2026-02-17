@@ -16,7 +16,7 @@ DB_CONFIG = {
     "charset": "utf8mb4",
     "collation": "utf8mb4_unicode_ci",
     "autocommit": True,
-    "raise_on_warnings": True
+    "raise_on_warnings": True,
 }
 
 # Admin connection config (without database) for initialization
@@ -28,5 +28,5 @@ ADMIN_DB_CONFIG = {
     "charset": DB_CONFIG["charset"],
     "collation": DB_CONFIG["collation"],
     "autocommit": True,
-    "raise_on_warnings": True
+    "raise_on_warnings": True,
 }

@@ -70,7 +70,7 @@ class AuthRepository:
         result = db_manager.execute_query(query, (username,))
         if not result:
             return None
-        
+
         row = result[0]
         user = {
             "password": row["password"],
@@ -80,7 +80,7 @@ class AuthRepository:
             "phone": row["phone"],
             "address": row["address"],
         }
-        
+
         if row["assigned_sensors"]:
             sensors = row["assigned_sensors"].split(",")
             types = row["sensor_types"].split(",") if row["sensor_types"] else []
@@ -90,7 +90,7 @@ class AuthRepository:
             user["supervisors"] = row["supervisors"].split(",")
         if row["subordinates"]:
             user["subordinates"] = row["subordinates"].split(",")
-        
+
         return user
 
     def add_user(
@@ -102,7 +102,9 @@ class AuthRepository:
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         try:
-            db_manager.execute_insert(query, (username, password, role, full_name, dni, phone, address))
+            db_manager.execute_insert(
+                query, (username, password, role, full_name, dni, phone, address)
+            )
         except Exception as e:
             if "Duplicate entry" in str(e):
                 raise ValueError("El usuario ya existe.")
@@ -127,9 +129,9 @@ class AuthRepository:
         user_result = db_manager.execute_query(user_query, (username,))
         if not user_result:
             raise ValueError("El usuario no existe.")
-        
+
         user_id = user_result[0]["id"]
-        
+
         # Actualizar campos básicos
         updates = []
         params = []
@@ -151,12 +153,12 @@ class AuthRepository:
         if address is not None:
             updates.append("address = %s")
             params.append(address)
-        
+
         if updates:
             query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
             params.append(user_id)
             db_manager.execute_update(query, tuple(params))
-        
+
         # Actualizar sensores asignados
         if assigned_sensors is not None:
             # Eliminar sensores actuales
@@ -171,13 +173,13 @@ class AuthRepository:
                 else:
                     sensor_id = sensor_data
                     sensor_type = "unknown"
-                
+
                 db_manager.execute_insert(
                     """INSERT INTO user_assigned_sensors (user_id, sensor_id, sensor_type)
                        VALUES (%s, %s, %s)""",
-                    (user_id, sensor_id, sensor_type)
+                    (user_id, sensor_id, sensor_type),
                 )
-        
+
         # Actualizar supervisores
         if supervisors is not None:
             db_manager.execute_update(
@@ -189,7 +191,7 @@ class AuthRepository:
                 if sup_result:
                     db_manager.execute_insert(
                         "INSERT INTO user_supervisors (user_id, supervisor_id) VALUES (%s, %s)",
-                        (user_id, sup_result[0]["id"])
+                        (user_id, sup_result[0]["id"]),
                     )
 
     def delete_user(self, username):

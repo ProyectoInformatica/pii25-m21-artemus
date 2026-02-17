@@ -9,7 +9,11 @@ def _serialize(event: LightModel) -> Dict[str, Any]:
     return {
         "sensor_id": event.sensor_id,
         "timestamp": datetime.fromtimestamp(event.timestamp),
-        "value": float(event.value) if hasattr(event, 'value') else (1.0 if event.is_on else 0.0),
+        "value": (
+            float(event.value)
+            if hasattr(event, "value")
+            else (1.0 if event.is_on else 0.0)
+        ),
         "status": event.status,
     }
 
@@ -21,12 +25,9 @@ def save_light_event(event: LightModel) -> int:
         INSERT INTO light_measurements (sensor_id, timestamp, value, status)
         VALUES (%s, %s, %s, %s)
     """
-    return db_manager.execute_insert(query, (
-        data["sensor_id"], 
-        data["timestamp"], 
-        data["value"], 
-        data["status"]
-    ))
+    return db_manager.execute_insert(
+        query, (data["sensor_id"], data["timestamp"], data["value"], data["status"])
+    )
 
 
 def load_all_light_events(limit: int = 1000) -> List[Dict[str, Any]]:
@@ -40,7 +41,9 @@ def load_all_light_events(limit: int = 1000) -> List[Dict[str, Any]]:
     return db_manager.execute_query(query, (limit,))
 
 
-def load_light_events_by_sensor(sensor_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+def load_light_events_by_sensor(
+    sensor_id: str, limit: int = 100
+) -> List[Dict[str, Any]]:
     """Carga eventos de luz para un sensor específico."""
     query = """
         SELECT sensor_id, timestamp, value, status
@@ -52,7 +55,9 @@ def load_light_events_by_sensor(sensor_id: str, limit: int = 100) -> List[Dict[s
     return db_manager.execute_query(query, (sensor_id, limit))
 
 
-def load_light_events_by_date_range(start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+def load_light_events_by_date_range(
+    start_date: datetime, end_date: datetime
+) -> List[Dict[str, Any]]:
     """Carga eventos de luz en un rango de fechas."""
     query = """
         SELECT sensor_id, timestamp, value, status

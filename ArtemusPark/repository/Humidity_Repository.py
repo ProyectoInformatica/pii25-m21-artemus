@@ -21,12 +21,9 @@ def save_humidity_measurement(measurement: HumidityModel) -> int:
         INSERT INTO humidity_measurements (sensor_id, timestamp, value, status)
         VALUES (%s, %s, %s, %s)
     """
-    return db_manager.execute_insert(query, (
-        data["sensor_id"], 
-        data["timestamp"], 
-        data["value"], 
-        data["status"]
-    ))
+    return db_manager.execute_insert(
+        query, (data["sensor_id"], data["timestamp"], data["value"], data["status"])
+    )
 
 
 def load_all_humidity_measurements(limit: int = 1000) -> List[Dict[str, Any]]:
@@ -52,7 +49,9 @@ def load_humidity_by_sensor(sensor_id: str, limit: int = 100) -> List[Dict[str, 
     return db_manager.execute_query(query, (sensor_id, limit))
 
 
-def load_humidity_by_date_range(start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+def load_humidity_by_date_range(
+    start_date: datetime, end_date: datetime
+) -> List[Dict[str, Any]]:
     """Carga registros de humedad en un rango de fechas."""
     query = """
         SELECT sensor_id, timestamp, value, status

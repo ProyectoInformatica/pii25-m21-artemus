@@ -9,7 +9,11 @@ def _serialize(event: DoorModel) -> Dict[str, Any]:
     return {
         "sensor_id": event.sensor_id,
         "timestamp": datetime.fromtimestamp(event.timestamp),
-        "status": event.direction if hasattr(event, 'direction') else ('open' if event.is_open else 'closed'),
+        "status": (
+            event.direction
+            if hasattr(event, "direction")
+            else ("open" if event.is_open else "closed")
+        ),
         "is_open": event.is_open,
     }
 
@@ -21,12 +25,9 @@ def save_door_event(event: DoorModel) -> int:
         INSERT INTO door_status (sensor_id, timestamp, status, is_open)
         VALUES (%s, %s, %s, %s)
     """
-    return db_manager.execute_insert(query, (
-        data["sensor_id"], 
-        data["timestamp"], 
-        data["status"], 
-        data["is_open"]
-    ))
+    return db_manager.execute_insert(
+        query, (data["sensor_id"], data["timestamp"], data["status"], data["is_open"])
+    )
 
 
 def load_all_door_events(limit: int = 1000) -> List[Dict[str, Any]]:
@@ -40,7 +41,9 @@ def load_all_door_events(limit: int = 1000) -> List[Dict[str, Any]]:
     return db_manager.execute_query(query, (limit,))
 
 
-def load_door_events_by_sensor(sensor_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+def load_door_events_by_sensor(
+    sensor_id: str, limit: int = 100
+) -> List[Dict[str, Any]]:
     """Carga eventos de puerta para un sensor específico."""
     query = """
         SELECT sensor_id, timestamp, status, is_open
@@ -52,7 +55,9 @@ def load_door_events_by_sensor(sensor_id: str, limit: int = 100) -> List[Dict[st
     return db_manager.execute_query(query, (sensor_id, limit))
 
 
-def load_door_events_by_date_range(start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+def load_door_events_by_date_range(
+    start_date: datetime, end_date: datetime
+) -> List[Dict[str, Any]]:
     """Carga eventos de puerta en un rango de fechas."""
     query = """
         SELECT sensor_id, timestamp, status, is_open

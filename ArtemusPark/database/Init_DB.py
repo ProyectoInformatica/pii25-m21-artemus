@@ -151,22 +151,150 @@ CREATE TABLE IF NOT EXISTS system_config (
 
 # Datos iniciales de usuarios
 DEFAULT_USERS = [
-    ("admin1", "admin123", "admin", "Adrian Molina", "11111111H", "600111111", "Calle Falsa 123"),
-    ("admin_super", "root2025", "admin", "Sonia Ortega", "22222222J", "600222222", "Avenida Siempre Viva 45"),
-    ("boss_artemus", "masterkey", "admin", "Javier Torres", "33333333P", "600333333", "Plaza Mayor 1"),
-    ("admin_alpha", "alpha_pass", "admin", "Marta Vega", "44444444A", "600444444", "Rua Augusta 10"),
-    ("maint_joe", "fixitnow", "maintenance", "Jose Pardo", "55555555K", "600555555", "Paseo de la Castellana 50"),
-    ("tech_sarah", "cables99", "maintenance", "Sara Marin", "66666666Q", "600666666", "Gran Via 20"),
-    ("eng_mike", "wrench77", "maintenance", "Miguel Rios", "77777777B", "600777777", "Via Laietana 30"),
-    ("client_ana", "guest001", "user", "Ana Garcia", "88888888Y", "600888888", "Calle del Arenal 1"),
-    ("visit_tom", "parkfun2", "user", "Tomas Perez", "99999999R", "600999999", "Calle Alcala 15"),
-    ("user_demo", "testpass", "user", "Dario Ponce", "10101010P", "600101010", "Calle Mayor 5"),
-    ("user_sofia", "sofia_pass", "user", "Sofia Martin", "12121212M", "600121212", "Plaza de Espana 3"),
-    ("user_pedro", "pedro_pass", "user", "Pedro Ruiz", "13131313S", "600131313", "Paseo del Prado 10"),
-    ("user_maria", "maria_pass", "user", "Maria Gomez", "14141414W", "600141414", "Calle Serrano 25"),
-    ("user_luis", "luis_pass", "user", "Luis Hernandez", "15151515N", "600151515", "Ronda de Toledo 5"),
-    ("user_laura", "laura_pass", "user", "Laura Diaz", "16161616E", "600161616", "Calle de la Paz 7"),
-    ("user_carlos", "carlos_pass", "user", "Carlos Sanchez", "17171717D", "600171717", "Avenida de America 12"),
+    (
+        "admin1",
+        "admin123",
+        "admin",
+        "Adrian Molina",
+        "11111111H",
+        "600111111",
+        "Calle Falsa 123",
+    ),
+    (
+        "admin_super",
+        "root2025",
+        "admin",
+        "Sonia Ortega",
+        "22222222J",
+        "600222222",
+        "Avenida Siempre Viva 45",
+    ),
+    (
+        "boss_artemus",
+        "masterkey",
+        "admin",
+        "Javier Torres",
+        "33333333P",
+        "600333333",
+        "Plaza Mayor 1",
+    ),
+    (
+        "admin_alpha",
+        "alpha_pass",
+        "admin",
+        "Marta Vega",
+        "44444444A",
+        "600444444",
+        "Rua Augusta 10",
+    ),
+    (
+        "maint_joe",
+        "fixitnow",
+        "maintenance",
+        "Jose Pardo",
+        "55555555K",
+        "600555555",
+        "Paseo de la Castellana 50",
+    ),
+    (
+        "tech_sarah",
+        "cables99",
+        "maintenance",
+        "Sara Marin",
+        "66666666Q",
+        "600666666",
+        "Gran Via 20",
+    ),
+    (
+        "eng_mike",
+        "wrench77",
+        "maintenance",
+        "Miguel Rios",
+        "77777777B",
+        "600777777",
+        "Via Laietana 30",
+    ),
+    (
+        "client_ana",
+        "guest001",
+        "user",
+        "Ana Garcia",
+        "88888888Y",
+        "600888888",
+        "Calle del Arenal 1",
+    ),
+    (
+        "visit_tom",
+        "parkfun2",
+        "user",
+        "Tomas Perez",
+        "99999999R",
+        "600999999",
+        "Calle Alcala 15",
+    ),
+    (
+        "user_demo",
+        "testpass",
+        "user",
+        "Dario Ponce",
+        "10101010P",
+        "600101010",
+        "Calle Mayor 5",
+    ),
+    (
+        "user_sofia",
+        "sofia_pass",
+        "user",
+        "Sofia Martin",
+        "12121212M",
+        "600121212",
+        "Plaza de Espana 3",
+    ),
+    (
+        "user_pedro",
+        "pedro_pass",
+        "user",
+        "Pedro Ruiz",
+        "13131313S",
+        "600131313",
+        "Paseo del Prado 10",
+    ),
+    (
+        "user_maria",
+        "maria_pass",
+        "user",
+        "Maria Gomez",
+        "14141414W",
+        "600141414",
+        "Calle Serrano 25",
+    ),
+    (
+        "user_luis",
+        "luis_pass",
+        "user",
+        "Luis Hernandez",
+        "15151515N",
+        "600151515",
+        "Ronda de Toledo 5",
+    ),
+    (
+        "user_laura",
+        "laura_pass",
+        "user",
+        "Laura Diaz",
+        "16161616E",
+        "600161616",
+        "Calle de la Paz 7",
+    ),
+    (
+        "user_carlos",
+        "carlos_pass",
+        "user",
+        "Carlos Sanchez",
+        "17171717D",
+        "600171717",
+        "Avenida de America 12",
+    ),
 ]
 
 # Relaciones de supervisores
@@ -201,52 +329,61 @@ def init_database():
         # Conectar como admin (sin base de datos específica)
         conn = mysql.connector.connect(**ADMIN_DB_CONFIG)
         cursor = conn.cursor()
-        
+
         # Crear base de datos
         print(f"Creando base de datos '{DB_CONFIG['database']}'...")
         cursor.execute(CREATE_DATABASE_SQL)
         print("Base de datos creada/verificada exitosamente.")
-        
+
         # Usar la base de datos
         cursor.execute(f"USE {DB_CONFIG['database']}")
-        
+
         # Crear tablas
         print("Creando tablas...")
-        for statement in CREATE_TABLES_SQL.split(';'):
+        for statement in CREATE_TABLES_SQL.split(";"):
             stmt = statement.strip()
             if stmt:
                 cursor.execute(stmt)
         print("Tablas creadas exitosamente.")
-        
+
         # Insertar usuarios por defecto
         print("Insertando usuarios por defecto...")
-        cursor.executemany("""
+        cursor.executemany(
+            """
             INSERT IGNORE INTO users (username, password, role, full_name, dni, phone, address)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, DEFAULT_USERS)
-        
+        """,
+            DEFAULT_USERS,
+        )
+
         # Insertar relaciones de supervisores
         print("Configurando relaciones de supervisores...")
         for user, supervisor in SUPERVISOR_RELATIONS:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT IGNORE INTO user_supervisors (user_id, supervisor_id)
                 SELECT u1.id, u2.id 
                 FROM users u1, users u2 
                 WHERE u1.username = %s AND u2.username = %s
-            """, (user, supervisor))
-        
+            """,
+                (user, supervisor),
+            )
+
         # Insertar sensores asignados
         print("Configurando sensores asignados...")
         for username, sensor_id, sensor_type in ASSIGNED_SENSORS:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT IGNORE INTO user_assigned_sensors (user_id, sensor_id, sensor_type)
                 SELECT id, %s, %s FROM users WHERE username = %s
-            """, (sensor_id, sensor_type, username))
-        
+            """,
+                (sensor_id, sensor_type, username),
+            )
+
         conn.commit()
         print("Base de datos inicializada exitosamente.")
         print(f"Total de usuarios insertados: {len(DEFAULT_USERS)}")
-        
+
     except Error as e:
         print(f"Error inicializando base de datos: {e}")
         raise

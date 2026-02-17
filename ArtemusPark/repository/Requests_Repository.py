@@ -9,12 +9,12 @@ class RequestsRepository:
         # Obtener ID del usuario
         user_query = "SELECT id FROM users WHERE username = %s"
         user_result = db_manager.execute_query(user_query, (username,))
-        
+
         if not user_result:
             raise ValueError(f"Usuario {username} no encontrado")
-        
+
         user_id = user_result[0]["id"]
-        
+
         query = """
             INSERT INTO requests (user_id, request_type, message, status)
             VALUES (%s, %s, %s, 'PENDING')
