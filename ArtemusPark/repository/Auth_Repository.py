@@ -1,220 +1,112 @@
-import json
-from pathlib import Path
+from ArtemusPark.database.DB_Manager import db_manager
 
 
 class AuthRepository:
-    """Repositorio para gestionar la autenticación de usuarios con persistencia JSON."""
-
-    def __init__(self):
-        self.base_dir = Path(__file__).resolve().parent.parent
-        self.data_file = self.base_dir / "json" / "users.json"
-        self._ensure_file_exists()
-
-    def _ensure_file_exists(self):
-        """Crea el archivo users.json con datos por defecto si no existe."""
-        self.data_file.parent.mkdir(parents=True, exist_ok=True)
-        default_users = {
-            "admin1": {
-                "password": "admin123",
-                "role": "admin",
-                "full_name": "Adrian Molina",
-                "dni": "11111111H",
-                "phone": "600111111",
-                "address": "Calle Falsa 123",
-                "subordinates": ["user_laura", "user_carlos"],
-            },
-            "admin_super": {
-                "password": "root2025",
-                "role": "admin",
-                "full_name": "Sonia Ortega",
-                "dni": "22222222J",
-                "phone": "600222222",
-                "address": "Avenida Siempre Viva 45",
-                "subordinates": ["client_ana", "visit_tom", "user_demo"],
-            },
-            "boss_artemus": {
-                "password": "masterkey",
-                "role": "admin",
-                "full_name": "Javier Torres",
-                "dni": "33333333P",
-                "phone": "600333333",
-                "address": "Plaza Mayor 1",
-                "subordinates": ["client_ana", "user_sofia", "user_pedro"],
-            },
-            "admin_alpha": {
-                "password": "alpha_pass",
-                "role": "admin",
-                "full_name": "Marta Vega",
-                "dni": "44444444A",
-                "phone": "600444444",
-                "address": "Rua Augusta 10",
-                "subordinates": ["user_maria", "user_luis"],
-            },
-            "maint_joe": {
-                "password": "fixitnow",
-                "role": "maintenance",
-                "full_name": "Jose Pardo",
-                "dni": "55555555K",
-                "phone": "600555555",
-                "address": "Paseo de la Castellana 50",
-                "supervisors": ["admin_super"],
-                "assigned_sensors": ["temp_01", "hum_01", "door_01"],
-            },
-            "tech_sarah": {
-                "password": "cables99",
-                "role": "maintenance",
-                "full_name": "Sara Marin",
-                "dni": "66666666Q",
-                "phone": "600666666",
-                "address": "Gran Via 20",
-                "supervisors": ["admin_super"],
-                "assigned_sensors": ["smoke_01", "light_01", "wind_01"],
-            },
-            "eng_mike": {
-                "password": "wrench77",
-                "role": "maintenance",
-                "full_name": "Miguel Rios",
-                "dni": "77777777B",
-                "phone": "600777777",
-                "address": "Via Laietana 30",
-                "supervisors": ["admin_alpha"],
-            },
-            "client_ana": {
-                "password": "guest001",
-                "role": "user",
-                "full_name": "Ana Garcia",
-                "dni": "88888888Y",
-                "phone": "600888888",
-                "address": "Calle del Arenal 1",
-                "supervisors": ["admin_super", "boss_artemus"],
-            },
-            "visit_tom": {
-                "password": "parkfun2",
-                "role": "user",
-                "full_name": "Tomas Perez",
-                "dni": "99999999R",
-                "phone": "600999999",
-                "address": "Calle Alcala 15",
-                "supervisors": ["admin_super"],
-            },
-            "user_demo": {
-                "password": "testpass",
-                "role": "user",
-                "full_name": "Dario Ponce",
-                "dni": "10101010P",
-                "phone": "600101010",
-                "address": "Calle Mayor 5",
-                "supervisors": ["admin_super"],
-            },
-            "user_sofia": {
-                "password": "sofia_pass",
-                "role": "user",
-                "full_name": "Sofia Martin",
-                "dni": "12121212M",
-                "phone": "600121212",
-                "address": "Plaza de Espana 3",
-                "supervisors": ["boss_artemus"],
-            },
-            "user_pedro": {
-                "password": "pedro_pass",
-                "role": "user",
-                "full_name": "Pedro Ruiz",
-                "dni": "13131313S",
-                "phone": "600131313",
-                "address": "Paseo del Prado 10",
-                "supervisors": ["boss_artemus"],
-            },
-            "user_maria": {
-                "password": "maria_pass",
-                "role": "user",
-                "full_name": "Maria Gomez",
-                "dni": "14141414W",
-                "phone": "600141414",
-                "address": "Calle Serrano 25",
-                "supervisors": ["admin_alpha"],
-            },
-            "user_luis": {
-                "password": "luis_pass",
-                "role": "user",
-                "full_name": "Luis Hernandez",
-                "dni": "15151515N",
-                "phone": "600151515",
-                "address": "Ronda de Toledo 5",
-                "supervisors": ["admin_alpha"],
-            },
-            "user_laura": {
-                "password": "laura_pass",
-                "role": "user",
-                "full_name": "Laura Diaz",
-                "dni": "16161616E",
-                "phone": "600161616",
-                "address": "Calle de la Paz 7",
-                "supervisors": ["admin1"],
-            },
-            "user_carlos": {
-                "password": "carlos_pass",
-                "role": "user",
-                "full_name": "Carlos Sanchez",
-                "dni": "17171717D",
-                "phone": "600171717",
-                "address": "Avenida de America 12",
-                "supervisors": ["admin1"],
-            },
-        }
-
-        if not self.data_file.exists():
-            self._save_users(default_users)
-            return
-
-        try:
-            current_users = json.loads(self.data_file.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, FileNotFoundError):
-            current_users = {}
-
-        if not current_users:
-            self._save_users(default_users)
-
-    def _load_users(self):
-        """Carga los usuarios del archivo JSON."""
-        try:
-            return json.loads(self.data_file.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, FileNotFoundError):
-            return {}
-
-    def _save_users(self, users):
-        """Guarda los usuarios en el archivo JSON."""
-        self.data_file.write_text(json.dumps(users, indent=4), encoding="utf-8")
+    """Repositorio para gestionar la autenticación de usuarios con MariaDB."""
 
     def authenticate(self, username, password):
         """Verifica las credenciales y devuelve el rol si son correctas."""
-        users = self._load_users()
-        if username in users:
-            user_data = users[username]
-            if user_data["password"] == password:
-                return user_data["role"]
+        query = """
+            SELECT role FROM users 
+            WHERE username = %s AND password = %s
+        """
+        result = db_manager.execute_query(query, (username, password))
+        if result:
+            return result[0]["role"]
         return None
 
     def get_all_users(self):
-        """Retorna todos los usuarios."""
-        return self._load_users()
+        """Retorna todos los usuarios con sus datos."""
+        query = """
+            SELECT u.id, u.username, u.role, u.full_name, u.dni, u.phone, u.address,
+                   GROUP_CONCAT(DISTINCT s.sensor_id) as assigned_sensors,
+                   GROUP_CONCAT(DISTINCT sup.username) as supervisors,
+                   GROUP_CONCAT(DISTINCT sub.username) as subordinates
+            FROM users u
+            LEFT JOIN user_assigned_sensors s ON u.id = s.user_id
+            LEFT JOIN user_supervisors us ON u.id = us.user_id
+            LEFT JOIN users sup ON us.supervisor_id = sup.id
+            LEFT JOIN user_supervisors us2 ON u.id = us2.supervisor_id
+            LEFT JOIN users sub ON us2.user_id = sub.id
+            GROUP BY u.id
+        """
+        results = db_manager.execute_query(query)
+        users = {}
+        for row in results:
+            username = row["username"]
+            users[username] = {
+                "password": "",  # No devolver contraseñas
+                "role": row["role"],
+                "full_name": row["full_name"],
+                "dni": row["dni"],
+                "phone": row["phone"],
+                "address": row["address"],
+            }
+            if row["assigned_sensors"]:
+                users[username]["assigned_sensors"] = row["assigned_sensors"].split(",")
+            if row["supervisors"]:
+                users[username]["supervisors"] = row["supervisors"].split(",")
+            if row["subordinates"]:
+                users[username]["subordinates"] = row["subordinates"].split(",")
+        return users
+
+    def get_user_by_username(self, username):
+        """Obtiene un usuario específico por su nombre de usuario."""
+        query = """
+            SELECT u.id, u.username, u.password, u.role, u.full_name, u.dni, u.phone, u.address,
+                   GROUP_CONCAT(DISTINCT s.sensor_id) as assigned_sensors,
+                   GROUP_CONCAT(DISTINCT s.sensor_type) as sensor_types,
+                   GROUP_CONCAT(DISTINCT sup.username) as supervisors,
+                   GROUP_CONCAT(DISTINCT sub.username) as subordinates
+            FROM users u
+            LEFT JOIN user_assigned_sensors s ON u.id = s.user_id
+            LEFT JOIN user_supervisors us ON u.id = us.user_id
+            LEFT JOIN users sup ON us.supervisor_id = sup.id
+            LEFT JOIN user_supervisors us2 ON u.id = us2.supervisor_id
+            LEFT JOIN users sub ON us2.user_id = sub.id
+            WHERE u.username = %s
+            GROUP BY u.id
+        """
+        result = db_manager.execute_query(query, (username,))
+        if not result:
+            return None
+        
+        row = result[0]
+        user = {
+            "password": row["password"],
+            "role": row["role"],
+            "full_name": row["full_name"],
+            "dni": row["dni"],
+            "phone": row["phone"],
+            "address": row["address"],
+        }
+        
+        if row["assigned_sensors"]:
+            sensors = row["assigned_sensors"].split(",")
+            types = row["sensor_types"].split(",") if row["sensor_types"] else []
+            user["assigned_sensors"] = sensors
+            user["sensor_types"] = types
+        if row["supervisors"]:
+            user["supervisors"] = row["supervisors"].split(",")
+        if row["subordinates"]:
+            user["subordinates"] = row["subordinates"].split(",")
+        
+        return user
 
     def add_user(
         self, username, password, role, full_name="", dni="", phone="", address=""
     ):
         """Agrega un nuevo usuario con datos personales."""
-        users = self._load_users()
-        if username in users:
-            raise ValueError("El usuario ya existe.")
-
-        users[username] = {
-            "password": password,
-            "role": role,
-            "full_name": full_name,
-            "dni": dni,
-            "phone": phone,
-            "address": address,
-        }
-        self._save_users(users)
+        query = """
+            INSERT INTO users (username, password, role, full_name, dni, phone, address)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+        try:
+            db_manager.execute_insert(query, (username, password, role, full_name, dni, phone, address))
+        except Exception as e:
+            if "Duplicate entry" in str(e):
+                raise ValueError("El usuario ya existe.")
+            raise
 
     def update_user(
         self,
@@ -230,35 +122,97 @@ class AuthRepository:
         subordinates=None,
     ):
         """Actualiza datos de un usuario existente."""
-        users = self._load_users()
-        if username not in users:
+        # Obtener ID del usuario
+        user_query = "SELECT id FROM users WHERE username = %s"
+        user_result = db_manager.execute_query(user_query, (username,))
+        if not user_result:
             raise ValueError("El usuario no existe.")
-
-        if password:
-            users[username]["password"] = password
-        if role:
-            users[username]["role"] = role
-        if assigned_sensors is not None:
-            users[username]["assigned_sensors"] = assigned_sensors
-        if supervisors is not None:
-            users[username]["supervisors"] = supervisors
-        if subordinates is not None:
-            users[username]["subordinates"] = subordinates
-
+        
+        user_id = user_result[0]["id"]
+        
+        # Actualizar campos básicos
+        updates = []
+        params = []
+        if password is not None:
+            updates.append("password = %s")
+            params.append(password)
+        if role is not None:
+            updates.append("role = %s")
+            params.append(role)
         if full_name is not None:
-            users[username]["full_name"] = full_name
+            updates.append("full_name = %s")
+            params.append(full_name)
         if dni is not None:
-            users[username]["dni"] = dni
+            updates.append("dni = %s")
+            params.append(dni)
         if phone is not None:
-            users[username]["phone"] = phone
+            updates.append("phone = %s")
+            params.append(phone)
         if address is not None:
-            users[username]["address"] = address
-
-        self._save_users(users)
+            updates.append("address = %s")
+            params.append(address)
+        
+        if updates:
+            query = f"UPDATE users SET {', '.join(updates)} WHERE id = %s"
+            params.append(user_id)
+            db_manager.execute_update(query, tuple(params))
+        
+        # Actualizar sensores asignados
+        if assigned_sensors is not None:
+            # Eliminar sensores actuales
+            db_manager.execute_update(
+                "DELETE FROM user_assigned_sensors WHERE user_id = %s", (user_id,)
+            )
+            # Insertar nuevos sensores
+            for sensor_data in assigned_sensors:
+                if isinstance(sensor_data, dict):
+                    sensor_id = sensor_data.get("sensor_id")
+                    sensor_type = sensor_data.get("sensor_type", "unknown")
+                else:
+                    sensor_id = sensor_data
+                    sensor_type = "unknown"
+                
+                db_manager.execute_insert(
+                    """INSERT INTO user_assigned_sensors (user_id, sensor_id, sensor_type)
+                       VALUES (%s, %s, %s)""",
+                    (user_id, sensor_id, sensor_type)
+                )
+        
+        # Actualizar supervisores
+        if supervisors is not None:
+            db_manager.execute_update(
+                "DELETE FROM user_supervisors WHERE user_id = %s", (user_id,)
+            )
+            for supervisor_username in supervisors:
+                sup_query = "SELECT id FROM users WHERE username = %s"
+                sup_result = db_manager.execute_query(sup_query, (supervisor_username,))
+                if sup_result:
+                    db_manager.execute_insert(
+                        "INSERT INTO user_supervisors (user_id, supervisor_id) VALUES (%s, %s)",
+                        (user_id, sup_result[0]["id"])
+                    )
 
     def delete_user(self, username):
-        """Elimina un usuario."""
-        users = self._load_users()
-        if username in users:
-            del users[username]
-            self._save_users(users)
+        """Elimina un usuario y sus relaciones."""
+        query = "DELETE FROM users WHERE username = %s"
+        db_manager.execute_update(query, (username,))
+
+    def get_users_by_role(self, role):
+        """Obtiene todos los usuarios de un rol específico."""
+        query = """
+            SELECT username, full_name, dni, phone, address
+            FROM users WHERE role = %s
+        """
+        return db_manager.execute_query(query, (role,))
+
+    def get_maintenance_users(self):
+        """Obtiene todos los usuarios de mantenimiento con sus sensores."""
+        query = """
+            SELECT u.username, u.full_name, 
+                   GROUP_CONCAT(DISTINCT s.sensor_id) as sensors
+            FROM users u
+            LEFT JOIN user_assigned_sensors s ON u.id = s.user_id
+            WHERE u.role = 'maintenance'
+            GROUP BY u.id
+        """
+        return db_manager.execute_query(query)

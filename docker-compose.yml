@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: artemus-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: artemus_root_2025
+      MARIADB_DATABASE: artemus_db
+      MARIADB_USER: artemus_user
+      MARIADB_PASSWORD: artemus_pass_2025
+      TZ: Europe/Madrid
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - artemus-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # (Opcional) phpMyAdmin para gestionar la base de datos vía web
+  # Descomenta las siguientes líneas si quieres usar phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: artemus-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: artemus_root_2025
+    ports:
+      - "8080:80"
+    depends_on:
+      - mariadb
+    networks:
+      - artemus-network
+
+volumes:
+  mariadb_data:
+    driver: local
+
+networks:
+  artemus-network:
+    driver: bridge

@@ -1,56 +1,76 @@
-import json
-from pathlib import Path
 from typing import List, Dict, Any
 from datetime import datetime
+from ArtemusPark.database.DB_Manager import db_manager
 from ArtemusPark.model.Humidity_Model import HumidityModel
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "json" / "humidity"
-
-
 def _serialize(measurement: HumidityModel) -> Dict[str, Any]:
-    """Convierte el modelo a un diccionario serializable."""
+    """Convierte el modelo a un diccionario."""
     return {
         "sensor_id": measurement.sensor_id,
-        "timestamp": measurement.timestamp,
-        "value": measurement.value,
+        "timestamp": datetime.fromtimestamp(measurement.timestamp),
+        "value": float(measurement.value),
         "status": measurement.status,
     }
 
 
-def save_humidity_measurement(measurement: HumidityModel) -> None:
-    """Guarda un registro en un archivo JSON diario."""
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-    today = datetime.now().strftime("%Y-%m-%d")
-    file_path = DATA_DIR / f"hum_{today }.json"
-
-    if file_path.exists():
-        try:
-            data = json.loads(file_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            data = []
-    else:
-        data = []
-
-    data.append(_serialize(measurement))
-    file_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+def save_humidity_measurement(measurement: HumidityModel) -> int:
+    """Guarda un registro de humedad en la base de datos."""
+    data = _serialize(measurement)
+    query = """
+        INSERT INTO humidity_measurements (sensor_id, timestamp, value, status)
+        VALUES (%s, %s, %s, %s)
+    """
+    return db_manager.execute_insert(query, (
+        data["sensor_id"], 
+        data["timestamp"], 
+        data["value"], 
+        data["status"]
+    ))
 
 
-def load_all_humidity_measurements() -> List[Dict[str, Any]]:
-    """Carga todos los registros de los archivos JSON diarios."""
-    if not DATA_DIR.exists():
-        return []
+def load_all_humidity_measurements(limit: int = 1000) -> List[Dict[str, Any]]:
+    """Carga todos los registros de humedad."""
+    query = """
+        SELECT sensor_id, timestamp, value, status
+        FROM humidity_measurements
+        ORDER BY timestamp DESC
+        LIMIT %s
+    """
+    return db_manager.execute_query(query, (limit,))
 
-    all_data = []
-    for file_path in sorted(DATA_DIR.glob("hum_*.json")):
-        try:
-            file_content = file_path.read_text(encoding="utf-8")
-            data = json.loads(file_content)
-            if isinstance(data, list):
-                all_data.extend(data)
-        except json.JSONDecodeError:
-            continue
 
-    return all_data
+def load_humidity_by_sensor(sensor_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+    """Carga registros de humedad para un sensor específico."""
+    query = """
+        SELECT sensor_id, timestamp, value, status
+        FROM humidity_measurements
+        WHERE sensor_id = %s
+        ORDER BY timestamp DESC
+        LIMIT %s
+    """
+    return db_manager.execute_query(query, (sensor_id, limit))
+
+
+def load_humidity_by_date_range(start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
+    """Carga registros de humedad en un rango de fechas."""
+    query = """
+        SELECT sensor_id, timestamp, value, status
+        FROM humidity_measurements
+        WHERE timestamp BETWEEN %s AND %s
+        ORDER BY timestamp DESC
+    """
+    return db_manager.execute_query(query, (start_date, end_date))
+
+
+def get_latest_humidity_by_sensor(sensor_id: str) -> Dict[str, Any]:
+    """Obtiene la última medición de humedad de un sensor."""
+    query = """
+        SELECT sensor_id, timestamp, value, status
+        FROM humidity_measurements
+        WHERE sensor_id = %s
+        ORDER BY timestamp DESC
+        LIMIT 1
+    """
+    result = db_manager.execute_query(query, (sensor_id,))
+    return result[0] if result else None
