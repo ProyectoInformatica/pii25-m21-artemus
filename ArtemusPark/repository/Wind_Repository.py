@@ -4,7 +4,6 @@ from typing import List, Dict, Any
 from datetime import datetime
 from ArtemusPark.model.Wind_Model import WindModel
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "json" / "wind"
 
