@@ -12,7 +12,7 @@ DB_CONFIG = {
     "database": "artemus",
     "user": "root",
     "password": "",
-    "port": 3306
+    "port": 3306,
 }
 
 # Pongo el sem de 1 para no parar a todos
@@ -50,10 +50,7 @@ def registrar_auditoria(mensaje):
 def inicializar_pool():
     try:
         pool = mysql.connector.pooling.MySQLConnectionPool(
-            pool_name="artemus_pool",
-            pool_size=5,
-            pool_reset_session=True,
-            **DB_CONFIG
+            pool_name="artemus_pool", pool_size=5, pool_reset_session=True, **DB_CONFIG
         )
         print(" Pool de conexiones inicializado. Capacidad máxima: 5 simultáneas.")
         return pool
@@ -81,7 +78,9 @@ def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
     while intento < max_reintentos and conectado == False and error_critico == False:
         conexion = None
         try:
-            print(f" {nombre_hilo} (Usuario {id_usuario}): Intento BBDD {intento + 1}...")
+            print(
+                f" {nombre_hilo} (Usuario {id_usuario}): Intento BBDD {intento + 1}..."
+            )
             conexion = pool.get_connection()
 
             if conexion.is_connected():
@@ -117,7 +116,10 @@ def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
         print(f" {mensaje_final}")
         registrar_auditoria(mensaje_final)
     except Exception as e:
-        registrar_auditoria(f"ERROR: No se pudo cerrar el socket del usuario {id_usuario}: {e}")
+        registrar_auditoria(
+            f"ERROR: No se pudo cerrar el socket del usuario {id_usuario}: {e}"
+        )
+
 
 # =====================================================================
 # 3. EL SERVIDOR DE ESCUCHA (Lógica Estructurada + Logging)
@@ -138,7 +140,9 @@ def iniciar_servidor():
                 servidor_socket.listen(5)
 
                 print(f"\nSERVIDOR ARTEMUS ACTIVO en el puerto {puerto}.")
-                print(f"Para conectar desde otro PC usa tu IP local y el puerto {puerto}.")
+                print(
+                    f"Para conectar desde otro PC usa tu IP local y el puerto {puerto}."
+                )
                 registrar_auditoria(f"SISTEMA: Servidor iniciado en {ip_dir}:{puerto}")
 
                 servidor_activo = True
@@ -149,9 +153,14 @@ def iniciar_servidor():
                     conexion_cliente, direccion_remota = servidor_socket.accept()
 
                     print(f"\n Conexión  detectada desde: {direccion_remota[0]}")
-                    registrar_auditoria(f"RED: Conexión entrante desde {direccion_remota[0]}")
+                    registrar_auditoria(
+                        f"RED: Conexión entrante desde {direccion_remota[0]}"
+                    )
 
-                    hilo = threading.Thread(target=procesar_peticion_usuario, args=(id_usuario_contador, pool , conexion_cliente))
+                    hilo = threading.Thread(
+                        target=procesar_peticion_usuario,
+                        args=(id_usuario_contador, pool, conexion_cliente),
+                    )
                     hilo.start()
                     id_usuario_contador += 1
 
