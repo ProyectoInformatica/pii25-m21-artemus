@@ -4,7 +4,6 @@ from typing import List, Dict, Any
 from datetime import datetime
 from ArtemusPark.model.Humidity_Model import HumidityModel
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "json" / "humidity"
 

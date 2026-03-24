@@ -56,7 +56,8 @@ class DatabaseConnectionManager:
                 cursorclass=pymysql.cursors.DictCursor,
             )
             logger.info(
-                f"Conexión establecida a {DatabaseConfig.DB_HOST}:" f"{DatabaseConfig.DB_PORT}/{DatabaseConfig.DB_NAME}"
+                f"Conexión establecida a {DatabaseConfig.DB_HOST}:"
+                f"{DatabaseConfig.DB_PORT}/{DatabaseConfig.DB_NAME}"
             )
             return True
 
@@ -178,13 +179,17 @@ class DatabaseConnectionManager:
             with self.get_cursor(commit=False) as cursor:
                 cursor.execute(query, params)
                 results = cursor.fetchall()
-                logger.debug(f"Query ejecutada: {query[:100]}... Resultados: {len(results)}")
+                logger.debug(
+                    f"Query ejecutada: {query[:100]}... Resultados: {len(results)}"
+                )
                 return results
         except Exception as e:
             logger.error(f"Error en execute_query: {e}")
             raise
 
-    def execute_insert(self, query: str, params: Tuple = ()) -> Tuple[bool, Optional[int]]:
+    def execute_insert(
+        self, query: str, params: Tuple = ()
+    ) -> Tuple[bool, Optional[int]]:
         """Ejecuta un INSERT y retorna el ID generado.
 
         Args:

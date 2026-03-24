@@ -192,7 +192,9 @@ class QueryBuilder:
             query_parts.append(f"WHERE {' AND '.join(where_parts)}")
 
         if self.order_by_fields:
-            order_parts = [f"{field} {direction}" for field, direction in self.order_by_fields]
+            order_parts = [
+                f"{field} {direction}" for field, direction in self.order_by_fields
+            ]
             query_parts.append(f"ORDER BY {', '.join(order_parts)}")
 
         if self.limit_value > 0:
@@ -225,12 +227,16 @@ def build_insert_query(table_name: str, data: dict) -> Tuple[str, Tuple[Any, ...
     values = list(data.values())
     placeholders = ", ".join(["%s"] * len(columns))
 
-    query = f"INSERT INTO {table_name} ({', '.join(columns)}) " f"VALUES ({placeholders})"
+    query = (
+        f"INSERT INTO {table_name} ({', '.join(columns)}) " f"VALUES ({placeholders})"
+    )
 
     return query, tuple(values)
 
 
-def build_update_query(table_name: str, data: dict, where_conditions: dict) -> Tuple[str, Tuple[Any, ...]]:
+def build_update_query(
+    table_name: str, data: dict, where_conditions: dict
+) -> Tuple[str, Tuple[Any, ...]]:
     """Construye una query UPDATE de forma segura.
 
     Args:
@@ -256,12 +262,17 @@ def build_update_query(table_name: str, data: dict, where_conditions: dict) -> T
 
     values = list(data.values()) + list(where_conditions.values())
 
-    query = f"UPDATE {table_name} SET {', '.join(set_parts)} " f"WHERE {' AND '.join(where_parts)}"
+    query = (
+        f"UPDATE {table_name} SET {', '.join(set_parts)} "
+        f"WHERE {' AND '.join(where_parts)}"
+    )
 
     return query, tuple(values)
 
 
-def build_delete_query(table_name: str, where_conditions: dict) -> Tuple[str, Tuple[Any, ...]]:
+def build_delete_query(
+    table_name: str, where_conditions: dict
+) -> Tuple[str, Tuple[Any, ...]]:
     """Construye una query DELETE de forma segura.
 
     Args:
