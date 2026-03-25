@@ -36,8 +36,7 @@ def load_all_door_events() -> List[Dict[str, Any]]:
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT s.nombre AS sensor_id,
                    UNIX_TIMESTAMP(d.timestamp) AS timestamp,
                    d.estado AS is_open,
@@ -47,8 +46,7 @@ def load_all_door_events() -> List[Dict[str, Any]]:
             JOIN Dato d ON p.id_dato = d.id_dato
             JOIN Sensor s ON d.id_sensor = s.id_sensor
             ORDER BY d.timestamp ASC
-            """
-        )
+            """)
         rows = cursor.fetchall()
         cursor.close()
         return rows
