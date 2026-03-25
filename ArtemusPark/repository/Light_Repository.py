@@ -36,8 +36,7 @@ def load_all_light_events() -> List[Dict[str, Any]]:
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT d.sensor_codigo AS sensor_id,
                    UNIX_TIMESTAMP(d.timestamp) AS timestamp,
                    i.is_on AS is_on,
@@ -46,8 +45,7 @@ def load_all_light_events() -> List[Dict[str, Any]]:
             FROM Iluminacion i
             JOIN Dato d ON i.id_dato = d.id_dato
             ORDER BY d.timestamp ASC
-            """
-        )
+            """)
         rows = cursor.fetchall()
         cursor.close()
         return rows

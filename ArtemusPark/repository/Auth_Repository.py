@@ -30,15 +30,13 @@ class AuthRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT u.usuario, u.nombre_usuario, u.contrasena_hash, u.dni,
                        u.telefono, u.direccion, u.sensores_asignados,
                        u.supervisores, u.subordinados, r.rol
                 FROM Usuario u
                 JOIN Rol r ON u.id_rol = r.id_rol
-                """
-            )
+                """)
             rows = cursor.fetchall()
             cursor.close()
             result = {}
@@ -58,7 +56,9 @@ class AuthRepository:
         finally:
             conn.close()
 
-    def add_user(self, username, password, role, full_name="", dni="", phone="", address=""):
+    def add_user(
+        self, username, password, role, full_name="", dni="", phone="", address=""
+    ):
         """Agrega un nuevo usuario."""
         conn = get_connection()
         try:

@@ -68,7 +68,9 @@ def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
     Conecta a la BBDD, realiza operaciones SQL y cierra la red al terminar.
     """
     nombre_hilo = threading.current_thread().name
-    registrar_auditoria(f"INFO: {nombre_hilo} atendiendo a Usuario {id_usuario} (RED REAL).")
+    registrar_auditoria(
+        f"INFO: {nombre_hilo} atendiendo a Usuario {id_usuario} (RED REAL)."
+    )
 
     # Variables de estado para control estructurado
     max_reintentos = 3
@@ -77,7 +79,9 @@ def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
     error_critico = False
 
     # Bucle de reintentos para la base de datos
-    while intento < max_reintentos and conectado_bbdd == False and error_critico == False:
+    while (
+        intento < max_reintentos and conectado_bbdd == False and error_critico == False
+    ):
         conexion = None
         try:
             # 1. Pedir conexion al Pool
@@ -85,7 +89,9 @@ def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
             conexion = pool.get_connection()
 
             if conexion.is_connected():
-                registrar_auditoria(f"EXITO: {nombre_hilo} obtuvo conexion del pool para ID {id_usuario}.")
+                registrar_auditoria(
+                    f"EXITO: {nombre_hilo} obtuvo conexion del pool para ID {id_usuario}."
+                )
 
                 # =========================================================
                 # TRABAJO REAL: OPERACIONES SQL
@@ -93,7 +99,9 @@ def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
                 cursor = conexion.cursor(dictionary=True)
 
                 # Consultamos si el usuario existe en Artemus Park
-                sql_check = "SELECT nombre_usuario, id_rol FROM Usuario WHERE usuario = %s"
+                sql_check = (
+                    "SELECT nombre_usuario, id_rol FROM Usuario WHERE usuario = %s"
+                )
                 cursor.execute(sql_check, (id_usuario,))
                 usuario = cursor.fetchone()
 
@@ -102,7 +110,9 @@ def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
                     print(f" {msg_log}")
                     registrar_auditoria(f"BBDD: {msg_log}")
                 else:
-                    registrar_auditoria(f"ALERTA: Usuario {id_usuario} no encontrado en la BBDD.")
+                    registrar_auditoria(
+                        f"ALERTA: Usuario {id_usuario} no encontrado en la BBDD."
+                    )
 
                 cursor.close()
                 # Marcamos exito para salir del bucle de reintentos
@@ -136,7 +146,9 @@ def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
         conexion_cliente.close()
         registrar_auditoria(f"FIN: Conexion de red cerrada para Usuario {id_usuario}.")
     except Exception as e:
-        registrar_auditoria(f"ERROR: Fallo al cerrar socket del Usuario {id_usuario}: {e}")
+        registrar_auditoria(
+            f"ERROR: Fallo al cerrar socket del Usuario {id_usuario}: {e}"
+        )
 
 
 # =====================================================================

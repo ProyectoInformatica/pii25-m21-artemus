@@ -28,15 +28,13 @@ class RequestsRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT id_ticket AS id, usuario AS user, tipo AS type,
                        descripcion AS message, estado AS status,
                        UNIX_TIMESTAMP(fecha) AS timestamp
                 FROM Ticket
                 ORDER BY fecha DESC
-                """
-            )
+                """)
             rows = cursor.fetchall()
             cursor.close()
             return rows

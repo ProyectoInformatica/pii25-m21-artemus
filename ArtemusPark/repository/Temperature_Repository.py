@@ -36,8 +36,7 @@ def load_all_temperature_measurements() -> List[Dict[str, Any]]:
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT d.sensor_codigo AS sensor_id,
                    UNIX_TIMESTAMP(d.timestamp) AS timestamp,
                    t.temperatura AS value,
@@ -45,8 +44,7 @@ def load_all_temperature_measurements() -> List[Dict[str, Any]]:
             FROM Temperatura t
             JOIN Dato d ON t.id_dato = d.id_dato
             ORDER BY d.timestamp ASC
-            """
-        )
+            """)
         rows = cursor.fetchall()
         cursor.close()
         return rows

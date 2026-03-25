@@ -36,8 +36,7 @@ def load_all_humidity_measurements() -> List[Dict[str, Any]]:
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT d.sensor_codigo AS sensor_id,
                    UNIX_TIMESTAMP(d.timestamp) AS timestamp,
                    h.humedad_relativa AS value,
@@ -45,8 +44,7 @@ def load_all_humidity_measurements() -> List[Dict[str, Any]]:
             FROM Humedad h
             JOIN Dato d ON h.id_dato = d.id_dato
             ORDER BY d.timestamp ASC
-            """
-        )
+            """)
         rows = cursor.fetchall()
         cursor.close()
         return rows
