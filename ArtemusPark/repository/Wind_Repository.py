@@ -1,55 +1,80 @@
-import json
-from pathlib import Path
-from typing import List, Dict, Any
+import mysql.connector
 from datetime import datetime
+from typing import List, Dict, Any
+
 from ArtemusPark.model.Wind_Model import WindModel
+from ArtemusPark.bbdd.db_connection import get_connection, get_sensor_id
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "json" / "wind"
-
-
-def _serialize_measurement(measurement: WindModel) -> Dict[str, Any]:
-    """Convierte el modelo a un diccionario serializable."""
-    return {
-        "sensor_id": measurement.sensor_id,
-        "timestamp": measurement.timestamp,
-        "speed": measurement.speed,
-        "state": measurement.state,
-    }
+TIPO_NOMBRE = "Viento"
 
 
 def save_wind_measurement(measurement: WindModel) -> None:
-    """Guarda un registro en un archivo JSON diario."""
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-    today = datetime.now().strftime("%Y-%m-%d")
-    file_path = DATA_DIR / f"wind_{today }.json"
-
-    if file_path.exists():
-        try:
-            data = json.loads(file_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            data = []
-    else:
-        data = []
-
-    data.append(_serialize_measurement(measurement))
-    file_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    sensor_id = get_sensor_id(measurement.sensor_id, TIPO_NOMBRE)
+    ts = datetime.fromtimestamp(measurement.timestamp)
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO Dato (id_sensor, descripcion, timestamp) VALUES (%s, %s, %s)",
+            (sensor_id, measurement.state, ts),
+        )
+        id_dato = cursor.lastrowid
+        cursor.execute(
+            "INSERT INTO Viento (id_dato, velocidad) VALUES (%s, %s)",
+            (id_dato, measurement.speed),
+        )
+        conn.commit()
+        cursor.close()
+    except mysql.connector.Error:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def load_all_wind_measurements() -> List[Dict[str, Any]]:
-    """Carga todos los registros de los archivos JSON diarios."""
-    if not DATA_DIR.exists():
-        return []
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT s.nombre AS sensor_id,
+                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
+                   v.velocidad AS speed,
+                   d.descripcion AS state
+            FROM Viento v
+            JOIN Dato d ON v.id_dato = d.id_dato
+            JOIN Sensor s ON d.id_sensor = s.id_sensor
+            ORDER BY d.timestamp ASC
+            """
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    finally:
+        conn.close()
 
-    all_data = []
-    for file_path in sorted(DATA_DIR.glob("wind_*.json")):
-        try:
-            file_content = file_path.read_text(encoding="utf-8")
-            data = json.loads(file_content)
-            if isinstance(data, list):
-                all_data.extend(data)
-        except json.JSONDecodeError:
-            continue
 
-    return all_data
+def load_wind_measurements_by_date(date_str: str) -> List[Dict[str, Any]]:
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT s.nombre AS sensor_id,
+                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
+                   v.velocidad AS speed,
+                   d.descripcion AS state
+            FROM Viento v
+            JOIN Dato d ON v.id_dato = d.id_dato
+            JOIN Sensor s ON d.id_sensor = s.id_sensor
+            WHERE DATE(d.timestamp) = %s
+            ORDER BY d.timestamp ASC
+            """,
+            (date_str,),
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    finally:
+        conn.close()

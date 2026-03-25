@@ -1,56 +1,82 @@
-import json
-from pathlib import Path
-from typing import List, Dict, Any
+import mysql.connector
 from datetime import datetime
+from typing import List, Dict, Any
+
 from ArtemusPark.model.Door_Model import DoorModel
+from ArtemusPark.bbdd.db_connection import get_connection, get_sensor_id
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "json" / "door"
-
-
-def _serialize(event: DoorModel) -> Dict[str, Any]:
-    """Convierte el modelo a un diccionario serializable."""
-    return {
-        "sensor_id": event.sensor_id,
-        "timestamp": event.timestamp,
-        "is_open": event.is_open,
-        "direction": event.direction,
-        "username": event.username,
-    }
+TIPO_NOMBRE = "Puerta"
 
 
 def save_door_event(event: DoorModel) -> None:
-    """Guarda un registro en un archivo JSON diario."""
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-    today = datetime.now().strftime("%Y-%m-%d")
-    file_path = DATA_DIR / f"door_{today }.json"
-
-    if file_path.exists():
-        try:
-            data = json.loads(file_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            data = []
-    else:
-        data = []
-
-    data.append(_serialize(event))
-    file_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    sensor_id = get_sensor_id(event.sensor_id, TIPO_NOMBRE)
+    ts = datetime.fromtimestamp(event.timestamp)
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO Dato (id_sensor, estado, timestamp) VALUES (%s, %s, %s)",
+            (sensor_id, event.is_open, ts),
+        )
+        id_dato = cursor.lastrowid
+        cursor.execute(
+            "INSERT INTO Puerta (id_dato, nombre_usuario, entrada_salida) VALUES (%s, %s, %s)",
+            (id_dato, event.username, event.direction),
+        )
+        conn.commit()
+        cursor.close()
+    except mysql.connector.Error:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def load_all_door_events() -> List[Dict[str, Any]]:
-    """Carga todos los registros de los archivos JSON diarios."""
-    if not DATA_DIR.exists():
-        return []
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT s.nombre AS sensor_id,
+                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
+                   d.estado AS is_open,
+                   p.nombre_usuario AS username,
+                   p.entrada_salida AS direction
+            FROM Puerta p
+            JOIN Dato d ON p.id_dato = d.id_dato
+            JOIN Sensor s ON d.id_sensor = s.id_sensor
+            ORDER BY d.timestamp ASC
+            """
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    finally:
+        conn.close()
 
-    all_data = []
-    for file_path in sorted(DATA_DIR.glob("door_*.json")):
-        try:
-            file_content = file_path.read_text(encoding="utf-8")
-            data = json.loads(file_content)
-            if isinstance(data, list):
-                all_data.extend(data)
-        except json.JSONDecodeError:
-            continue
 
-    return all_data
+def load_door_events_by_date(date_str: str) -> List[Dict[str, Any]]:
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT s.nombre AS sensor_id,
+                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
+                   d.estado AS is_open,
+                   p.nombre_usuario AS username,
+                   p.entrada_salida AS direction
+            FROM Puerta p
+            JOIN Dato d ON p.id_dato = d.id_dato
+            JOIN Sensor s ON d.id_sensor = s.id_sensor
+            WHERE DATE(d.timestamp) = %s
+            ORDER BY d.timestamp ASC
+            """,
+            (date_str,),
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    finally:
+        conn.close()
