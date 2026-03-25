@@ -63,14 +63,19 @@ CREATE TABLE Usuario (
     c_publica TEXT,
     c_privada TEXT,
     estado_conexion BOOLEAN,
+    sensores_asignados TEXT,
+    supervisores TEXT,
+    subordinados TEXT,
     FOREIGN KEY (id_rol) REFERENCES Rol(id_rol)
 );
 
 CREATE TABLE Ticket (
     id_ticket INT AUTO_INCREMENT PRIMARY KEY,
     id_rol INT,
-    descripcion VARCHAR(255) ,
-    estado BOOLEAN,
+    usuario VARCHAR(50),
+    tipo VARCHAR(50),
+    descripcion VARCHAR(255),
+    estado VARCHAR(20) DEFAULT 'PENDING',
     fecha DATETIME,
     FOREIGN KEY (id_rol) REFERENCES Rol(id_rol)
 );
@@ -78,6 +83,7 @@ CREATE TABLE Ticket (
 CREATE TABLE Dato (
     id_dato INT AUTO_INCREMENT PRIMARY KEY,
     id_tipo INT NOT NULL,
+    sensor_codigo VARCHAR(50),
     descripcion VARCHAR(255),
     estado BOOLEAN,
     timestamp DATETIME,
@@ -137,6 +143,8 @@ CREATE TABLE Temperatura (
 CREATE TABLE Iluminacion (
     id_iluminacion INT AUTO_INCREMENT PRIMARY KEY,
     id_dato INT NOT NULL UNIQUE,
+    is_on BOOLEAN,
+    valor FLOAT,
     FOREIGN KEY (id_dato) REFERENCES Dato(id_dato) ON DELETE CASCADE
 );
 
@@ -151,7 +159,7 @@ CREATE TABLE Puerta (
 CREATE TABLE Calidad_Aire (
     id_calidad_aire INT AUTO_INCREMENT PRIMARY KEY,
     id_dato INT NOT NULL UNIQUE,
-    nivel_co2 VARCHAR(50),
+    nivel_co2 FLOAT,
     FOREIGN KEY (id_dato) REFERENCES Dato(id_dato) ON DELETE CASCADE
 );
 
@@ -162,3 +170,12 @@ CREATE TABLE Viento (
     velocidad FLOAT,
     FOREIGN KEY (id_dato) REFERENCES Dato(id_dato) ON DELETE CASCADE
 );
+
+-- Datos iniciales para la tabla Tipo
+INSERT INTO Tipo (descripcion) VALUES
+    ('Temperatura'),
+    ('Humedad'),
+    ('Viento'),
+    ('Calidad_Aire'),
+    ('Iluminacion'),
+    ('Puerta');

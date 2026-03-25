@@ -1,55 +1,78 @@
-import json
-from pathlib import Path
-from typing import List, Dict, Any
+import mysql.connector
 from datetime import datetime
+from typing import List, Dict, Any
+
 from ArtemusPark.model.Smoke_Model import SmokeModel
+from ArtemusPark.bbdd.db_connection import get_connection, get_tipo_id
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "json" / "smoke"
-
-
-def _serialize(measurement: SmokeModel) -> Dict[str, Any]:
-    """Convierte el modelo a un diccionario serializable."""
-    return {
-        "sensor_id": measurement.sensor_id,
-        "timestamp": measurement.timestamp,
-        "value": measurement.value,
-        "status": measurement.status,
-    }
+TIPO_NOMBRE = "Calidad_Aire"
 
 
 def save_smoke_measurement(measurement: SmokeModel) -> None:
-    """Guarda un registro en un archivo JSON diario."""
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-    today = datetime.now().strftime("%Y-%m-%d")
-    file_path = DATA_DIR / f"smoke_{today }.json"
-
-    if file_path.exists():
-        try:
-            data = json.loads(file_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            data = []
-    else:
-        data = []
-
-    data.append(_serialize(measurement))
-    file_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    tipo_id = get_tipo_id(TIPO_NOMBRE)
+    ts = datetime.fromtimestamp(measurement.timestamp)
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO Dato (id_tipo, sensor_codigo, descripcion, timestamp) VALUES (%s, %s, %s, %s)",
+            (tipo_id, measurement.sensor_id, measurement.status, ts),
+        )
+        id_dato = cursor.lastrowid
+        cursor.execute(
+            "INSERT INTO Calidad_Aire (id_dato, nivel_co2) VALUES (%s, %s)",
+            (id_dato, measurement.value),
+        )
+        conn.commit()
+        cursor.close()
+    except mysql.connector.Error:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def load_all_smoke_measurements() -> List[Dict[str, Any]]:
-    """Carga todos los registros de los archivos JSON diarios."""
-    if not DATA_DIR.exists():
-        return []
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT d.sensor_codigo AS sensor_id,
+                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
+                   ca.nivel_co2 AS value,
+                   d.descripcion AS status
+            FROM Calidad_Aire ca
+            JOIN Dato d ON ca.id_dato = d.id_dato
+            ORDER BY d.timestamp ASC
+            """
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    finally:
+        conn.close()
 
-    all_data = []
-    for file_path in sorted(DATA_DIR.glob("smoke_*.json")):
-        try:
-            file_content = file_path.read_text(encoding="utf-8")
-            data = json.loads(file_content)
-            if isinstance(data, list):
-                all_data.extend(data)
-        except json.JSONDecodeError:
-            continue
 
-    return all_data
+def load_smoke_measurements_by_date(date_str: str) -> List[Dict[str, Any]]:
+    conn = get_connection()
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT d.sensor_codigo AS sensor_id,
+                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
+                   ca.nivel_co2 AS value,
+                   d.descripcion AS status
+            FROM Calidad_Aire ca
+            JOIN Dato d ON ca.id_dato = d.id_dato
+            WHERE DATE(d.timestamp) = %s
+            ORDER BY d.timestamp ASC
+            """,
+            (date_str,),
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        return rows
+    finally:
+        conn.close()

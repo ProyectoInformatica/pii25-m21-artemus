@@ -64,61 +64,79 @@ def inicializar_pool():
 # =====================================================================
 def procesar_peticion_usuario(id_usuario, pool, conexion_cliente):
     """
-    Gestiona la petición. Los reintentos son para la BBDD.
-    La conexión de red se cierra solo al finalizar todos los intentos.
+    Gestiona la peticion de un usuario real.
+    Conecta a la BBDD, realiza operaciones SQL y cierra la red al terminar.
     """
     nombre_hilo = threading.current_thread().name
-    registrar_auditoria(f"INFO: {nombre_hilo} atendiendo a Usuario {id_usuario}.")
+    registrar_auditoria(f"INFO: {nombre_hilo} atendiendo a Usuario {id_usuario} (RED REAL).")
 
+    # Variables de estado para control estructurado
     max_reintentos = 3
     intento = 0
-    conectado = False
+    conectado_bbdd = False
     error_critico = False
 
-    while intento < max_reintentos and conectado == False and error_critico == False:
+    # Bucle de reintentos para la base de datos
+    while intento < max_reintentos and conectado_bbdd == False and error_critico == False:
         conexion = None
         try:
-            print(
-                f" {nombre_hilo} (Usuario {id_usuario}): Intento BBDD {intento + 1}..."
-            )
+            # 1. Pedir conexion al Pool
+            print(f" Intentando conectar a MariaDB (Intento {intento + 1})...")
             conexion = pool.get_connection()
 
             if conexion.is_connected():
-                mensaje_exito = f"ÉXITO: {nombre_hilo} conectó al Usuario {id_usuario}."
-                print(f" {mensaje_exito}")
-                registrar_auditoria(mensaje_exito)
+                registrar_auditoria(f"EXITO: {nombre_hilo} obtuvo conexion del pool para ID {id_usuario}.")
 
-                # --- AQUÍ IRÍA EL TRABAJO REAL ---
-                time.sleep(2)
-                # ---------------------------------
+                # =========================================================
+                # TRABAJO REAL: OPERACIONES SQL
+                # =========================================================
+                cursor = conexion.cursor(dictionary=True)
 
-                conectado = True
+                # Consultamos si el usuario existe en Artemus Park
+                sql_check = "SELECT nombre_usuario, id_rol FROM Usuario WHERE usuario = %s"
+                cursor.execute(sql_check, (id_usuario,))
+                usuario = cursor.fetchone()
+
+                if usuario:
+                    msg_log = f"ACCESO: {usuario['nombre_usuario']} (Rol {usuario['id_rol']}) ha entrado."
+                    print(f" {msg_log}")
+                    registrar_auditoria(f"BBDD: {msg_log}")
+                else:
+                    registrar_auditoria(f"ALERTA: Usuario {id_usuario} no encontrado en la BBDD.")
+
+                cursor.close()
+                # Marcamos exito para salir del bucle de reintentos
+                conectado_bbdd = True
+                # =========================================================
 
         except mysql.connector.Error as e:
-            registrar_auditoria(f"ALERTA: Error BBDD en {nombre_hilo}: {e}")
-            if intento < max_reintentos - 1:
-                time.sleep(3)  # Espera antes de reintentar
+            msg_err = f"ALERTA: Error de MariaDB en {nombre_hilo}: {e}"
+            print(f" {msg_err}")
+            registrar_auditoria(msg_err)
+            # Si falla, esperamos un poco antes del siguiente intento
+            time.sleep(2)
 
         except Exception as e:
-            registrar_auditoria(f"ERROR CRÍTICO: {nombre_hilo} falló: {e}")
+            msg_crit = f"ERROR CRITICO en {nombre_hilo}: {e}"
+            print(f" {msg_crit}")
+            registrar_auditoria(msg_crit)
             error_critico = True
 
         finally:
-            # Cerramos la conexión a la BBDD en cada intento para no dejar hilos muertos
+            # Liberamos la conexion de la BBDD al pool en cada intento
             if conexion and conexion.is_connected():
                 conexion.close()
+                registrar_auditoria(f"POOL: {nombre_hilo} devolvio conexion al pool.")
 
         intento += 1
 
+    # --- CIERRE DE COMUNICACION ---
+    # Una vez terminados los intentos, cerramos la conexion de red con el cliente
     try:
         conexion_cliente.close()
-        mensaje_final = f"CIERRE: {nombre_hilo} liberó la red del Usuario {id_usuario}."
-        print(f" {mensaje_final}")
-        registrar_auditoria(mensaje_final)
+        registrar_auditoria(f"FIN: Conexion de red cerrada para Usuario {id_usuario}.")
     except Exception as e:
-        registrar_auditoria(
-            f"ERROR: No se pudo cerrar el socket del usuario {id_usuario}: {e}"
-        )
+        registrar_auditoria(f"ERROR: Fallo al cerrar socket del Usuario {id_usuario}: {e}")
 
 
 # =====================================================================
