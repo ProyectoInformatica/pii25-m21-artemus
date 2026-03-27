@@ -144,7 +144,10 @@ async def main(page: ft.Page):
         """Periodically generates random sensor data."""
         while True:
             now = time.time()
-            generate_sensor_snapshot(now, all_users)
+            try:
+                generate_sensor_snapshot(now, all_users)
+            except Exception as e:
+                print(f"Error in sensor simulation: {e}")
 
             try:
                 page.pubsub.send_all("refresh_dashboard")
@@ -226,8 +229,10 @@ async def main(page: ft.Page):
 
     def login_success(username, role):
         """Handles successful login and configures the main interface."""
+        permissions = auth_repo.get_user_permissions(username)
         session["role"] = role
         session["username"] = username
+        session["permissions"] = permissions
         page.clean()
 
         sidebar = Sidebar(
@@ -235,6 +240,7 @@ async def main(page: ft.Page):
             on_logout=logout,
             user_role=role,
             username=username,
+            permissions=permissions,
         )
 
         page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
@@ -247,6 +253,22 @@ async def main(page: ft.Page):
         sidebar.set_active(target_view)
         change_view(target_view)
 
+    from ArtemusPark.service.Dashboard_Service import DashboardService
+    service = DashboardService()
+
+    def on_message(message):
+        if message == "catastrophe_mode":
+            page.bgcolor = ft.Colors.RED_900
+            page.update()
+        elif message == "normal_mode":
+            page.bgcolor = "#e5e7eb"
+            page.update()
+
+    page.pubsub.subscribe(on_message)
+
+    if service.is_catastrophe_mode():
+        page.bgcolor = ft.Colors.RED_900
+
     page.add(LoginPage(on_login_success=login_success))
 
 
@@ -254,7 +276,3 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
     ft.app(target=main, assets_dir="assets")
 
-
-if __name__ == "__main__":
-    multiprocessing.freeze_support()
-    ft.app(target=main, assets_dir="assets")

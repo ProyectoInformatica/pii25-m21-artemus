@@ -1,19 +1,21 @@
 import flet as ft
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
+from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class Sidebar(ft.Container):
 
-    def __init__(self, on_nav_change, on_logout, user_role="user", username=""):
+    def __init__(self, on_nav_change, on_logout, user_role="user", username="", permissions=None):
         super().__init__()
         self.on_nav_change = on_nav_change
         self.on_logout = on_logout
         self.user_role = user_role
         self.username = username
+        self.permissions = permissions or []
         self.badge_controls = {}
         self.has_pending_requests = False
-        if self.user_role == "admin":
+        if "MANAGE_REQUESTS" in self.permissions or self.user_role == "admin":
             self.has_pending_requests = self._check_pending_requests()
 
         self.width = 260
@@ -24,12 +26,20 @@ class Sidebar(ft.Container):
         self.content = self.content_column
 
     def did_mount(self):
-        if self.user_role == "admin":
-            self.page.pubsub.subscribe(self._on_message)
+        self.page.pubsub.subscribe(self._on_message)
+        if DashboardService().is_catastrophe_mode():
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
 
     def _on_message(self, message):
         if isinstance(message, dict) and message.get("topic") == "requests_updated":
             self._refresh_pending_requests()
+        elif message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_DARK
+            self.update()
 
     def _build_content(self):
         """Construye el contenido vertical de la barra lateral."""
@@ -46,23 +56,23 @@ class Sidebar(ft.Container):
             self._make_button("Dashboard", "📊", "dashboard", active=True),
         ]
 
-        if self.user_role in ["admin", "maintenance"]:
+        if "VIEW_HISTORY" in self.permissions or self.user_role == "admin":
             controls_list.append(self._make_button("Historial", "🧾", "history"))
 
-        if self.user_role in ["admin", "maintenance"]:
+        if "VIEW_REQUESTS" in self.permissions or self.user_role == "admin":
             controls_list.append(
                 self._make_button(
                     "Solicitudes",
                     "📩",
                     "requests",
-                    show_badge=self.user_role == "admin" and self.has_pending_requests,
+                    show_badge=("MANAGE_REQUESTS" in self.permissions or self.user_role == "admin") and self.has_pending_requests,
                 )
             )
 
-        if self.user_role in ["admin", "maintenance"]:
+        if "VIEW_MAINTENANCE" in self.permissions or self.user_role == "admin":
             controls_list.append(self._make_button("Mantenimiento", "🛠", "maintenance"))
 
-        if self.user_role == "admin":
+        if "ACCESS_ADMIN_PANEL" in self.permissions or self.user_role == "admin":
             controls_list.append(self._make_button("Administración", "⚙️", "admin"))
 
         controls_list.append(ft.Container(expand=True))

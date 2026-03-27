@@ -108,6 +108,8 @@ class HistoryPage(ft.Container):
         self._is_mounted = True
         self.page.pubsub.subscribe(self._on_message)
         self.load_data()
+        if self.service.is_catastrophe_mode():
+            self.bgcolor = ft.Colors.RED_900
 
     def will_unmount(self):
         """2. Se ejecuta al salir: Nos desconectamos."""
@@ -120,6 +122,12 @@ class HistoryPage(ft.Container):
 
         if message == "refresh_dashboard":
             self.load_data()
+        elif message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_MAIN
+            self.update()
 
     def _toggle_sort(self, e):
         self.sort_descending = not self.sort_descending

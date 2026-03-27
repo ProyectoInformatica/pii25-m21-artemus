@@ -206,13 +206,25 @@ class AdminPage(ft.Container):
     def did_mount(self):
         if self.page:
             self.page.overlay.append(self.file_picker)
+            self.page.pubsub.subscribe(self._on_message)
             self.page.update()
             
         self.simulation_running = True
         self._update_button_state()
         self._load_users()
 
+        if self.service.is_catastrophe_mode():
+            self.bgcolor = ft.Colors.RED_900
+
         threading.Thread(target=self._realtime_energy_loop, daemon=True).start()
+
+    def _on_message(self, message):
+        if message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_MAIN
+            self.update()
 
     def will_unmount(self):
         self.simulation_running = False
@@ -369,7 +381,11 @@ class AdminPage(ft.Container):
         )
         tf_dni = ft.TextField(label="DNI", value=user_data.get("dni", ""))
         tf_phone = ft.TextField(label="Teléfono", value=user_data.get("phone", ""))
-        tf_address = ft.TextField(label="Dirección", value=user_data.get("address", ""))
+        
+        # Desglose de dirección según tablas.sql
+        tf_street = ft.TextField(label="Calle / Dirección", value=user_data.get("address_street", ""))
+        tf_city = ft.TextField(label="Ciudad", value=user_data.get("address_city", ""))
+        tf_zip = ft.TextField(label="Código Postal", value=user_data.get("address_zip", ""))
 
         self.selected_image_bytes = None
         self.img_preview.visible = False
@@ -387,7 +403,11 @@ class AdminPage(ft.Container):
                 tf_full_name,
                 tf_dni,
                 tf_phone,
-                tf_address,
+                ft.Divider(),
+                ft.Text("Dirección Detallada:", weight="bold"),
+                tf_street,
+                tf_city,
+                tf_zip,
                 ft.Divider(),
                 ft.Text("Foto de Perfil:", weight="bold"),
                 ft.Row([
@@ -412,12 +432,14 @@ class AdminPage(ft.Container):
                 or not tf_full_name.value
                 or not tf_dni.value
                 or not tf_phone.value
-                or not tf_address.value
+                or not tf_street.value
+                or not tf_city.value
+                or not tf_zip.value
             ):
                 self.page.open(
                     ft.SnackBar(
                         content=ft.Text(
-                            "Todos los campos son obligatorios",
+                            "Todos los campos (incluida dirección completa) son obligatorios",
                             color=AppColors.TEXT_WHITE,
                         ),
                         bgcolor=ft.Colors.RED,
@@ -456,7 +478,9 @@ class AdminPage(ft.Container):
                 "full_name": tf_full_name.value,
                 "dni": tf_dni.value,
                 "phone": tf_phone.value,
-                "address": tf_address.value,
+                "address_street": tf_street.value,
+                "address_city": tf_city.value,
+                "address_zip": tf_zip.value,
                 "is_edit": is_edit,
                 "original_username": username,
             }
@@ -672,7 +696,9 @@ class AdminPage(ft.Container):
                     "full_name": payload["full_name"],
                     "dni": payload["dni"],
                     "phone": payload["phone"],
-                    "address": payload["address"],
+                    "address_street": payload["address_street"],
+                    "address_city": payload["address_city"],
+                    "address_zip": payload["address_zip"],
                 }
                 if self.selected_image_bytes:
                     update_data["profile_picture"] = self.selected_image_bytes
@@ -686,7 +712,9 @@ class AdminPage(ft.Container):
                     full_name=payload["full_name"],
                     dni=payload["dni"],
                     phone=payload["phone"],
-                    address=payload["address"],
+                    address_street=payload["address_street"],
+                    address_city=payload["address_city"],
+                    address_zip=payload["address_zip"]
                 )
                 
                 update_data = {"assigned_sensors": assigned_sensors}
@@ -825,33 +853,85 @@ class AdminPage(ft.Container):
             if profile_pic:
                 avatar_src_base64 = base64.b64encode(profile_pic).decode("utf-8")
 
+        self.admin_avatar = ft.CircleAvatar(
+            foreground_image_src=avatar_src if not avatar_src_base64 else None,
+            content=ft.Image(
+                src_base64=avatar_src_base64,
+                border_radius=30,
+                fit=ft.ImageFit.COVER,
+            )
+            if avatar_src_base64
+            else None,
+            radius=30,
+        )
+
         return self._build_section_container(
             "Perfil de Administrador",
             ft.Row(
-                [
-                    ft.CircleAvatar(
-                        foreground_image_src=avatar_src if not avatar_src_base64 else None,
-                        src_base64=avatar_src_base64,
-                        radius=30,
-                    ),
-                    ft.Column(
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                controls=[
+                    ft.Row(
                         [
-                            ft.Text(
-                                admin_full_name,
-                                weight="bold",
-                                size=16,
-                                color=ft.Colors.BLACK,
-                            ),
-                            ft.Text(
-                                admin_email,
-                                color=ft.Colors.GREY_700,
-                                size=12,
+                            self.admin_avatar,
+                            ft.Column(
+                                [
+                                    ft.Text(
+                                        admin_full_name,
+                                        weight="bold",
+                                        size=16,
+                                        color=ft.Colors.BLACK,
+                                    ),
+                                    ft.Text(
+                                        admin_email,
+                                        color=ft.Colors.GREY_700,
+                                        size=12,
+                                    ),
+                                ]
                             ),
                         ]
                     ),
+                    ft.ElevatedButton(
+                        "Cambiar Foto",
+                        icon=ft.Icons.UPLOAD,
+                        on_click=lambda _: self._pick_own_profile_pic(),
+                        style=ft.ButtonStyle(
+                            color=ft.Colors.BLUE,
+                            bgcolor=ft.Colors.BLUE_50,
+                        )
+                    )
                 ]
             ),
         )
+
+    def _pick_own_profile_pic(self):
+        self.file_picker.on_result = self._on_own_profile_pic_result
+        self.file_picker.pick_files(allow_multiple=False, file_type=ft.FilePickerFileType.IMAGE)
+
+    def _on_own_profile_pic_result(self, e: ft.FilePickerResultEvent):
+        # Reset file picker event handler to default after use
+        self.file_picker.on_result = self._on_file_result
+        
+        if e.files:
+            file_path = e.files[0].path
+            with open(file_path, "rb") as f:
+                img_bytes = f.read()
+            
+            try:
+                self.auth_repo.update_user(self.current_username, profile_picture=img_bytes)
+                
+                # Refresh UI
+                new_b64 = base64.b64encode(img_bytes).decode("utf-8")
+                self.admin_avatar.content = ft.Image(
+                    src_base64=new_b64,
+                    border_radius=30,
+                    fit=ft.ImageFit.COVER
+                )
+                self.admin_avatar.foreground_image_src = None
+                self.admin_avatar.update()
+                
+                self.page.open(ft.SnackBar(ft.Text("Foto de perfil actualizada"), bgcolor=ft.Colors.GREEN))
+            except Exception as ex:
+                self.page.open(ft.SnackBar(ft.Text(f"Error al guardar foto: {ex}"), bgcolor=ft.Colors.RED))
 
     def _calculate_sensor_load(self) -> dict:
         base_load = 50.0

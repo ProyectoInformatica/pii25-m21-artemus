@@ -108,6 +108,8 @@ class MaintenancePage(ft.Container):
         self._is_mounted = True
         self.page.pubsub.subscribe(self._on_message)
         self.update_data()
+        if self.service.is_catastrophe_mode():
+            self.bgcolor = ft.Colors.RED_900
 
     def will_unmount(self):
         """Limpia suscripciones."""
@@ -119,6 +121,12 @@ class MaintenancePage(ft.Container):
 
         if message == "refresh_dashboard":
             self.update_data()
+        elif message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_MAIN
+            self.update()
 
     def _open_request_dialog(self, e):
         self.tf_request_msg = ft.TextField(

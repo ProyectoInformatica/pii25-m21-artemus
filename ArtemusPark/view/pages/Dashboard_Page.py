@@ -236,8 +236,8 @@ class DashboardPage(ft.Container):
 
         if self.card_alerts:
             self.card_alerts.show_alert(
-                "PROTOCOLO DE EMERGENCIA",
-                "¡EVACUACIÓN! Siga las luces de emergencia.",
+                "ALERTA CATÁSTROFE",
+                "¡SISTEMA EN ESTADO CRÍTICO! Siga los protocolos de seguridad.",
                 is_critical=True,
             )
         self.update()

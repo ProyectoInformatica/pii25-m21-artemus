@@ -5,6 +5,24 @@ from ArtemusPark.bbdd.db_connection import get_connection
 class AuthRepository:
     """Repository to handle user authentication using MySQL SHA2 function."""
 
+    def get_user_permissions(self, username):
+        """Returns a list of permission descriptions for the user."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(buffered=True)
+            query = """
+                SELECT p.description FROM Permission p
+                JOIN Role_Permission rp ON p.id_permission = rp.id_permission
+                JOIN User u ON u.id_role = rp.id_role
+                WHERE u.username = %s AND u.active = TRUE
+            """
+            cursor.execute(query, (username,))
+            perms = [row[0] for row in cursor.fetchall()]
+            cursor.close()
+            return perms
+        finally:
+            conn.close()
+
     def authenticate(self, username, password):
         """Verifies credentials using MySQL's SHA2(password, 256) function."""
         conn = get_connection()
@@ -60,8 +78,6 @@ class AuthRepository:
                 )
                 subordinates = [s[0] for s in sub_cursor.fetchall()]
                 sub_cursor.close()
-
-                full_address = f"{row['address_street']}, {row['address_city']} ({row['address_zip']})"
                 
                 result[username] = {
                     "password": row["password_hash"],
@@ -69,7 +85,9 @@ class AuthRepository:
                     "full_name": row["full_name"],
                     "dni": dni,
                     "phone": row["phone"] or "",
-                    "address": full_address.strip(", "),
+                    "address_street": row["address_street"] or "",
+                    "address_city": row["address_city"] or "",
+                    "address_zip": row["address_zip"] or "",
                     "assigned_sensors": sensors,
                     "supervisors": supervisors,
                     "subordinates": subordinates,
@@ -121,17 +139,15 @@ class AuthRepository:
             subordinates = [s[0] for s in sub_cursor.fetchall()]
             sub_cursor.close()
 
-            full_address = (
-                f"{row['address_street']}, {row['address_city']} ({row['address_zip']})"
-            )
-
             result = {
                 "password": row["password_hash"],
                 "role": row["role"],
                 "full_name": row["full_name"],
                 "dni": dni,
                 "phone": row["phone"] or "",
-                "address": full_address.strip(", "),
+                "address_street": row["address_street"] or "",
+                "address_city": row["address_city"] or "",
+                "address_zip": row["address_zip"] or "",
                 "assigned_sensors": sensors,
                 "supervisors": supervisors,
                 "subordinates": subordinates,
@@ -141,7 +157,8 @@ class AuthRepository:
         finally:
             conn.close()
 
-    def add_user(self, username, password, role, full_name="", dni="", phone="", address=""):
+    def add_user(self, username, password, role, full_name="", dni="", phone="", 
+                 address_street="", address_city="", address_zip=""):
         """Inserts a user and hashes the password directly in MySQL."""
         conn = get_connection()
         try:
@@ -152,10 +169,6 @@ class AuthRepository:
                 raise ValueError(f"Role '{role}' does not exist.")
             
             id_role = row[0]
-            parts = address.split(",")
-            street = parts[0].strip() if len(parts) > 0 else address
-            city = parts[1].strip() if len(parts) > 1 else ""
-            zip_code = parts[2].strip() if len(parts) > 2 else ""
 
             query = """
                 INSERT INTO User
@@ -163,7 +176,8 @@ class AuthRepository:
                      address_street, address_city, address_zip, active)
                 VALUES (%s, %s, %s, %s, SHA2(%s, 256), %s, %s, %s, %s, TRUE)
             """
-            cursor.execute(query, (dni, id_role, username, full_name, password, phone, street, city, zip_code))
+            cursor.execute(query, (dni, id_role, username, full_name, password, phone, 
+                                 address_street, address_city, address_zip))
             conn.commit()
             cursor.close()
         except mysql.connector.Error:
@@ -221,15 +235,21 @@ class AuthRepository:
                         (row[0], username),
                     )
 
-            # Update Address
-            if "address" in kwargs:
-                parts = kwargs["address"].split(",")
-                street = parts[0].strip() if len(parts) > 0 else kwargs["address"]
-                city = parts[1].strip() if len(parts) > 1 else ""
-                zip_code = parts[2].strip() if len(parts) > 2 else ""
+            # Update Address components
+            if "address_street" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET address_street=%s, address_city=%s, address_zip=%s WHERE username=%s",
-                    (street, city, zip_code, username),
+                    "UPDATE User SET address_street=%s WHERE username=%s",
+                    (kwargs["address_street"], username),
+                )
+            if "address_city" in kwargs:
+                cursor.execute(
+                    "UPDATE User SET address_city=%s WHERE username=%s",
+                    (kwargs["address_city"], username),
+                )
+            if "address_zip" in kwargs:
+                cursor.execute(
+                    "UPDATE User SET address_zip=%s WHERE username=%s",
+                    (kwargs["address_zip"], username),
                 )
             
             # Update Sensors
@@ -239,11 +259,58 @@ class AuthRepository:
                 if res:
                     dni = res[0]
                     cursor.execute("DELETE FROM User_Sensor WHERE dni=%s", (dni,))
-                    for s_id in kwargs["assigned_sensors"]:
-                        cursor.execute(
-                            "INSERT INTO User_Sensor (dni, id_sensor) VALUES (%s, %s)",
-                            (dni, s_id),
-                        )
+                    
+                    from ArtemusPark.bbdd.db_connection import get_sensor_id
+                    from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
+                    
+                    for s_id_name in kwargs["assigned_sensors"]:
+                        # Buscamos el tipo de sensor en SENSOR_CONFIG para obtener el ID real de la BD
+                        s_type = "Temperature" # Default
+                        for t, sensors in SENSOR_CONFIG.items():
+                            if any(s["id"] == s_id_name for s in sensors):
+                                s_type = t.capitalize()
+                                break
+                        
+                        db_id = get_sensor_id(s_id_name, s_type)
+                        if db_id:
+                            cursor.execute(
+                                "INSERT INTO User_Sensor (dni, id_sensor) VALUES (%s, %s)",
+                                (dni, db_id),
+                            )
+
+            # --- NUEVA LÓGICA: Update Hierarchy (Supervisors) ---
+            if "supervisors" in kwargs:
+                cursor.execute("SELECT dni FROM User WHERE username=%s", (username,))
+                res = cursor.fetchone()
+                if res:
+                    sub_dni = res[0]
+                    # Borramos sus supervisores actuales (él es el subordinado)
+                    cursor.execute("DELETE FROM User_Hierarchy WHERE subordinate_dni=%s", (sub_dni,))
+                    for sup_username in kwargs["supervisors"]:
+                        cursor.execute("SELECT dni FROM User WHERE username=%s", (sup_username,))
+                        sup_res = cursor.fetchone()
+                        if sup_res:
+                            cursor.execute(
+                                "INSERT INTO User_Hierarchy (superior_dni, subordinate_dni) VALUES (%s, %s)",
+                                (sup_res[0], sub_dni),
+                            )
+
+            # --- NUEVA LÓGICA: Update Hierarchy (Subordinates) ---
+            if "subordinates" in kwargs:
+                cursor.execute("SELECT dni FROM User WHERE username=%s", (username,))
+                res = cursor.fetchone()
+                if res:
+                    sup_dni = res[0]
+                    # Borramos sus subordinados actuales (él es el superior)
+                    cursor.execute("DELETE FROM User_Hierarchy WHERE superior_dni=%s", (sup_dni,))
+                    for sub_username in kwargs["subordinates"]:
+                        cursor.execute("SELECT dni FROM User WHERE username=%s", (sub_username,))
+                        sub_res = cursor.fetchone()
+                        if sub_res:
+                            cursor.execute(
+                                "INSERT INTO User_Hierarchy (superior_dni, subordinate_dni) VALUES (%s, %s)",
+                                (sup_dni, sub_res[0]),
+                            )
 
             conn.commit()
             cursor.close()
