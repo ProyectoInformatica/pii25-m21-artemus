@@ -207,7 +207,7 @@ class AdminPage(ft.Container):
         if self.page:
             self.page.overlay.append(self.file_picker)
             self.page.update()
-            
+
         self.simulation_running = True
         self._update_button_state()
         self._load_users()
@@ -222,9 +222,11 @@ class AdminPage(ft.Container):
             file_path = e.files[0].path
             with open(file_path, "rb") as f:
                 self.selected_image_bytes = f.read()
-            
+
             # Show preview
-            self.img_preview.src_base64 = base64.b64encode(self.selected_image_bytes).decode("utf-8")
+            self.img_preview.src_base64 = base64.b64encode(
+                self.selected_image_bytes
+            ).decode("utf-8")
             self.img_preview.visible = True
             self.img_preview.update()
 
@@ -373,12 +375,14 @@ class AdminPage(ft.Container):
 
         self.selected_image_bytes = None
         self.img_preview.visible = False
-        
+
         # Load existing image if editing
         if is_edit:
             existing_img = self.auth_repo.get_user_profile_picture(username)
             if existing_img:
-                self.img_preview.src_base64 = base64.b64encode(existing_img).decode("utf-8")
+                self.img_preview.src_base64 = base64.b64encode(existing_img).decode(
+                    "utf-8"
+                )
                 self.img_preview.visible = True
 
         profile_section = ft.Column(
@@ -390,17 +394,20 @@ class AdminPage(ft.Container):
                 tf_address,
                 ft.Divider(),
                 ft.Text("Foto de Perfil:", weight="bold"),
-                ft.Row([
-                    ft.ElevatedButton(
-                        "Seleccionar Imagen",
-                        icon=ft.Icons.IMAGE,
-                        on_click=lambda _: self.file_picker.pick_files(
-                            allow_multiple=False,
-                            file_type=ft.FilePickerFileType.IMAGE
-                        )
-                    ),
-                    self.img_preview
-                ], alignment=ft.MainAxisAlignment.START)
+                ft.Row(
+                    [
+                        ft.ElevatedButton(
+                            "Seleccionar Imagen",
+                            icon=ft.Icons.IMAGE,
+                            on_click=lambda _: self.file_picker.pick_files(
+                                allow_multiple=False,
+                                file_type=ft.FilePickerFileType.IMAGE,
+                            ),
+                        ),
+                        self.img_preview,
+                    ],
+                    alignment=ft.MainAxisAlignment.START,
+                ),
             ],
         )
 
@@ -688,11 +695,11 @@ class AdminPage(ft.Container):
                     phone=payload["phone"],
                     address=payload["address"],
                 )
-                
+
                 update_data = {"assigned_sensors": assigned_sensors}
                 if self.selected_image_bytes:
                     update_data["profile_picture"] = self.selected_image_bytes
-                    
+
                 self.auth_repo.update_user(username, **update_data)
 
             target_username = original_username if is_edit else username
@@ -812,14 +819,16 @@ class AdminPage(ft.Container):
     def _build_admin_profile_section(self):
         admin_full_name = "Super Admin"
         admin_email = "admin@artemus.park"
-        avatar_src = "https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+        avatar_src = (
+            "https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+        )
         avatar_src_base64 = None
 
         if self.current_username:
             user_data = self.auth_repo.get_user_by_username(self.current_username)
             admin_full_name = user_data.get("full_name", admin_full_name)
             admin_email = f"{self .current_username }@artemus.park"
-            
+
             # Load actual profile picture from DB
             profile_pic = self.auth_repo.get_user_profile_picture(self.current_username)
             if profile_pic:
@@ -830,7 +839,9 @@ class AdminPage(ft.Container):
             ft.Row(
                 [
                     ft.CircleAvatar(
-                        foreground_image_src=avatar_src if not avatar_src_base64 else None,
+                        foreground_image_src=(
+                            avatar_src if not avatar_src_base64 else None
+                        ),
                         src_base64=avatar_src_base64,
                         radius=30,
                     ),
