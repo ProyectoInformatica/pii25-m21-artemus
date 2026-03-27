@@ -11,7 +11,9 @@ class RequestsRepository:
         try:
             cursor = conn.cursor()
             # First, get the user's DNI from the username (case-insensitive)
-            cursor.execute("SELECT dni FROM User WHERE LOWER(username) = LOWER(%s)", (username,))
+            cursor.execute(
+                "SELECT dni FROM User WHERE LOWER(username) = LOWER(%s)", (username,)
+            )
             res = cursor.fetchone()
             if not res:
                 raise ValueError(f"User '{username}' does not exist.")

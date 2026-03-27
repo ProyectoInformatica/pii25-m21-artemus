@@ -118,7 +118,7 @@ class Sidebar(ft.Container):
         mapping = {
             "admin": "Administrador",
             "maintenance": "Mantenimiento",
-            "user": "Usuario"
+            "user": "Usuario",
         }
         return mapping.get(self.user_role, self.user_role)
 
