@@ -161,26 +161,10 @@ class DashboardService:
         history = []
 
         sources = [
-            (
-                Temperature_Repository.load_temperature_measurements_by_date(date_str),
-                "Temperatura",
-                "value",
-            ),
-            (
-                Humidity_Repository.load_humidity_measurements_by_date(date_str),
-                "Humedad",
-                "value",
-            ),
-            (
-                Wind_Repository.load_wind_measurements_by_date(date_str),
-                "Viento",
-                "speed",
-            ),
-            (
-                Smoke_Repository.load_smoke_measurements_by_date(date_str),
-                "Calidad Aire",
-                "value",
-            ),
+            (Temperature_Repository.load_temperature_measurements_by_date(date_str), "Temperatura", "value"),
+            (Humidity_Repository.load_humidity_measurements_by_date(date_str), "Humedad", "value"),
+            (Wind_Repository.load_wind_measurements_by_date(date_str), "Viento", "speed"),
+            (Smoke_Repository.load_smoke_measurements_by_date(date_str), "Calidad Aire", "value"),
             (Door_Repository.load_door_events_by_date(date_str), "Puerta", "is_open"),
             (Light_Repository.load_light_events_by_date(date_str), "Luz", "value"),
         ]

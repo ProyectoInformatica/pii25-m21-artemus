@@ -3,25 +3,26 @@ from datetime import datetime
 from typing import List, Dict, Any
 
 from ArtemusPark.model.Light_Model import LightModel
-from ArtemusPark.bbdd.db_connection import get_connection, get_tipo_id
+from ArtemusPark.bbdd.db_connection import get_connection, get_sensor_id
 
-TIPO_NOMBRE = "Iluminacion"
+TIPO_NOMBRE = "Lighting"
 
 
 def save_light_event(event: LightModel) -> None:
-    tipo_id = get_tipo_id(TIPO_NOMBRE)
+    """Saves a lighting event to the database."""
+    sensor_id = get_sensor_id(event.sensor_id, TIPO_NOMBRE)
     ts = datetime.fromtimestamp(event.timestamp)
     conn = get_connection()
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO Dato (id_tipo, sensor_codigo, descripcion, timestamp) VALUES (%s, %s, %s, %s)",
-            (tipo_id, event.sensor_id, event.status, ts),
+            "INSERT INTO Measurement (id_sensor, description, timestamp) VALUES (%s, %s, %s)",
+            (sensor_id, event.status, ts),
         )
-        id_dato = cursor.lastrowid
+        id_measurement = cursor.lastrowid
         cursor.execute(
-            "INSERT INTO Iluminacion (id_dato, is_on, valor) VALUES (%s, %s, %s)",
-            (id_dato, event.is_on, event.value),
+            "INSERT INTO Lighting (id_measurement, is_on, value) VALUES (%s, %s, %s)",
+            (id_measurement, event.is_on, event.value),
         )
         conn.commit()
         cursor.close()
@@ -33,18 +34,20 @@ def save_light_event(event: LightModel) -> None:
 
 
 def load_all_light_events() -> List[Dict[str, Any]]:
+    """Loads all lighting events from the database."""
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT d.sensor_codigo AS sensor_id,
-                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
+            SELECT s.name AS sensor_id,
+                   UNIX_TIMESTAMP(m.timestamp) AS timestamp,
                    i.is_on AS is_on,
-                   i.valor AS value,
-                   d.descripcion AS status
-            FROM Iluminacion i
-            JOIN Dato d ON i.id_dato = d.id_dato
-            ORDER BY d.timestamp ASC
+                   i.value AS value,
+                   m.description AS status
+            FROM Lighting i
+            JOIN Measurement m ON i.id_measurement = m.id_measurement
+            JOIN Sensor s ON m.id_sensor = s.id_sensor
+            ORDER BY m.timestamp ASC
             """)
         rows = cursor.fetchall()
         cursor.close()
@@ -54,20 +57,22 @@ def load_all_light_events() -> List[Dict[str, Any]]:
 
 
 def load_light_events_by_date(date_str: str) -> List[Dict[str, Any]]:
+    """Loads lighting events for a specific date."""
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
             """
-            SELECT d.sensor_codigo AS sensor_id,
-                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
+            SELECT s.name AS sensor_id,
+                   UNIX_TIMESTAMP(m.timestamp) AS timestamp,
                    i.is_on AS is_on,
-                   i.valor AS value,
-                   d.descripcion AS status
-            FROM Iluminacion i
-            JOIN Dato d ON i.id_dato = d.id_dato
-            WHERE DATE(d.timestamp) = %s
-            ORDER BY d.timestamp ASC
+                   i.value AS value,
+                   m.description AS status
+            FROM Lighting i
+            JOIN Measurement m ON i.id_measurement = m.id_measurement
+            JOIN Sensor s ON m.id_sensor = s.id_sensor
+            WHERE DATE(m.timestamp) = %s
+            ORDER BY m.timestamp ASC
             """,
             (date_str,),
         )

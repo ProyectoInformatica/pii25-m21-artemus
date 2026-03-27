@@ -3,18 +3,26 @@ from ArtemusPark.bbdd.db_connection import get_connection
 
 
 class RequestsRepository:
-    """Repositorio para gestionar tickets de mantenimiento con persistencia en MariaDB."""
+    """Repository to manage maintenance tickets in the database."""
 
-    def create_request(self, username, message, request_type="sensor_change"):
+    def create_request(self, username, message, request_type="MAINTENANCE"):
+        """Creates a new maintenance ticket."""
         conn = get_connection()
         try:
             cursor = conn.cursor()
+            # First, get the user's DNI from the username (case-insensitive)
+            cursor.execute("SELECT dni FROM User WHERE LOWER(username) = LOWER(%s)", (username,))
+            res = cursor.fetchone()
+            if not res:
+                raise ValueError(f"User '{username}' does not exist.")
+            user_dni = res[0]
+
             cursor.execute(
                 """
-                INSERT INTO Ticket (usuario, tipo, descripcion, estado, fecha)
-                VALUES (%s, %s, %s, 'PENDING', NOW())
+                INSERT INTO Ticket (user_dni, type, description, status)
+                VALUES (%s, %s, %s, 'PENDING')
                 """,
-                (username, request_type, message),
+                (user_dni, request_type, message),
             )
             conn.commit()
             cursor.close()
@@ -25,15 +33,17 @@ class RequestsRepository:
             conn.close()
 
     def get_all_requests(self):
+        """Returns all maintenance tickets."""
         conn = get_connection()
         try:
             cursor = conn.cursor(dictionary=True)
             cursor.execute("""
-                SELECT id_ticket AS id, usuario AS user, tipo AS type,
-                       descripcion AS message, estado AS status,
-                       UNIX_TIMESTAMP(fecha) AS timestamp
-                FROM Ticket
-                ORDER BY fecha DESC
+                SELECT t.id_ticket AS id, u.username AS user, t.type,
+                       t.description AS message, t.status,
+                       UNIX_TIMESTAMP(t.created_at) AS timestamp
+                FROM Ticket t
+                JOIN User u ON t.user_dni = u.dni
+                ORDER BY t.created_at DESC
                 """)
             rows = cursor.fetchall()
             cursor.close()
@@ -42,11 +52,12 @@ class RequestsRepository:
             conn.close()
 
     def update_request_status(self, request_id, new_status):
+        """Updates the status of a maintenance ticket."""
         conn = get_connection()
         try:
             cursor = conn.cursor()
             cursor.execute(
-                "UPDATE Ticket SET estado=%s WHERE id_ticket=%s",
+                "UPDATE Ticket SET status=%s WHERE id_ticket=%s",
                 (new_status, request_id),
             )
             conn.commit()

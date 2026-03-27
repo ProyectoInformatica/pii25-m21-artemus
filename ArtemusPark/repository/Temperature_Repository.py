@@ -3,25 +3,26 @@ from datetime import datetime
 from typing import List, Dict, Any
 
 from ArtemusPark.model.Temperature_Model import TemperatureModel
-from ArtemusPark.bbdd.db_connection import get_connection, get_tipo_id
+from ArtemusPark.bbdd.db_connection import get_connection, get_sensor_id
 
-TIPO_NOMBRE = "Temperatura"
+TIPO_NOMBRE = "Temperature"
 
 
 def save_temperature_measurement(measurement: TemperatureModel) -> None:
-    tipo_id = get_tipo_id(TIPO_NOMBRE)
+    """Saves a temperature measurement to the database."""
+    sensor_id = get_sensor_id(measurement.sensor_id, TIPO_NOMBRE)
     ts = datetime.fromtimestamp(measurement.timestamp)
     conn = get_connection()
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO Dato (id_tipo, sensor_codigo, descripcion, timestamp) VALUES (%s, %s, %s, %s)",
-            (tipo_id, measurement.sensor_id, measurement.status, ts),
+            "INSERT INTO Measurement (id_sensor, description, timestamp) VALUES (%s, %s, %s)",
+            (sensor_id, measurement.status, ts),
         )
-        id_dato = cursor.lastrowid
+        id_measurement = cursor.lastrowid
         cursor.execute(
-            "INSERT INTO Temperatura (id_dato, temperatura) VALUES (%s, %s)",
-            (id_dato, measurement.value),
+            "INSERT INTO Temperature (id_measurement, temperature) VALUES (%s, %s)",
+            (id_measurement, measurement.value),
         )
         conn.commit()
         cursor.close()
@@ -33,17 +34,19 @@ def save_temperature_measurement(measurement: TemperatureModel) -> None:
 
 
 def load_all_temperature_measurements() -> List[Dict[str, Any]]:
+    """Loads all temperature measurements from the database."""
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT d.sensor_codigo AS sensor_id,
-                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
-                   t.temperatura AS value,
-                   d.descripcion AS status
-            FROM Temperatura t
-            JOIN Dato d ON t.id_dato = d.id_dato
-            ORDER BY d.timestamp ASC
+            SELECT s.name AS sensor_id,
+                   UNIX_TIMESTAMP(m.timestamp) AS timestamp,
+                   t.temperature AS value,
+                   m.description AS status
+            FROM Temperature t
+            JOIN Measurement m ON t.id_measurement = m.id_measurement
+            JOIN Sensor s ON m.id_sensor = s.id_sensor
+            ORDER BY m.timestamp ASC
             """)
         rows = cursor.fetchall()
         cursor.close()
@@ -53,19 +56,21 @@ def load_all_temperature_measurements() -> List[Dict[str, Any]]:
 
 
 def load_temperature_measurements_by_date(date_str: str) -> List[Dict[str, Any]]:
+    """Loads temperature measurements for a specific date."""
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
             """
-            SELECT d.sensor_codigo AS sensor_id,
-                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
-                   t.temperatura AS value,
-                   d.descripcion AS status
-            FROM Temperatura t
-            JOIN Dato d ON t.id_dato = d.id_dato
-            WHERE DATE(d.timestamp) = %s
-            ORDER BY d.timestamp ASC
+            SELECT s.name AS sensor_id,
+                   UNIX_TIMESTAMP(m.timestamp) AS timestamp,
+                   t.temperature AS value,
+                   m.description AS status
+            FROM Temperature t
+            JOIN Measurement m ON t.id_measurement = m.id_measurement
+            JOIN Sensor s ON m.id_sensor = s.id_sensor
+            WHERE DATE(m.timestamp) = %s
+            ORDER BY m.timestamp ASC
             """,
             (date_str,),
         )

@@ -3,25 +3,26 @@ from datetime import datetime
 from typing import List, Dict, Any
 
 from ArtemusPark.model.Wind_Model import WindModel
-from ArtemusPark.bbdd.db_connection import get_connection, get_tipo_id
+from ArtemusPark.bbdd.db_connection import get_connection, get_sensor_id
 
-TIPO_NOMBRE = "Viento"
+TIPO_NOMBRE = "Wind"
 
 
 def save_wind_measurement(measurement: WindModel) -> None:
-    tipo_id = get_tipo_id(TIPO_NOMBRE)
+    """Saves a wind measurement to the database."""
+    sensor_id = get_sensor_id(measurement.sensor_id, TIPO_NOMBRE)
     ts = datetime.fromtimestamp(measurement.timestamp)
     conn = get_connection()
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO Dato (id_tipo, sensor_codigo, descripcion, timestamp) VALUES (%s, %s, %s, %s)",
-            (tipo_id, measurement.sensor_id, measurement.state, ts),
+            "INSERT INTO Measurement (id_sensor, description, timestamp) VALUES (%s, %s, %s)",
+            (sensor_id, measurement.state, ts),
         )
-        id_dato = cursor.lastrowid
+        id_measurement = cursor.lastrowid
         cursor.execute(
-            "INSERT INTO Viento (id_dato, velocidad) VALUES (%s, %s)",
-            (id_dato, measurement.speed),
+            "INSERT INTO Wind (id_measurement, direction, speed) VALUES (%s, %s, %s)",
+            (id_measurement, "N", measurement.speed),
         )
         conn.commit()
         cursor.close()
@@ -33,17 +34,20 @@ def save_wind_measurement(measurement: WindModel) -> None:
 
 
 def load_all_wind_measurements() -> List[Dict[str, Any]]:
+    """Loads all wind measurements from the database."""
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT d.sensor_codigo AS sensor_id,
-                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
-                   v.velocidad AS speed,
-                   d.descripcion AS state
-            FROM Viento v
-            JOIN Dato d ON v.id_dato = d.id_dato
-            ORDER BY d.timestamp ASC
+            SELECT s.name AS sensor_id,
+                   UNIX_TIMESTAMP(m.timestamp) AS timestamp,
+                   v.direction AS direction,
+                   v.speed AS speed,
+                   m.description AS state
+            FROM Wind v
+            JOIN Measurement m ON v.id_measurement = m.id_measurement
+            JOIN Sensor s ON m.id_sensor = s.id_sensor
+            ORDER BY m.timestamp ASC
             """)
         rows = cursor.fetchall()
         cursor.close()
@@ -53,19 +57,22 @@ def load_all_wind_measurements() -> List[Dict[str, Any]]:
 
 
 def load_wind_measurements_by_date(date_str: str) -> List[Dict[str, Any]]:
+    """Loads wind measurements for a specific date."""
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
             """
-            SELECT d.sensor_codigo AS sensor_id,
-                   UNIX_TIMESTAMP(d.timestamp) AS timestamp,
-                   v.velocidad AS speed,
-                   d.descripcion AS state
-            FROM Viento v
-            JOIN Dato d ON v.id_dato = d.id_dato
-            WHERE DATE(d.timestamp) = %s
-            ORDER BY d.timestamp ASC
+            SELECT s.name AS sensor_id,
+                   UNIX_TIMESTAMP(m.timestamp) AS timestamp,
+                   v.direction AS direction,
+                   v.speed AS speed,
+                   m.description AS state
+            FROM Wind v
+            JOIN Measurement m ON v.id_measurement = m.id_measurement
+            JOIN Sensor s ON m.id_sensor = s.id_sensor
+            WHERE DATE(m.timestamp) = %s
+            ORDER BY m.timestamp ASC
             """,
             (date_str,),
         )

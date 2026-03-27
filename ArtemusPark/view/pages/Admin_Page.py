@@ -1,6 +1,7 @@
 import flet as ft
 import time
 import threading
+import base64
 from datetime import datetime
 
 from flet.core.types import MainAxisAlignment
@@ -29,6 +30,17 @@ class AdminPage(ft.Container):
         self.req_repo = RequestsRepository()
         self.simulation_running = False
         self.current_username = current_username
+
+        self.file_picker = ft.FilePicker(on_result=self._on_file_result)
+        self.selected_image_bytes = None
+        self.img_preview = ft.Image(
+            src="",
+            width=100,
+            height=100,
+            fit=ft.ImageFit.COVER,
+            border_radius=50,
+            visible=False,
+        )
 
         if user_role != "admin":
             self.content = ft.Center(
@@ -173,13 +185,6 @@ class AdminPage(ft.Container):
             expand=1, spacing=20, controls=[emergency_section, energy_section]
         )
 
-        admin_full_name = "Super Admin"
-        admin_email = "admin@artemus.park"
-        if self.current_username:
-            user_data = self.auth_repo.get_all_users().get(self.current_username, {})
-            admin_full_name = user_data.get("full_name", admin_full_name)
-            admin_email = f"{self .current_username }@artemus.park"
-
         self.content = ft.ListView(
             spacing=20,
             controls=[
@@ -189,32 +194,7 @@ class AdminPage(ft.Container):
                     weight="bold",
                     color=ft.Colors.BLACK,
                 ),
-                self._build_section_container(
-                    "Perfil de Administrador",
-                    ft.Row(
-                        [
-                            ft.CircleAvatar(
-                                foreground_image_src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff",
-                                radius=30,
-                            ),
-                            ft.Column(
-                                [
-                                    ft.Text(
-                                        admin_full_name,
-                                        weight="bold",
-                                        size=16,
-                                        color=ft.Colors.BLACK,
-                                    ),
-                                    ft.Text(
-                                        admin_email,
-                                        color=ft.Colors.GREY_700,
-                                        size=12,
-                                    ),
-                                ]
-                            ),
-                        ]
-                    ),
-                ),
+                self._build_admin_profile_section(),
                 ft.Row(
                     controls=[user_mgmt_section, right_column],
                     spacing=20,
@@ -224,6 +204,10 @@ class AdminPage(ft.Container):
         )
 
     def did_mount(self):
+        if self.page:
+            self.page.overlay.append(self.file_picker)
+            self.page.update()
+            
         self.simulation_running = True
         self._update_button_state()
         self._load_users()
@@ -232,6 +216,17 @@ class AdminPage(ft.Container):
 
     def will_unmount(self):
         self.simulation_running = False
+
+    def _on_file_result(self, e: ft.FilePickerResultEvent):
+        if e.files:
+            file_path = e.files[0].path
+            with open(file_path, "rb") as f:
+                self.selected_image_bytes = f.read()
+            
+            # Show preview
+            self.img_preview.src_base64 = base64.b64encode(self.selected_image_bytes).decode("utf-8")
+            self.img_preview.visible = True
+            self.img_preview.update()
 
     def _load_users(self):
         users = self.auth_repo.get_all_users()
@@ -376,6 +371,16 @@ class AdminPage(ft.Container):
         tf_phone = ft.TextField(label="Teléfono", value=user_data.get("phone", ""))
         tf_address = ft.TextField(label="Dirección", value=user_data.get("address", ""))
 
+        self.selected_image_bytes = None
+        self.img_preview.visible = False
+        
+        # Load existing image if editing
+        if is_edit:
+            existing_img = self.auth_repo.get_user_profile_picture(username)
+            if existing_img:
+                self.img_preview.src_base64 = base64.b64encode(existing_img).decode("utf-8")
+                self.img_preview.visible = True
+
         profile_section = ft.Column(
             [
                 ft.Text("Datos Personales (Obligatorios):", weight="bold"),
@@ -384,6 +389,18 @@ class AdminPage(ft.Container):
                 tf_phone,
                 tf_address,
                 ft.Divider(),
+                ft.Text("Foto de Perfil:", weight="bold"),
+                ft.Row([
+                    ft.ElevatedButton(
+                        "Seleccionar Imagen",
+                        icon=ft.Icons.IMAGE,
+                        on_click=lambda _: self.file_picker.pick_files(
+                            allow_multiple=False,
+                            file_type=ft.FilePickerFileType.IMAGE
+                        )
+                    ),
+                    self.img_preview
+                ], alignment=ft.MainAxisAlignment.START)
             ],
         )
 
@@ -648,16 +665,19 @@ class AdminPage(ft.Container):
             if is_edit:
 
                 target_user = original_username if original_username else username
-                self.auth_repo.update_user(
-                    target_user,
-                    password=payload["password"],
-                    role=payload["role"],
-                    assigned_sensors=assigned_sensors,
-                    full_name=payload["full_name"],
-                    dni=payload["dni"],
-                    phone=payload["phone"],
-                    address=payload["address"],
-                )
+                update_data = {
+                    "password": payload["password"],
+                    "role": payload["role"],
+                    "assigned_sensors": assigned_sensors,
+                    "full_name": payload["full_name"],
+                    "dni": payload["dni"],
+                    "phone": payload["phone"],
+                    "address": payload["address"],
+                }
+                if self.selected_image_bytes:
+                    update_data["profile_picture"] = self.selected_image_bytes
+
+                self.auth_repo.update_user(target_user, **update_data)
             else:
                 self.auth_repo.add_user(
                     username,
@@ -668,7 +688,12 @@ class AdminPage(ft.Container):
                     phone=payload["phone"],
                     address=payload["address"],
                 )
-                self.auth_repo.update_user(username, assigned_sensors=assigned_sensors)
+                
+                update_data = {"assigned_sensors": assigned_sensors}
+                if self.selected_image_bytes:
+                    update_data["profile_picture"] = self.selected_image_bytes
+                    
+                self.auth_repo.update_user(username, **update_data)
 
             target_username = original_username if is_edit else username
             role = payload["role"]
@@ -783,6 +808,50 @@ class AdminPage(ft.Container):
             self.btn_catastrophe.bgcolor = ft.Colors.RED_700
             self.btn_catastrophe.icon = ft.Icons.WARNING_AMBER_ROUNDED
         self.btn_catastrophe.update()
+
+    def _build_admin_profile_section(self):
+        admin_full_name = "Super Admin"
+        admin_email = "admin@artemus.park"
+        avatar_src = "https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+        avatar_src_base64 = None
+
+        if self.current_username:
+            user_data = self.auth_repo.get_user_by_username(self.current_username)
+            admin_full_name = user_data.get("full_name", admin_full_name)
+            admin_email = f"{self .current_username }@artemus.park"
+            
+            # Load actual profile picture from DB
+            profile_pic = self.auth_repo.get_user_profile_picture(self.current_username)
+            if profile_pic:
+                avatar_src_base64 = base64.b64encode(profile_pic).decode("utf-8")
+
+        return self._build_section_container(
+            "Perfil de Administrador",
+            ft.Row(
+                [
+                    ft.CircleAvatar(
+                        foreground_image_src=avatar_src if not avatar_src_base64 else None,
+                        src_base64=avatar_src_base64,
+                        radius=30,
+                    ),
+                    ft.Column(
+                        [
+                            ft.Text(
+                                admin_full_name,
+                                weight="bold",
+                                size=16,
+                                color=ft.Colors.BLACK,
+                            ),
+                            ft.Text(
+                                admin_email,
+                                color=ft.Colors.GREY_700,
+                                size=12,
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+        )
 
     def _calculate_sensor_load(self) -> dict:
         base_load = 50.0

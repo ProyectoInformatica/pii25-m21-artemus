@@ -78,10 +78,15 @@ class Sidebar(ft.Container):
                             spacing=2,
                             controls=[
                                 ft.Text(
-                                    f"{self .username .upper ()} ({self .user_role .upper ()})",
+                                    f"{self.username.upper()}",
                                     size=12,
                                     weight=ft.FontWeight.BOLD,
                                     color="white",
+                                ),
+                                ft.Text(
+                                    self._get_role_display_name().upper(),
+                                    size=10,
+                                    color="#9ca3af",
                                 ),
                             ],
                         ),
@@ -97,6 +102,15 @@ class Sidebar(ft.Container):
         )
 
         return ft.Column(controls=controls_list)
+
+    def _get_role_display_name(self):
+        """Mapea el rol interno a un nombre amigable en español."""
+        mapping = {
+            "admin": "Administrador",
+            "maintenance": "Mantenimiento",
+            "user": "Usuario"
+        }
+        return mapping.get(self.user_role, self.user_role)
 
     def _make_button(self, text, icon, key, active=False, show_badge=False):
         """Crea un botón de navegación personalizado."""

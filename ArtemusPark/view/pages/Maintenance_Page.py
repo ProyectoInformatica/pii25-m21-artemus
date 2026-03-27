@@ -6,23 +6,25 @@ from ArtemusPark.repository.Requests_Repository import RequestsRepository
 
 
 class MaintenancePage(ft.Container):
-    def __init__(self, current_username=None):
+    def __init__(self, current_username=None, user_role=None):
         super().__init__()
         self.expand = True
         self.padding = 20
         self.bgcolor = AppColors.BG_MAIN
         self.service = DashboardService()
         self.current_username = current_username
+        self.current_role = user_role
         self.auth_repo = AuthRepository()
         self.req_repo = RequestsRepository()
         self._is_mounted = False
 
         self.assigned_sensors = []
-        self.current_role = None
         if self.current_username:
-            user_data = self.auth_repo.get_all_users().get(self.current_username, {})
+            user_data = self.auth_repo.get_user_by_username(self.current_username)
             self.assigned_sensors = user_data.get("assigned_sensors", [])
-            self.current_role = user_data.get("role")
+            # If current_role was not passed, use the one from database
+            if not self.current_role:
+                self.current_role = user_data.get("role")
 
         self.my_sensors_row = ft.Row(spacing=20, scroll=ft.ScrollMode.AUTO)
         self.my_sensors_container = ft.Column(
@@ -55,13 +57,14 @@ class MaintenancePage(ft.Container):
             controls=[],
         )
 
+        # Allow admins to also generate tickets if they are doing maintenance work
         self.btn_request_change = ft.ElevatedButton(
             "Solicitar Cambio de Sensores",
             icon=ft.Icons.EDIT_NOTE,
             bgcolor=ft.Colors.BLUE_GREY_100,
             color=ft.Colors.BLUE_GREY_900,
             on_click=self._open_request_dialog,
-            visible=bool(self.current_username) and self.current_role != "admin",
+            visible=bool(self.current_username),
         )
 
         self.content = ft.Column(
@@ -157,17 +160,27 @@ class MaintenancePage(ft.Container):
             self.tf_request_msg.update()
             return
 
-        self.req_repo.create_request(self.current_username, msg)
         try:
-            self.page.pubsub.send_all({"topic": "requests_updated"})
-        except Exception:
-            pass
-        self.page.close(self.dlg_request)
+            self.req_repo.create_request(self.current_username, msg)
+            try:
+                self.page.pubsub.send_all({"topic": "requests_updated"})
+            except Exception:
+                pass
+            self.page.close(self.dlg_request)
 
-        self.page.snack_bar = ft.SnackBar(
-            content=ft.Text("Solicitud enviada correctamente"), bgcolor="green"
-        )
-        self.page.snack_bar.open = True
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text("Solicitud enviada correctamente"), bgcolor="green"
+                )
+            )
+        except Exception as ex:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text(f"Error al enviar solicitud: {str(ex)}"),
+                    bgcolor="red",
+                )
+            )
+
         if self.page:
             self.page.update()
 

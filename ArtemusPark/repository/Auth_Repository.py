@@ -2,79 +2,168 @@ import json
 import mysql.connector
 from ArtemusPark.bbdd.db_connection import get_connection
 
-
 class AuthRepository:
-    """Repositorio para gestionar la autenticación de usuarios con persistencia en MariaDB."""
+    """Repository to handle user authentication using MySQL SHA2 function."""
 
     def authenticate(self, username, password):
-        """Verifica las credenciales y devuelve el rol si son correctas."""
+        """Verifies credentials using MySQL's SHA2(password, 256) function."""
         conn = get_connection()
         try:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                """
-                SELECT r.rol FROM Usuario u
-                JOIN Rol r ON u.id_rol = r.id_rol
-                WHERE u.usuario = %s AND u.contrasena_hash = %s
-                """,
-                (username, password),
-            )
+            cursor = conn.cursor(dictionary=True, buffered=True)
+            query = """
+                SELECT r.role FROM User u
+                JOIN Role r ON u.id_role = r.id_role
+                WHERE u.username = %s AND u.password_hash = SHA2(%s, 256) AND u.active = TRUE
+            """
+            cursor.execute(query, (username, password))
             row = cursor.fetchone()
             cursor.close()
-            return row["rol"] if row else None
+            return row["role"] if row else None
         finally:
             conn.close()
 
     def get_all_users(self):
-        """Retorna todos los usuarios en el mismo formato que antes."""
+        """Returns all users from English tables."""
         conn = get_connection()
         try:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("""
-                SELECT u.usuario, u.nombre_usuario, u.contrasena_hash, u.dni,
-                       u.telefono, u.direccion, u.sensores_asignados,
-                       u.supervisores, u.subordinados, r.rol
-                FROM Usuario u
-                JOIN Rol r ON u.id_rol = r.id_rol
-                """)
+            cursor = conn.cursor(dictionary=True, buffered=True)
+            cursor.execute(
+                """
+                SELECT u.username, u.full_name, u.password_hash, u.dni,
+                       u.phone, u.address_street, u.address_city, u.address_zip, r.role, u.active
+                FROM User u
+                JOIN Role r ON u.id_role = r.id_role
+                WHERE u.active = TRUE
+                """
+            )
             rows = cursor.fetchall()
-            cursor.close()
+            
             result = {}
             for row in rows:
-                result[row["usuario"]] = {
-                    "password": row["contrasena_hash"],
-                    "role": row["rol"],
-                    "full_name": row["nombre_usuario"],
-                    "dni": row["dni"],
-                    "phone": row["telefono"] or "",
-                    "address": row["direccion"] or "",
-                    "assigned_sensors": json.loads(row["sensores_asignados"] or "[]"),
-                    "supervisors": json.loads(row["supervisores"] or "[]"),
-                    "subordinates": json.loads(row["subordinados"] or "[]"),
+                username = row["username"]
+                dni = row["dni"]
+                
+                sub_cursor = conn.cursor(buffered=True)
+                
+                sub_cursor.execute("SELECT id_sensor FROM User_Sensor WHERE dni = %s", (dni,))
+                sensors = [s[0] for s in sub_cursor.fetchall()]
+
+                sub_cursor.execute(
+                    "SELECT u.username FROM User_Hierarchy h JOIN User u ON h.superior_dni = u.dni WHERE h.subordinate_dni = %s",
+                    (dni,)
+                )
+                supervisors = [s[0] for s in sub_cursor.fetchall()]
+
+                sub_cursor.execute(
+                    "SELECT u.username FROM User_Hierarchy h JOIN User u ON h.subordinate_dni = u.dni WHERE h.superior_dni = %s",
+                    (dni,)
+                )
+                subordinates = [s[0] for s in sub_cursor.fetchall()]
+                sub_cursor.close()
+
+                full_address = f"{row['address_street']}, {row['address_city']} ({row['address_zip']})"
+                
+                result[username] = {
+                    "password": row["password_hash"],
+                    "role": row["role"],
+                    "full_name": row["full_name"],
+                    "dni": dni,
+                    "phone": row["phone"] or "",
+                    "address": full_address.strip(", "),
+                    "assigned_sensors": sensors,
+                    "supervisors": supervisors,
+                    "subordinates": subordinates,
                 }
+            
+            cursor.close()
             return result
         finally:
             conn.close()
 
-    def add_user(
-        self, username, password, role, full_name="", dni="", phone="", address=""
-    ):
-        """Agrega un nuevo usuario."""
+    def get_user_by_username(self, username):
+        """Returns data for a single user by username."""
         conn = get_connection()
         try:
-            cursor = conn.cursor()
-            cursor.execute("SELECT id_rol FROM Rol WHERE rol = %s", (role,))
-            row = cursor.fetchone()
-            if not row:
-                raise ValueError(f"Rol '{role}' no existe.")
+            cursor = conn.cursor(dictionary=True, buffered=True)
             cursor.execute(
                 """
-                INSERT INTO Usuario
-                    (dni, id_rol, usuario, nombre_usuario, contrasena_hash, telefono, direccion)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                SELECT u.username, u.full_name, u.password_hash, u.dni,
+                       u.phone, u.address_street, u.address_city, u.address_zip, r.role, u.active
+                FROM User u
+                JOIN Role r ON u.id_role = r.id_role
+                WHERE u.username = %s AND u.active = TRUE
                 """,
-                (dni, row[0], username, full_name, password, phone, address),
+                (username,),
             )
+            row = cursor.fetchone()
+            if not row:
+                cursor.close()
+                return {}
+
+            dni = row["dni"]
+            sub_cursor = conn.cursor(buffered=True)
+
+            sub_cursor.execute(
+                "SELECT id_sensor FROM User_Sensor WHERE dni = %s", (dni,)
+            )
+            sensors = [s[0] for s in sub_cursor.fetchall()]
+
+            sub_cursor.execute(
+                "SELECT u.username FROM User_Hierarchy h JOIN User u ON h.superior_dni = u.dni WHERE h.subordinate_dni = %s",
+                (dni,),
+            )
+            supervisors = [s[0] for s in sub_cursor.fetchall()]
+
+            sub_cursor.execute(
+                "SELECT u.username FROM User_Hierarchy h JOIN User u ON h.subordinate_dni = u.dni WHERE h.superior_dni = %s",
+                (dni,),
+            )
+            subordinates = [s[0] for s in sub_cursor.fetchall()]
+            sub_cursor.close()
+
+            full_address = (
+                f"{row['address_street']}, {row['address_city']} ({row['address_zip']})"
+            )
+
+            result = {
+                "password": row["password_hash"],
+                "role": row["role"],
+                "full_name": row["full_name"],
+                "dni": dni,
+                "phone": row["phone"] or "",
+                "address": full_address.strip(", "),
+                "assigned_sensors": sensors,
+                "supervisors": supervisors,
+                "subordinates": subordinates,
+            }
+            cursor.close()
+            return result
+        finally:
+            conn.close()
+
+    def add_user(self, username, password, role, full_name="", dni="", phone="", address=""):
+        """Inserts a user and hashes the password directly in MySQL."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(buffered=True)
+            cursor.execute("SELECT id_role FROM Role WHERE role = %s", (role,))
+            row = cursor.fetchone()
+            if not row:
+                raise ValueError(f"Role '{role}' does not exist.")
+            
+            id_role = row[0]
+            parts = address.split(",")
+            street = parts[0].strip() if len(parts) > 0 else address
+            city = parts[1].strip() if len(parts) > 1 else ""
+            zip_code = parts[2].strip() if len(parts) > 2 else ""
+
+            query = """
+                INSERT INTO User
+                    (dni, id_role, username, full_name, password_hash, phone, 
+                     address_street, address_city, address_zip, active)
+                VALUES (%s, %s, %s, %s, SHA2(%s, 256), %s, %s, %s, %s, TRUE)
+            """
+            cursor.execute(query, (dni, id_role, username, full_name, password, phone, street, city, zip_code))
             conn.commit()
             cursor.close()
         except mysql.connector.Error:
@@ -83,83 +172,101 @@ class AuthRepository:
         finally:
             conn.close()
 
-    def update_user(
-        self,
-        username,
-        password=None,
-        role=None,
-        assigned_sensors=None,
-        full_name=None,
-        dni=None,
-        phone=None,
-        address=None,
-        supervisors=None,
-        subordinates=None,
-    ):
-        """Actualiza datos de un usuario existente."""
+    def update_user(self, username, **kwargs):
+        """Updates user data and hashes the password in MySQL if provided."""
         conn = get_connection()
         try:
-            cursor = conn.cursor()
-            if password:
+            cursor = conn.cursor(buffered=True)
+            
+            # Update password
+            if "password" in kwargs:
                 cursor.execute(
-                    "UPDATE Usuario SET contrasena_hash=%s WHERE usuario=%s",
-                    (password, username),
+                    "UPDATE User SET password_hash=SHA2(%s, 256) WHERE username=%s",
+                    (kwargs["password"], username),
                 )
-            if role:
-                cursor.execute("SELECT id_rol FROM Rol WHERE rol=%s", (role,))
+            
+            # Update basic info
+            if "full_name" in kwargs:
+                cursor.execute(
+                    "UPDATE User SET full_name=%s WHERE username=%s",
+                    (kwargs["full_name"], username),
+                )
+            
+            if "dni" in kwargs:
+                cursor.execute(
+                    "UPDATE User SET dni=%s WHERE username=%s",
+                    (kwargs["dni"], username),
+                )
+                
+            if "phone" in kwargs:
+                cursor.execute(
+                    "UPDATE User SET phone=%s WHERE username=%s",
+                    (kwargs["phone"], username),
+                )
+            
+            # Update Profile Picture (Binary Data)
+            if "profile_picture" in kwargs:
+                cursor.execute(
+                    "UPDATE User SET profile_picture=%s WHERE username=%s",
+                    (kwargs["profile_picture"], username),
+                )
+            
+            # Update Role
+            if "role" in kwargs:
+                cursor.execute("SELECT id_role FROM Role WHERE role = %s", (kwargs["role"],))
                 row = cursor.fetchone()
                 if row:
                     cursor.execute(
-                        "UPDATE Usuario SET id_rol=%s WHERE usuario=%s",
+                        "UPDATE User SET id_role=%s WHERE username=%s",
                         (row[0], username),
                     )
-            if full_name is not None:
+
+            # Update Address
+            if "address" in kwargs:
+                parts = kwargs["address"].split(",")
+                street = parts[0].strip() if len(parts) > 0 else kwargs["address"]
+                city = parts[1].strip() if len(parts) > 1 else ""
+                zip_code = parts[2].strip() if len(parts) > 2 else ""
                 cursor.execute(
-                    "UPDATE Usuario SET nombre_usuario=%s WHERE usuario=%s",
-                    (full_name, username),
+                    "UPDATE User SET address_street=%s, address_city=%s, address_zip=%s WHERE username=%s",
+                    (street, city, zip_code, username),
                 )
-            if dni is not None:
-                cursor.execute(
-                    "UPDATE Usuario SET dni=%s WHERE usuario=%s", (dni, username)
-                )
-            if phone is not None:
-                cursor.execute(
-                    "UPDATE Usuario SET telefono=%s WHERE usuario=%s", (phone, username)
-                )
-            if address is not None:
-                cursor.execute(
-                    "UPDATE Usuario SET direccion=%s WHERE usuario=%s",
-                    (address, username),
-                )
-            if assigned_sensors is not None:
-                cursor.execute(
-                    "UPDATE Usuario SET sensores_asignados=%s WHERE usuario=%s",
-                    (json.dumps(assigned_sensors), username),
-                )
-            if supervisors is not None:
-                cursor.execute(
-                    "UPDATE Usuario SET supervisores=%s WHERE usuario=%s",
-                    (json.dumps(supervisors), username),
-                )
-            if subordinates is not None:
-                cursor.execute(
-                    "UPDATE Usuario SET subordinados=%s WHERE usuario=%s",
-                    (json.dumps(subordinates), username),
-                )
+            
+            # Update Sensors
+            if "assigned_sensors" in kwargs:
+                cursor.execute("SELECT dni FROM User WHERE username=%s", (username,))
+                res = cursor.fetchone()
+                if res:
+                    dni = res[0]
+                    cursor.execute("DELETE FROM User_Sensor WHERE dni=%s", (dni,))
+                    for s_id in kwargs["assigned_sensors"]:
+                        cursor.execute(
+                            "INSERT INTO User_Sensor (dni, id_sensor) VALUES (%s, %s)",
+                            (dni, s_id),
+                        )
+
             conn.commit()
             cursor.close()
-        except mysql.connector.Error:
-            conn.rollback()
-            raise
+        finally:
+            conn.close()
+
+    def get_user_profile_picture(self, username):
+        """Returns the profile picture binary data for a user."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(buffered=True)
+            cursor.execute("SELECT profile_picture FROM User WHERE username = %s", (username,))
+            row = cursor.fetchone()
+            return row[0] if row else None
         finally:
             conn.close()
 
     def delete_user(self, username):
-        """Elimina un usuario."""
+        """Logical deletion in 'User' table."""
         conn = get_connection()
         try:
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM Usuario WHERE usuario=%s", (username,))
+            cursor = conn.cursor(buffered=True)
+            cursor.execute("UPDATE User SET active = FALSE WHERE username=%s", (username,))
             conn.commit()
             cursor.close()
         finally:

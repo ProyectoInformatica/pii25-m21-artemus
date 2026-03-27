@@ -4,40 +4,40 @@ import random
 import multiprocessing
 import flet as ft
 from ArtemusPark.repository.Auth_Repository import AuthRepository
-from repository.Temperature_Repository import (
+from ArtemusPark.repository.Temperature_Repository import (
     save_temperature_measurement,
     load_all_temperature_measurements,
 )
-from repository.Humidity_Repository import save_humidity_measurement
-from repository.Wind_Repository import save_wind_measurement
-from repository.Smoke_Repository import save_smoke_measurement
-from repository.Door_Repository import save_door_event
-from repository.Light_Repository import save_light_event
+from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
+from ArtemusPark.repository.Wind_Repository import save_wind_measurement
+from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement
+from ArtemusPark.repository.Door_Repository import save_door_event
+from ArtemusPark.repository.Light_Repository import save_light_event
 
 
-from config.Sensor_Config import SENSOR_CONFIG
+from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
 
 
-from model.Temperature_Model import TemperatureModel
-from model.Humidity_Model import HumidityModel
-from model.Wind_Model import WindModel
-from model.Smoke_Model import SmokeModel
-from model.Door_Model import DoorModel
-from model.Light_Model import LightModel
+from ArtemusPark.model.Temperature_Model import TemperatureModel
+from ArtemusPark.model.Humidity_Model import HumidityModel
+from ArtemusPark.model.Wind_Model import WindModel
+from ArtemusPark.model.Smoke_Model import SmokeModel
+from ArtemusPark.model.Door_Model import DoorModel
+from ArtemusPark.model.Light_Model import LightModel
 
 
-from view.pages.Login_Page import LoginPage
-from view.components.Sidebar import Sidebar
-from view.pages.Dashboard_Page import DashboardPage
-from view.pages.Placeholder_Page import PlaceholderPage
-from view.pages.History_Page import HistoryPage
-from view.pages.Maintenance_Page import MaintenancePage
-from view.pages.Requests_Page import RequestsPage
-from view.pages.Admin_Page import AdminPage
+from ArtemusPark.view.pages.Login_Page import LoginPage
+from ArtemusPark.view.components.Sidebar import Sidebar
+from ArtemusPark.view.pages.Dashboard_Page import DashboardPage
+from ArtemusPark.view.pages.Placeholder_Page import PlaceholderPage
+from ArtemusPark.view.pages.History_Page import HistoryPage
+from ArtemusPark.view.pages.Maintenance_Page import MaintenancePage
+from ArtemusPark.view.pages.Requests_Page import RequestsPage
+from ArtemusPark.view.pages.Admin_Page import AdminPage
 
 
 def generate_sensor_snapshot(timestamp: float, all_users: list):
-    """Genera y guarda un snapshot de datos para todos los sensores configurados."""
+    """Generates and saves a data snapshot for all configured sensors."""
 
     for sensor in SENSOR_CONFIG.get("temperature", []):
         temp_val = int(random.uniform(18, 32))
@@ -123,7 +123,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
 
 
 async def main(page: ft.Page):
-    """Punto de entrada de la aplicación GUI."""
+    """Application main GUI entry point."""
     page.title = "Artemus Park"
     page.window.width = 1420
     page.window.height = 820
@@ -141,7 +141,7 @@ async def main(page: ft.Page):
     all_users = list(auth_repo.get_all_users().keys())
 
     async def sensor_simulation_loop():
-        """Genera datos aleatorios de sensores periódicamente."""
+        """Periodically generates random sensor data."""
         while True:
             now = time.time()
             generate_sensor_snapshot(now, all_users)
@@ -149,13 +149,12 @@ async def main(page: ft.Page):
             try:
                 page.pubsub.send_all("refresh_dashboard")
             except Exception as e:
-                print(f"Error enviando pubsub: {e }")
+                print(f"Error sending pubsub: {e}")
 
             await asyncio.sleep(3)
 
-    """Iniciar simulación al empezar para tener siempre datos disponibles"""
-
     def seed_historical_data_if_needed(days=30):
+        """Seeds historical data if the database is empty or outdated."""
         now = time.time()
         temps = load_all_temperature_measurements()
         if temps:
@@ -172,20 +171,19 @@ async def main(page: ft.Page):
     page.run_task(sensor_simulation_loop)
 
     def change_view(page_name, data=None):
-        """Cambia la vista actual en el área de contenido principal."""
+        """Changes the current view in the main content area."""
         current_role = session.get("role")
         current_username = session.get("username")
 
         display_name = current_username
         if current_username:
-            all_users_data = auth_repo.get_all_users()
-            user_data = all_users_data.get(current_username)
+            user_data = auth_repo.get_user_by_username(current_username)
             if user_data and user_data.get("full_name"):
                 display_name = user_data["full_name"]
 
         if page_name == "admin" and current_role != "admin":
 
-            page.snack_bar = ft.SnackBar(ft.Text("Acceso denegado"))
+            page.snack_bar = ft.SnackBar(ft.Text("Access Denied"))
             page.snack_bar.open = True
             page.update()
             return
@@ -201,7 +199,9 @@ async def main(page: ft.Page):
             content_area.content = HistoryPage()
 
         elif page_name == "maintenance":
-            content_area.content = MaintenancePage(current_username=current_username)
+            content_area.content = MaintenancePage(
+                current_username=current_username, user_role=current_role
+            )
 
         elif page_name == "requests":
             content_area.content = RequestsPage(
@@ -216,8 +216,8 @@ async def main(page: ft.Page):
         content_area.update()
 
     def logout():
-        """Cierra la sesión del usuario actual y vuelve al login."""
-        print("Cerrando sesión...")
+        """Logs out the current user and returns to login page."""
+        print("Logging out...")
         session["role"] = None
         session["username"] = None
         page.clean()
@@ -225,7 +225,7 @@ async def main(page: ft.Page):
         page.add(LoginPage(on_login_success=login_success))
 
     def login_success(username, role):
-        """Maneja el inicio de sesión exitoso y configura la interfaz principal."""
+        """Handles successful login and configures the main interface."""
         session["role"] = role
         session["username"] = username
         page.clean()
@@ -248,6 +248,11 @@ async def main(page: ft.Page):
         change_view(target_view)
 
     page.add(LoginPage(on_login_success=login_success))
+
+
+if __name__ == "__main__":
+    multiprocessing.freeze_support()
+    ft.app(target=main, assets_dir="assets")
 
 
 if __name__ == "__main__":
