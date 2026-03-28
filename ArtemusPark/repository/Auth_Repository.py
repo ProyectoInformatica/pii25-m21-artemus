@@ -2,6 +2,7 @@ import json
 import mysql.connector
 from ArtemusPark.bbdd.db_connection import get_connection
 
+
 class AuthRepository:
     """Repository to handle user authentication using MySQL SHA2 function."""
 
@@ -45,40 +46,40 @@ class AuthRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(dictionary=True, buffered=True)
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT u.username, u.full_name, u.password_hash, u.dni,
                        u.phone, u.address_street, u.address_city, u.address_zip, r.role, u.active
                 FROM User u
                 JOIN Role r ON u.id_role = r.id_role
                 WHERE u.active = TRUE
-                """
-            )
+                """)
             rows = cursor.fetchall()
-            
+
             result = {}
             for row in rows:
                 username = row["username"]
                 dni = row["dni"]
-                
+
                 sub_cursor = conn.cursor(buffered=True)
-                
-                sub_cursor.execute("SELECT id_sensor FROM User_Sensor WHERE dni = %s", (dni,))
+
+                sub_cursor.execute(
+                    "SELECT id_sensor FROM User_Sensor WHERE dni = %s", (dni,)
+                )
                 sensors = [s[0] for s in sub_cursor.fetchall()]
 
                 sub_cursor.execute(
                     "SELECT u.username FROM User_Hierarchy h JOIN User u ON h.superior_dni = u.dni WHERE h.subordinate_dni = %s",
-                    (dni,)
+                    (dni,),
                 )
                 supervisors = [s[0] for s in sub_cursor.fetchall()]
 
                 sub_cursor.execute(
                     "SELECT u.username FROM User_Hierarchy h JOIN User u ON h.subordinate_dni = u.dni WHERE h.superior_dni = %s",
-                    (dni,)
+                    (dni,),
                 )
                 subordinates = [s[0] for s in sub_cursor.fetchall()]
                 sub_cursor.close()
-                
+
                 result[username] = {
                     "password": row["password_hash"],
                     "role": row["role"],
@@ -92,7 +93,7 @@ class AuthRepository:
                     "supervisors": supervisors,
                     "subordinates": subordinates,
                 }
-            
+
             cursor.close()
             return result
         finally:
@@ -157,8 +158,18 @@ class AuthRepository:
         finally:
             conn.close()
 
-    def add_user(self, username, password, role, full_name="", dni="", phone="", 
-                 address_street="", address_city="", address_zip=""):
+    def add_user(
+        self,
+        username,
+        password,
+        role,
+        full_name="",
+        dni="",
+        phone="",
+        address_street="",
+        address_city="",
+        address_zip="",
+    ):
         """Inserts a user and hashes the password directly in MySQL."""
         conn = get_connection()
         try:
@@ -167,7 +178,7 @@ class AuthRepository:
             row = cursor.fetchone()
             if not row:
                 raise ValueError(f"Role '{role}' does not exist.")
-            
+
             id_role = row[0]
 
             query = """
@@ -176,8 +187,20 @@ class AuthRepository:
                      address_street, address_city, address_zip, active)
                 VALUES (%s, %s, %s, %s, SHA2(%s, 256), %s, %s, %s, %s, TRUE)
             """
-            cursor.execute(query, (dni, id_role, username, full_name, password, phone, 
-                                 address_street, address_city, address_zip))
+            cursor.execute(
+                query,
+                (
+                    dni,
+                    id_role,
+                    username,
+                    full_name,
+                    password,
+                    phone,
+                    address_street,
+                    address_city,
+                    address_zip,
+                ),
+            )
             conn.commit()
             cursor.close()
         except mysql.connector.Error:
@@ -191,45 +214,47 @@ class AuthRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)
-            
+
             # Update password
             if "password" in kwargs:
                 cursor.execute(
                     "UPDATE User SET password_hash=SHA2(%s, 256) WHERE dni=%s",
                     (kwargs["password"], dni),
                 )
-            
+
             # Update basic info
             if "full_name" in kwargs:
                 cursor.execute(
                     "UPDATE User SET full_name=%s WHERE dni=%s",
                     (kwargs["full_name"], dni),
                 )
-            
+
             # Note: Changing DNI itself (PK)
             if "new_dni" in kwargs:
                 cursor.execute(
                     "UPDATE User SET dni=%s WHERE dni=%s",
                     (kwargs["new_dni"], dni),
                 )
-                dni = kwargs["new_dni"] # Update local dni for subsequent queries
-                
+                dni = kwargs["new_dni"]  # Update local dni for subsequent queries
+
             if "phone" in kwargs:
                 cursor.execute(
                     "UPDATE User SET phone=%s WHERE dni=%s",
                     (kwargs["phone"], dni),
                 )
-            
+
             # Update Profile Picture (Binary Data)
             if "profile_picture" in kwargs:
                 cursor.execute(
                     "UPDATE User SET profile_picture=%s WHERE dni=%s",
                     (kwargs["profile_picture"], dni),
                 )
-            
+
             # Update Role
             if "role" in kwargs:
-                cursor.execute("SELECT id_role FROM Role WHERE role = %s", (kwargs["role"],))
+                cursor.execute(
+                    "SELECT id_role FROM Role WHERE role = %s", (kwargs["role"],)
+                )
                 row = cursor.fetchone()
                 if row:
                     cursor.execute(
@@ -253,21 +278,21 @@ class AuthRepository:
                     "UPDATE User SET address_zip=%s WHERE dni=%s",
                     (kwargs["address_zip"], dni),
                 )
-            
+
             # Update Sensors
             if "assigned_sensors" in kwargs:
                 cursor.execute("DELETE FROM User_Sensor WHERE dni=%s", (dni,))
-                
+
                 from ArtemusPark.bbdd.db_connection import get_sensor_id
                 from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
-                
+
                 for s_id_name in kwargs["assigned_sensors"]:
-                    s_type = "Temperature" # Default
+                    s_type = "Temperature"  # Default
                     for t, sensors in SENSOR_CONFIG.items():
                         if any(s["id"] == s_id_name for s in sensors):
                             s_type = t.capitalize()
                             break
-                    
+
                     db_id = get_sensor_id(s_id_name, s_type)
                     if db_id:
                         cursor.execute(
@@ -278,9 +303,13 @@ class AuthRepository:
             # Update Hierarchy (Supervisors)
             if "supervisors" in kwargs:
                 # Borramos sus supervisores actuales
-                cursor.execute("DELETE FROM User_Hierarchy WHERE subordinate_dni=%s", (dni,))
+                cursor.execute(
+                    "DELETE FROM User_Hierarchy WHERE subordinate_dni=%s", (dni,)
+                )
                 for sup_username in kwargs["supervisors"]:
-                    cursor.execute("SELECT dni FROM User WHERE username=%s", (sup_username,))
+                    cursor.execute(
+                        "SELECT dni FROM User WHERE username=%s", (sup_username,)
+                    )
                     sup_res = cursor.fetchone()
                     if sup_res:
                         cursor.execute(
@@ -291,9 +320,13 @@ class AuthRepository:
             # Update Hierarchy (Subordinates)
             if "subordinates" in kwargs:
                 # Borramos sus subordinados actuales
-                cursor.execute("DELETE FROM User_Hierarchy WHERE superior_dni=%s", (dni,))
+                cursor.execute(
+                    "DELETE FROM User_Hierarchy WHERE superior_dni=%s", (dni,)
+                )
                 for sub_username in kwargs["subordinates"]:
-                    cursor.execute("SELECT dni FROM User WHERE username=%s", (sub_username,))
+                    cursor.execute(
+                        "SELECT dni FROM User WHERE username=%s", (sub_username,)
+                    )
                     sub_res = cursor.fetchone()
                     if sub_res:
                         cursor.execute(
@@ -311,7 +344,9 @@ class AuthRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)
-            cursor.execute("SELECT profile_picture FROM User WHERE username = %s", (username,))
+            cursor.execute(
+                "SELECT profile_picture FROM User WHERE username = %s", (username,)
+            )
             row = cursor.fetchone()
             return row[0] if row else None
         finally:

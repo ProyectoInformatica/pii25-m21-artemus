@@ -55,7 +55,9 @@ class LoginPage(ft.Container):
 
         self.tf_full_name = ft.TextField(label="Nombre Completo", **common_tf_props)
         self.tf_dni = ft.TextField(label="DNI (8 nums + letra)", **common_tf_props)
-        self.tf_phone = ft.TextField(label="Teléfono", keyboard_type=ft.KeyboardType.PHONE, **common_tf_props)
+        self.tf_phone = ft.TextField(
+            label="Teléfono", keyboard_type=ft.KeyboardType.PHONE, **common_tf_props
+        )
         self.tf_street = ft.TextField(label="Calle / Dirección", **common_tf_props)
         self.tf_city = ft.TextField(label="Ciudad", **common_tf_props)
         self.tf_zip = ft.TextField(label="C. Postal", **common_tf_props)
@@ -110,7 +112,7 @@ class LoginPage(ft.Container):
             content=ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 spacing=5,
-                tight=True, # Ajuste automático de altura
+                tight=True,  # Ajuste automático de altura
                 controls=[
                     ft.Image(src="/img/artemusLogo2Negro.png", width=100, height=100),
                     self.title_text,
@@ -124,8 +126,16 @@ class LoginPage(ft.Container):
         )
 
     def _reset_error_state(self, e):
-        fields = [self.tf_username, self.tf_password, self.tf_full_name, self.tf_dni, 
-                  self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]
+        fields = [
+            self.tf_username,
+            self.tf_password,
+            self.tf_full_name,
+            self.tf_dni,
+            self.tf_phone,
+            self.tf_street,
+            self.tf_city,
+            self.tf_zip,
+        ]
         for f in fields:
             f.border_color = AppColors.TEXT_LIGHT_GREY
         self.update()
@@ -140,13 +150,31 @@ class LoginPage(ft.Container):
             self.btn_enter.text = "Registrarse"
             self.btn_switch.text = "¿Ya tienes cuenta? Login"
 
-            for tf in [self.tf_full_name, self.tf_dni, self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]:
+            for tf in [
+                self.tf_full_name,
+                self.tf_dni,
+                self.tf_phone,
+                self.tf_street,
+                self.tf_city,
+                self.tf_zip,
+            ]:
                 tf.visible = True
 
             self.animated_switcher.content = ft.Row(
                 [
-                    ft.Column([self.tf_username, self.tf_password, self.tf_full_name, self.tf_dni], spacing=10),
-                    ft.Column([self.tf_phone, self.tf_street, self.tf_city, self.tf_zip], spacing=10),
+                    ft.Column(
+                        [
+                            self.tf_username,
+                            self.tf_password,
+                            self.tf_full_name,
+                            self.tf_dni,
+                        ],
+                        spacing=10,
+                    ),
+                    ft.Column(
+                        [self.tf_phone, self.tf_street, self.tf_city, self.tf_zip],
+                        spacing=10,
+                    ),
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
                 spacing=20,
@@ -157,7 +185,14 @@ class LoginPage(ft.Container):
             self.btn_enter.text = "Entrar"
             self.btn_switch.text = "¿No tienes cuenta? Registro"
 
-            for tf in [self.tf_full_name, self.tf_dni, self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]:
+            for tf in [
+                self.tf_full_name,
+                self.tf_dni,
+                self.tf_phone,
+                self.tf_street,
+                self.tf_city,
+                self.tf_zip,
+            ]:
                 tf.visible = False
 
             self.animated_switcher.content = self.login_controls
@@ -187,8 +222,16 @@ class LoginPage(ft.Container):
         self.is_registering = not self.is_registering
 
         # Limpiar valores y errores
-        tfs = [self.tf_username, self.tf_password, self.tf_full_name, self.tf_dni, 
-               self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]
+        tfs = [
+            self.tf_username,
+            self.tf_password,
+            self.tf_full_name,
+            self.tf_dni,
+            self.tf_phone,
+            self.tf_street,
+            self.tf_city,
+            self.tf_zip,
+        ]
         for tf in tfs:
             tf.value = ""
         self._reset_error_state(None)
@@ -200,9 +243,16 @@ class LoginPage(ft.Container):
             self.btn_switch.text = "¿Ya tienes cuenta? Inicia sesión"
 
             # Aumentar altura para que quepan 4 filas de campos
-            self.input_fields_container.height = 220 
+            self.input_fields_container.height = 220
 
-            for tf in [self.tf_full_name, self.tf_dni, self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]:
+            for tf in [
+                self.tf_full_name,
+                self.tf_dni,
+                self.tf_phone,
+                self.tf_street,
+                self.tf_city,
+                self.tf_zip,
+            ]:
                 tf.visible = True
 
             # Estructura de 2 columnas para Registro
@@ -241,7 +291,14 @@ class LoginPage(ft.Container):
 
             self.input_fields_container.height = 165
 
-            for tf in [self.tf_full_name, self.tf_dni, self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]:
+            for tf in [
+                self.tf_full_name,
+                self.tf_dni,
+                self.tf_phone,
+                self.tf_street,
+                self.tf_city,
+                self.tf_zip,
+            ]:
                 tf.visible = False
 
             # Restaurar campos al modo Login (1 columna)

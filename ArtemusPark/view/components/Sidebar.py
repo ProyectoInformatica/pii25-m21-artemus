@@ -6,7 +6,9 @@ from ArtemusPark.service.Dashboard_Service import DashboardService
 
 class Sidebar(ft.Container):
 
-    def __init__(self, on_nav_change, on_logout, user_role="user", username="", permissions=None):
+    def __init__(
+        self, on_nav_change, on_logout, user_role="user", username="", permissions=None
+    ):
         super().__init__()
         self.on_nav_change = on_nav_change
         self.on_logout = on_logout
@@ -65,7 +67,11 @@ class Sidebar(ft.Container):
                     "Solicitudes",
                     "📩",
                     "requests",
-                    show_badge=("MANAGE_REQUESTS" in self.permissions or self.user_role == "admin") and self.has_pending_requests,
+                    show_badge=(
+                        "MANAGE_REQUESTS" in self.permissions
+                        or self.user_role == "admin"
+                    )
+                    and self.has_pending_requests,
                 )
             )
 
@@ -116,6 +122,7 @@ class Sidebar(ft.Container):
     def _handle_logout(self, e):
         if self.on_logout:
             import asyncio
+
             if asyncio.iscoroutinefunction(self.on_logout):
                 self.page.run_task(self.on_logout)
             else:
