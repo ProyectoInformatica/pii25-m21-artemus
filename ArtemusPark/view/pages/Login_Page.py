@@ -16,147 +16,153 @@ class LoginPage(ft.Container):
 
         self.tf_username = ft.TextField(
             label="Usuario",
-            width=280,
+            width=240,
             bgcolor=AppColors.BG_CARD,
             border_radius=8,
             border_color=AppColors.TEXT_LIGHT_GREY,
-            text_style=ft.TextStyle(
-                color=AppColors.BG_DARK, size=16, weight=ft.FontWeight.W_500
-            ),
-            cursor_color=AppColors.BG_DARK,
+            text_style=ft.TextStyle(color=AppColors.BG_DARK, size=14),
+            height=45,
+            content_padding=10,
             on_change=self._reset_error_state,
             on_submit=self._handle_submit,
-            height=40,
-            content_padding=10,
         )
 
         self.tf_password = ft.TextField(
             label="Contraseña",
-            width=280,
+            width=240,
             password=True,
             can_reveal_password=True,
             bgcolor=AppColors.BG_CARD,
             border_radius=8,
             border_color=AppColors.TEXT_LIGHT_GREY,
-            text_style=ft.TextStyle(
-                color=AppColors.BG_DARK, size=16, weight=ft.FontWeight.W_500
-            ),
-            cursor_color=AppColors.BG_DARK,
+            text_style=ft.TextStyle(color=AppColors.BG_DARK, size=14),
+            height=45,
+            content_padding=10,
             on_change=self._reset_error_state,
             on_submit=self._handle_submit,
-            height=40,
-            content_padding=10,
         )
 
         common_tf_props = {
-            "width": 280,
+            "width": 240,
             "bgcolor": AppColors.BG_CARD,
             "border_radius": 8,
             "border_color": AppColors.TEXT_LIGHT_GREY,
-            "text_style": ft.TextStyle(
-                color=AppColors.BG_DARK, size=16, weight=ft.FontWeight.W_500
-            ),
-            "cursor_color": AppColors.BG_DARK,
-            "height": 40,
+            "text_style": ft.TextStyle(color=AppColors.BG_DARK, size=14),
+            "height": 45,
             "content_padding": 10,
             "visible": False,
         }
 
         self.tf_full_name = ft.TextField(label="Nombre Completo", **common_tf_props)
         self.tf_dni = ft.TextField(label="DNI (8 nums + letra)", **common_tf_props)
-        self.tf_phone = ft.TextField(
-            label="Teléfono (9 dígitos)",
-            keyboard_type=ft.KeyboardType.PHONE,
-            **common_tf_props,
-        )
-        self.tf_address = ft.TextField(label="Dirección", **common_tf_props)
+        self.tf_phone = ft.TextField(label="Teléfono", keyboard_type=ft.KeyboardType.PHONE, **common_tf_props)
+        self.tf_street = ft.TextField(label="Calle / Dirección", **common_tf_props)
+        self.tf_city = ft.TextField(label="Ciudad", **common_tf_props)
+        self.tf_zip = ft.TextField(label="C. Postal", **common_tf_props)
 
         self.btn_enter = ft.ElevatedButton(
             text="Entrar al Sistema",
-            width=280,
+            width=240,
             height=45,
             bgcolor=AppColors.BG_DARK,
             color=AppColors.TEXT_WHITE,
-            style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=8)),
             on_click=self._handle_submit,
         )
 
         self.btn_switch = ft.TextButton(
             text="¿No tienes cuenta? Regístrate",
             on_click=self._toggle_mode,
-            style=ft.ButtonStyle(color=AppColors.TEXT_MUTED),
         )
 
         self.title_text = ft.Text(
             "ARTEMUS PARK",
-            size=24,
-            weight=ft.FontWeight.BOLD,
+            size=22,
+            weight="bold",
             color=AppColors.BG_DARK,
-            text_align=ft.TextAlign.CENTER,
-            style=ft.TextStyle(font_family="RobotoCondensed", letter_spacing=1.5),
         )
 
         self.sub_title_text = ft.Text(
-            "Identifícate para acceder", size=14, color=AppColors.TEXT_MUTED
+            "Identifícate para acceder", size=13, color=AppColors.TEXT_MUTED
         )
 
         self.login_controls = ft.Column(
-            [
-                self.tf_username,
-                self.tf_password,
-            ],
+            [self.tf_username, self.tf_password],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=10,
         )
 
         self.input_fields_container = ft.Container(
-            alignment=ft.alignment.center,
-            height=165,
-            clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
-            padding=ft.padding.only(top=10),
             content=ft.AnimatedSwitcher(
                 self.login_controls,
                 transition=ft.AnimatedSwitcherTransition.FADE,
                 duration=300,
-                reverse_duration=100,
-                switch_in_curve=ft.AnimationCurve.EASE_IN,
-                switch_out_curve=ft.AnimationCurve.EASE_OUT,
             ),
+            padding=ft.padding.symmetric(vertical=10),
         )
         self.animated_switcher = self.input_fields_container.content
 
-        self.input_fields_block = ft.Container(
-            expand=True,
-            alignment=ft.alignment.center,
-            content=self.input_fields_container,
-        )
-
         self.content = ft.Container(
-            width=650,
-            height=650,
-            padding=40,
+            width=580,
+            padding=30,
             bgcolor=AppColors.BG_CARD,
             border_radius=15,
             shadow=ft.BoxShadow(blur_radius=15, color=AppColors.SHADOW),
             content=ft.Column(
-                tight=False,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                spacing=15,
+                spacing=5,
+                tight=True, # Ajuste automático de altura
                 controls=[
-                    ft.Image(
-                        src="/img/artemusLogo2Negro.png",
-                        width=200,
-                        height=200,
-                        fit=ft.ImageFit.CONTAIN,
-                    ),
+                    ft.Image(src="/img/artemusLogo2Negro.png", width=100, height=100),
                     self.title_text,
                     self.sub_title_text,
-                    self.input_fields_block,
+                    self.input_fields_container,
+                    ft.Container(height=10),
                     self.btn_enter,
                     self.btn_switch,
                 ],
             ),
         )
+
+    def _reset_error_state(self, e):
+        fields = [self.tf_username, self.tf_password, self.tf_full_name, self.tf_dni, 
+                  self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]
+        for f in fields:
+            f.border_color = AppColors.TEXT_LIGHT_GREY
+        self.update()
+
+    def _toggle_mode(self, e):
+        self.is_registering = not self.is_registering
+        self._reset_error_state(None)
+
+        if self.is_registering:
+            self.title_text.value = "REGISTRO"
+            self.sub_title_text.value = "Crea tu cuenta"
+            self.btn_enter.text = "Registrarse"
+            self.btn_switch.text = "¿Ya tienes cuenta? Login"
+
+            for tf in [self.tf_full_name, self.tf_dni, self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]:
+                tf.visible = True
+
+            self.animated_switcher.content = ft.Row(
+                [
+                    ft.Column([self.tf_username, self.tf_password, self.tf_full_name, self.tf_dni], spacing=10),
+                    ft.Column([self.tf_phone, self.tf_street, self.tf_city, self.tf_zip], spacing=10),
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                spacing=20,
+            )
+        else:
+            self.title_text.value = "ARTEMUS PARK"
+            self.sub_title_text.value = "Identifícate"
+            self.btn_enter.text = "Entrar"
+            self.btn_switch.text = "¿No tienes cuenta? Registro"
+
+            for tf in [self.tf_full_name, self.tf_dni, self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]:
+                tf.visible = False
+
+            self.animated_switcher.content = self.login_controls
+
+        self.update()
 
     def _reset_error_state(self, e):
         """Limpia los estados de error en los campos de texto."""
@@ -166,7 +172,9 @@ class LoginPage(ft.Container):
             self.tf_full_name,
             self.tf_dni,
             self.tf_phone,
-            self.tf_address,
+            self.tf_street,
+            self.tf_city,
+            self.tf_zip,
         ]
         for field in fields_to_check:
             if field.border_color == ft.Colors.RED:
@@ -175,15 +183,14 @@ class LoginPage(ft.Container):
                     field.update()
 
     def _toggle_mode(self, e):
-        """Alterna entre modo Login y Registro."""
+        """Alterna entre modo Login y Registro con re-parenting correcto."""
         self.is_registering = not self.is_registering
 
-        self.tf_username.value = ""
-        self.tf_password.value = ""
-        self.tf_full_name.value = ""
-        self.tf_dni.value = ""
-        self.tf_phone.value = ""
-        self.tf_address.value = ""
+        # Limpiar valores y errores
+        tfs = [self.tf_username, self.tf_password, self.tf_full_name, self.tf_dni, 
+               self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]
+        for tf in tfs:
+            tf.value = ""
         self._reset_error_state(None)
 
         if self.is_registering:
@@ -192,41 +199,38 @@ class LoginPage(ft.Container):
             self.btn_enter.text = "Registrarse"
             self.btn_switch.text = "¿Ya tienes cuenta? Inicia sesión"
 
-            self.tf_full_name.visible = True
-            self.tf_dni.visible = True
-            self.tf_phone.visible = True
-            self.tf_address.visible = True
+            # Aumentar altura para que quepan 4 filas de campos
+            self.input_fields_container.height = 220 
 
+            for tf in [self.tf_full_name, self.tf_dni, self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]:
+                tf.visible = True
+
+            # Estructura de 2 columnas para Registro
             self.animated_switcher.content = ft.Row(
                 [
-                    ft.Container(
-                        padding=ft.padding.only(top=10),
-                        content=ft.Row(
-                            [
-                                ft.Column(
-                                    [
-                                        self.tf_username,
-                                        self.tf_password,
-                                        self.tf_full_name,
-                                    ],
-                                    spacing=10,
-                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                                ft.Column(
-                                    [
-                                        self.tf_dni,
-                                        self.tf_phone,
-                                        self.tf_address,
-                                    ],
-                                    spacing=10,
-                                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                ),
-                            ],
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            spacing=10,
-                        ),
-                    )
+                    ft.Column(
+                        [
+                            self.tf_username,
+                            self.tf_password,
+                            self.tf_full_name,
+                            self.tf_dni,
+                        ],
+                        spacing=10,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    ft.Column(
+                        [
+                            self.tf_phone,
+                            self.tf_street,
+                            self.tf_city,
+                            self.tf_zip,
+                        ],
+                        spacing=10,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
                 ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                spacing=20,
             )
 
         else:
@@ -235,11 +239,13 @@ class LoginPage(ft.Container):
             self.btn_enter.text = "Entrar al Sistema"
             self.btn_switch.text = "¿No tienes cuenta? Regístrate"
 
-            self.tf_full_name.visible = False
-            self.tf_dni.visible = False
-            self.tf_phone.visible = False
-            self.tf_address.visible = False
+            self.input_fields_container.height = 165
 
+            for tf in [self.tf_full_name, self.tf_dni, self.tf_phone, self.tf_street, self.tf_city, self.tf_zip]:
+                tf.visible = False
+
+            # Restaurar campos al modo Login (1 columna)
+            self.login_controls.controls = [self.tf_username, self.tf_password]
             self.animated_switcher.content = self.login_controls
 
         self.animated_switcher.update()
@@ -247,7 +253,7 @@ class LoginPage(ft.Container):
         self.update()
 
     def _handle_submit(self, e):
-        """Maneja el envío del formulario (login o registro)."""
+        """Maneja el envío del formulario con los campos desglosados."""
         username = self.tf_username.value
         password = self.tf_password.value
 
@@ -259,43 +265,21 @@ class LoginPage(ft.Container):
             full_name = self.tf_full_name.value
             dni = self.tf_dni.value
             phone = self.tf_phone.value
-            address = self.tf_address.value
+            street = self.tf_street.value
+            city = self.tf_city.value
+            zip_code = self.tf_zip.value
 
-            if not full_name.strip():
-                self._show_error(
-                    "El nombre completo no puede estar vacío.",
-                    fields_to_highlight=[self.tf_full_name],
-                )
+            # Validaciones de los nuevos campos
+            if not all([full_name, dni, phone, street, city, zip_code]):
+                self._show_error("Todos los campos son obligatorios")
                 return
-            if not dni.strip():
-                self._show_error(
-                    "El DNI no puede estar vacío.",
-                    fields_to_highlight=[self.tf_dni],
-                )
-                return
+
             if not self._is_valid_dni(dni):
-                self._show_error(
-                    "DNI inválido. Debe tener 8 números y letra correcta.",
-                    fields_to_highlight=[self.tf_dni],
-                )
+                self._show_error("DNI inválido", [self.tf_dni])
                 return
-            if not phone.strip():
-                self._show_error(
-                    "El teléfono no puede estar vacío.",
-                    fields_to_highlight=[self.tf_phone],
-                )
-                return
-            if not phone.strip().isdigit() or len(phone.strip()) != 9:
-                self._show_error(
-                    "Teléfono inválido. Debe contener 9 dígitos numéricos.",
-                    fields_to_highlight=[self.tf_phone],
-                )
-                return
-            if not address.strip():
-                self._show_error(
-                    "La dirección no puede estar vacía.",
-                    fields_to_highlight=[self.tf_address],
-                )
+
+            if not phone.isdigit() or len(phone) != 9:
+                self._show_error("Teléfono inválido (9 dígitos)", [self.tf_phone])
                 return
 
             try:
@@ -306,20 +290,20 @@ class LoginPage(ft.Container):
                     full_name=full_name,
                     dni=dni,
                     phone=phone,
-                    address=address,
+                    address_street=street,
+                    address_city=city,
+                    address_zip=zip_code,
                 )
-                self._show_success("Registro exitoso. Por favor inicia sesión.")
+                self._show_success("Registro exitoso. Ya puedes entrar.")
                 self._toggle_mode(None)
-            except ValueError as ex:
-                self._show_error(str(ex))
+            except Exception as ex:
+                self._show_error(f"Error al registrar: {str(ex)}")
         else:
             role = self.auth_repo.authenticate(username, password)
-
             if role:
-                print(f"Login: Acceso concedido a {username } ({role })")
                 self.on_login_success(username, role)
             else:
-                self._show_error("Usuario o contraseña incorrectos")
+                self._show_error("Credenciales incorrectas")
 
     def _show_error(self, message, fields_to_highlight=None):
         """Muestra un mensaje de error visual y resalta campos."""
@@ -331,7 +315,9 @@ class LoginPage(ft.Container):
                         self.tf_full_name,
                         self.tf_dni,
                         self.tf_phone,
-                        self.tf_address,
+                        self.tf_street,
+                        self.tf_city,
+                        self.tf_zip,
                     ]
                 )
         else:

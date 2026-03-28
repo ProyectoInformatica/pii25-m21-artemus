@@ -687,23 +687,32 @@ class AdminPage(ft.Container):
             selected_subordinates = payload.get("selected_subordinates", [])
 
             if is_edit:
+                # Buscamos los datos originales para obtener el DNI actual
+                original_data = self.auth_repo.get_user_by_username(original_username)
+                current_dni = original_data.get("dni")
 
-                target_user = original_username if original_username else username
                 update_data = {
                     "password": payload["password"],
                     "role": payload["role"],
                     "assigned_sensors": assigned_sensors,
                     "full_name": payload["full_name"],
-                    "dni": payload["dni"],
                     "phone": payload["phone"],
                     "address_street": payload["address_street"],
                     "address_city": payload["address_city"],
                     "address_zip": payload["address_zip"],
+                    "supervisors": selected_supervisors,
+                    "subordinates": selected_subordinates
                 }
+
+                # Si el DNI ha cambiado, lo pasamos como new_dni
+                if payload["dni"] != current_dni:
+                    update_data["new_dni"] = payload["dni"]
+
                 if self.selected_image_bytes:
                     update_data["profile_picture"] = self.selected_image_bytes
 
-                self.auth_repo.update_user(target_user, **update_data)
+                # Usamos el DNI actual como identificador en el WHERE
+                self.auth_repo.update_user(current_dni, **update_data)
             else:
                 self.auth_repo.add_user(
                     username,
@@ -717,27 +726,15 @@ class AdminPage(ft.Container):
                     address_zip=payload["address_zip"]
                 )
                 
-                update_data = {"assigned_sensors": assigned_sensors}
+                update_data = {
+                    "assigned_sensors": assigned_sensors,
+                    "supervisors": selected_supervisors,
+                    "subordinates": selected_subordinates
+                }
                 if self.selected_image_bytes:
                     update_data["profile_picture"] = self.selected_image_bytes
                     
-                self.auth_repo.update_user(username, **update_data)
-
-            target_username = original_username if is_edit else username
-            role = payload["role"]
-
-            if role == "admin":
-                self._sync_subordinates(target_username, selected_subordinates)
-
-                self.auth_repo.update_user(target_username, supervisors=[])
-            elif role == "maintenance":
-
-                self._sync_supervisors(target_username, selected_supervisors)
-                self.auth_repo.update_user(target_username, subordinates=[])
-            else:
-                self.auth_repo.update_user(
-                    target_username, supervisors=[], subordinates=[]
-                )
+                self.auth_repo.update_user(payload["dni"], **update_data)
 
             self._load_users()
             self.page.open(
@@ -762,41 +759,22 @@ class AdminPage(ft.Container):
                     supervisors.add(sup_name)
         return supervisors
 
-    def _sync_supervisors(self, username, selected_supervisors):
-        users = self.auth_repo.get_all_users()
-        admin_users = [u for u, d in users.items() if d.get("role") == "admin"]
-        for sup in admin_users:
-            subs = set(users.get(sup, {}).get("subordinates", []))
-            if sup in selected_supervisors:
-                subs.add(username)
-            else:
-                subs.discard(username)
-            self.auth_repo.update_user(sup, subordinates=list(subs))
-        self.auth_repo.update_user(username, supervisors=selected_supervisors)
-
-    def _sync_subordinates(self, supervisor, selected_subordinates):
-        self.auth_repo.update_user(supervisor, subordinates=selected_subordinates)
-        users = self.auth_repo.get_all_users()
-        user_accounts = [u for u, d in users.items() if d.get("role") == "user"]
-        for user in user_accounts:
-            sups = set(users.get(user, {}).get("supervisors", []))
-            if user in selected_subordinates:
-                sups.add(supervisor)
-            else:
-                sups.discard(supervisor)
-            self.auth_repo.update_user(user, supervisors=list(sups))
-
     def _delete_user(self, username):
         def confirm_delete(e):
-            self.auth_repo.delete_user(username)
-            self.page.close(dialog)
-            self._load_users()
-            self.page.open(
-                ft.SnackBar(
-                    content=ft.Text(f"Usuario {username } eliminado", color="white"),
-                    bgcolor=ft.Colors.RED_700,
+            # Obtenemos el DNI antes de borrar
+            user_data = self.auth_repo.get_user_by_username(username)
+            user_dni = user_data.get("dni")
+            
+            if user_dni:
+                self.auth_repo.delete_user(user_dni)
+                self.page.close(dialog)
+                self._load_users()
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text(f"Usuario {username } eliminado", color="white"),
+                        bgcolor=ft.Colors.RED_700,
+                    )
                 )
-            )
 
         dialog = ft.AlertDialog(
             title=ft.Text("Confirmar eliminación"),

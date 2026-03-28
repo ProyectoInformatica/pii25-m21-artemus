@@ -104,7 +104,7 @@ class Sidebar(ft.Container):
                             icon=ft.Icons.LOGOUT_ROUNDED,
                             icon_color="#ef4444",
                             tooltip="Cerrar Sesión",
-                            on_click=lambda e: self.on_logout(),
+                            on_click=self._handle_logout,
                         ),
                     ],
                 ),
@@ -112,6 +112,14 @@ class Sidebar(ft.Container):
         )
 
         return ft.Column(controls=controls_list)
+
+    def _handle_logout(self, e):
+        if self.on_logout:
+            import asyncio
+            if asyncio.iscoroutinefunction(self.on_logout):
+                self.page.run_task(self.on_logout)
+            else:
+                self.on_logout()
 
     def _get_role_display_name(self):
         """Mapea el rol interno a un nombre amigable en español."""

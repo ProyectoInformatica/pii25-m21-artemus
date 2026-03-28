@@ -186,8 +186,8 @@ class AuthRepository:
         finally:
             conn.close()
 
-    def update_user(self, username, **kwargs):
-        """Updates user data and hashes the password in MySQL if provided."""
+    def update_user(self, dni, **kwargs):
+        """Updates user data and hashes the password in MySQL if provided. Uses PK (dni) in WHERE."""
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)
@@ -195,34 +195,36 @@ class AuthRepository:
             # Update password
             if "password" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET password_hash=SHA2(%s, 256) WHERE username=%s",
-                    (kwargs["password"], username),
+                    "UPDATE User SET password_hash=SHA2(%s, 256) WHERE dni=%s",
+                    (kwargs["password"], dni),
                 )
             
             # Update basic info
             if "full_name" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET full_name=%s WHERE username=%s",
-                    (kwargs["full_name"], username),
+                    "UPDATE User SET full_name=%s WHERE dni=%s",
+                    (kwargs["full_name"], dni),
                 )
             
-            if "dni" in kwargs:
+            # Note: Changing DNI itself (PK)
+            if "new_dni" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET dni=%s WHERE username=%s",
-                    (kwargs["dni"], username),
+                    "UPDATE User SET dni=%s WHERE dni=%s",
+                    (kwargs["new_dni"], dni),
                 )
+                dni = kwargs["new_dni"] # Update local dni for subsequent queries
                 
             if "phone" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET phone=%s WHERE username=%s",
-                    (kwargs["phone"], username),
+                    "UPDATE User SET phone=%s WHERE dni=%s",
+                    (kwargs["phone"], dni),
                 )
             
             # Update Profile Picture (Binary Data)
             if "profile_picture" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET profile_picture=%s WHERE username=%s",
-                    (kwargs["profile_picture"], username),
+                    "UPDATE User SET profile_picture=%s WHERE dni=%s",
+                    (kwargs["profile_picture"], dni),
                 )
             
             # Update Role
@@ -231,86 +233,73 @@ class AuthRepository:
                 row = cursor.fetchone()
                 if row:
                     cursor.execute(
-                        "UPDATE User SET id_role=%s WHERE username=%s",
-                        (row[0], username),
+                        "UPDATE User SET id_role=%s WHERE dni=%s",
+                        (row[0], dni),
                     )
 
             # Update Address components
             if "address_street" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET address_street=%s WHERE username=%s",
-                    (kwargs["address_street"], username),
+                    "UPDATE User SET address_street=%s WHERE dni=%s",
+                    (kwargs["address_street"], dni),
                 )
             if "address_city" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET address_city=%s WHERE username=%s",
-                    (kwargs["address_city"], username),
+                    "UPDATE User SET address_city=%s WHERE dni=%s",
+                    (kwargs["address_city"], dni),
                 )
             if "address_zip" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET address_zip=%s WHERE username=%s",
-                    (kwargs["address_zip"], username),
+                    "UPDATE User SET address_zip=%s WHERE dni=%s",
+                    (kwargs["address_zip"], dni),
                 )
             
             # Update Sensors
             if "assigned_sensors" in kwargs:
-                cursor.execute("SELECT dni FROM User WHERE username=%s", (username,))
-                res = cursor.fetchone()
-                if res:
-                    dni = res[0]
-                    cursor.execute("DELETE FROM User_Sensor WHERE dni=%s", (dni,))
+                cursor.execute("DELETE FROM User_Sensor WHERE dni=%s", (dni,))
+                
+                from ArtemusPark.bbdd.db_connection import get_sensor_id
+                from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
+                
+                for s_id_name in kwargs["assigned_sensors"]:
+                    s_type = "Temperature" # Default
+                    for t, sensors in SENSOR_CONFIG.items():
+                        if any(s["id"] == s_id_name for s in sensors):
+                            s_type = t.capitalize()
+                            break
                     
-                    from ArtemusPark.bbdd.db_connection import get_sensor_id
-                    from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
-                    
-                    for s_id_name in kwargs["assigned_sensors"]:
-                        # Buscamos el tipo de sensor en SENSOR_CONFIG para obtener el ID real de la BD
-                        s_type = "Temperature" # Default
-                        for t, sensors in SENSOR_CONFIG.items():
-                            if any(s["id"] == s_id_name for s in sensors):
-                                s_type = t.capitalize()
-                                break
-                        
-                        db_id = get_sensor_id(s_id_name, s_type)
-                        if db_id:
-                            cursor.execute(
-                                "INSERT INTO User_Sensor (dni, id_sensor) VALUES (%s, %s)",
-                                (dni, db_id),
-                            )
+                    db_id = get_sensor_id(s_id_name, s_type)
+                    if db_id:
+                        cursor.execute(
+                            "INSERT INTO User_Sensor (dni, id_sensor) VALUES (%s, %s)",
+                            (dni, db_id),
+                        )
 
-            # --- NUEVA LÓGICA: Update Hierarchy (Supervisors) ---
+            # Update Hierarchy (Supervisors)
             if "supervisors" in kwargs:
-                cursor.execute("SELECT dni FROM User WHERE username=%s", (username,))
-                res = cursor.fetchone()
-                if res:
-                    sub_dni = res[0]
-                    # Borramos sus supervisores actuales (él es el subordinado)
-                    cursor.execute("DELETE FROM User_Hierarchy WHERE subordinate_dni=%s", (sub_dni,))
-                    for sup_username in kwargs["supervisors"]:
-                        cursor.execute("SELECT dni FROM User WHERE username=%s", (sup_username,))
-                        sup_res = cursor.fetchone()
-                        if sup_res:
-                            cursor.execute(
-                                "INSERT INTO User_Hierarchy (superior_dni, subordinate_dni) VALUES (%s, %s)",
-                                (sup_res[0], sub_dni),
-                            )
+                # Borramos sus supervisores actuales
+                cursor.execute("DELETE FROM User_Hierarchy WHERE subordinate_dni=%s", (dni,))
+                for sup_username in kwargs["supervisors"]:
+                    cursor.execute("SELECT dni FROM User WHERE username=%s", (sup_username,))
+                    sup_res = cursor.fetchone()
+                    if sup_res:
+                        cursor.execute(
+                            "INSERT INTO User_Hierarchy (superior_dni, subordinate_dni) VALUES (%s, %s)",
+                            (sup_res[0], dni),
+                        )
 
-            # --- NUEVA LÓGICA: Update Hierarchy (Subordinates) ---
+            # Update Hierarchy (Subordinates)
             if "subordinates" in kwargs:
-                cursor.execute("SELECT dni FROM User WHERE username=%s", (username,))
-                res = cursor.fetchone()
-                if res:
-                    sup_dni = res[0]
-                    # Borramos sus subordinados actuales (él es el superior)
-                    cursor.execute("DELETE FROM User_Hierarchy WHERE superior_dni=%s", (sup_dni,))
-                    for sub_username in kwargs["subordinates"]:
-                        cursor.execute("SELECT dni FROM User WHERE username=%s", (sub_username,))
-                        sub_res = cursor.fetchone()
-                        if sub_res:
-                            cursor.execute(
-                                "INSERT INTO User_Hierarchy (superior_dni, subordinate_dni) VALUES (%s, %s)",
-                                (sup_dni, sub_res[0]),
-                            )
+                # Borramos sus subordinados actuales
+                cursor.execute("DELETE FROM User_Hierarchy WHERE superior_dni=%s", (dni,))
+                for sub_username in kwargs["subordinates"]:
+                    cursor.execute("SELECT dni FROM User WHERE username=%s", (sub_username,))
+                    sub_res = cursor.fetchone()
+                    if sub_res:
+                        cursor.execute(
+                            "INSERT INTO User_Hierarchy (superior_dni, subordinate_dni) VALUES (%s, %s)",
+                            (dni, sub_res[0]),
+                        )
 
             conn.commit()
             cursor.close()
@@ -328,12 +317,12 @@ class AuthRepository:
         finally:
             conn.close()
 
-    def delete_user(self, username):
-        """Logical deletion in 'User' table."""
+    def delete_user(self, dni):
+        """Logical deletion in 'User' table using PK (dni)."""
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)
-            cursor.execute("UPDATE User SET active = FALSE WHERE username=%s", (username,))
+            cursor.execute("UPDATE User SET active = FALSE WHERE dni=%s", (dni,))
             conn.commit()
             cursor.close()
         finally:

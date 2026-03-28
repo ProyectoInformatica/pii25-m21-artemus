@@ -137,6 +137,9 @@ async def main(page: ft.Page):
     session = {"role": None, "username": None}
     content_area = ft.Container(expand=True, padding=0)
 
+    from ArtemusPark.service.Dashboard_Service import DashboardService
+    service = DashboardService()
+    
     auth_repo = AuthRepository()
     all_users = list(auth_repo.get_all_users().keys())
 
@@ -218,22 +221,52 @@ async def main(page: ft.Page):
 
         content_area.update()
 
-    def logout():
-        """Logs out the current user and returns to login page."""
-        print("Logging out...")
-        session["role"] = None
-        session["username"] = None
-        page.clean()
+    def on_message(message):
+        if message == "catastrophe_mode":
+            page.bgcolor = ft.Colors.RED_900
+            page.update()
+        elif message == "normal_mode":
+            page.bgcolor = "#e5e7eb"
+            page.update()
 
-        page.add(LoginPage(on_login_success=login_success))
+    async def logout():
+        """Logs out the current user and returns to login page safely."""
+        print("Iniciando cierre de sesión...")
+        
+        try:
+            # 1. Limpiar subscripciones y re-suscribir el manejador de la página
+            page.pubsub.unsubscribe_all()
+            page.pubsub.subscribe(on_message)
+            
+            # 2. Limpiar sesión
+            session["role"] = None
+            session["username"] = None
+            
+            # 3. Limpieza total de la UI (Controles y Overlays)
+            page.controls.clear()
+            page.overlay.clear()
+            
+            # 4. Re-añadir Login
+            page.add(LoginPage(on_login_success=login_success))
+            page.update()
+            print("Logout completado con éxito. UI lista.")
+        except Exception as e:
+            print(f"Error crítico durante el logout: {e}")
+            page.clean()
+            page.add(LoginPage(on_login_success=login_success))
+            page.update()
 
     def login_success(username, role):
         """Handles successful login and configures the main interface."""
+        print(f"Login exitoso: {username} ({role})")
         permissions = auth_repo.get_user_permissions(username)
         session["role"] = role
         session["username"] = username
         session["permissions"] = permissions
-        page.clean()
+        
+        # Limpiamos antes de añadir la nueva interfaz
+        page.controls.clear()
+        page.overlay.clear()
 
         sidebar = Sidebar(
             on_nav_change=change_view,
@@ -244,26 +277,18 @@ async def main(page: ft.Page):
         )
 
         page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
+        
+        target_view = "dashboard"
         if role == "admin":
             target_view = "admin"
         elif role == "maintenance":
             target_view = "maintenance"
-        else:
-            target_view = "dashboard"
+            
         sidebar.set_active(target_view)
         change_view(target_view)
+        page.update()
 
-    from ArtemusPark.service.Dashboard_Service import DashboardService
-    service = DashboardService()
-
-    def on_message(message):
-        if message == "catastrophe_mode":
-            page.bgcolor = ft.Colors.RED_900
-            page.update()
-        elif message == "normal_mode":
-            page.bgcolor = "#e5e7eb"
-            page.update()
-
+    # Suscribir manejador inicial
     page.pubsub.subscribe(on_message)
 
     if service.is_catastrophe_mode():
