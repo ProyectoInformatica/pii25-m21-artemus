@@ -138,8 +138,9 @@ async def main(page: ft.Page):
     content_area = ft.Container(expand=True, padding=0)
 
     from ArtemusPark.service.Dashboard_Service import DashboardService
+
     service = DashboardService()
-    
+
     auth_repo = AuthRepository()
     all_users = list(auth_repo.get_all_users().keys())
 
@@ -233,20 +234,20 @@ async def main(page: ft.Page):
     async def logout():
         """Logs out the current user and returns to login page safely."""
         print("Iniciando cierre de sesión...")
-        
+
         try:
             # 1. Limpiar subscripciones y re-suscribir el manejador de la página
             page.pubsub.unsubscribe_all()
             page.pubsub.subscribe(on_message)
-            
+
             # 2. Limpiar sesión
             session["role"] = None
             session["username"] = None
-            
+
             # 3. Limpieza total de la UI (Controles y Overlays)
             page.controls.clear()
             page.overlay.clear()
-            
+
             # 4. Re-añadir Login
             page.add(LoginPage(on_login_success=login_success))
             page.update()
@@ -264,7 +265,7 @@ async def main(page: ft.Page):
         session["role"] = role
         session["username"] = username
         session["permissions"] = permissions
-        
+
         # Limpiamos antes de añadir la nueva interfaz
         page.controls.clear()
         page.overlay.clear()
@@ -278,13 +279,13 @@ async def main(page: ft.Page):
         )
 
         page.add(ft.Row(expand=True, spacing=0, controls=[sidebar, content_area]))
-        
+
         target_view = "dashboard"
         if role == "admin":
             target_view = "admin"
         elif role == "maintenance":
             target_view = "maintenance"
-            
+
         sidebar.set_active(target_view)
         change_view(target_view)
         page.update()
@@ -301,4 +302,3 @@ async def main(page: ft.Page):
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     ft.app(target=main, assets_dir="assets")
-
