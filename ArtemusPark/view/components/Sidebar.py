@@ -1,6 +1,8 @@
 import flet as ft
+import base64
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
+from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
@@ -13,6 +15,7 @@ class Sidebar(ft.Container):
         self.user_role = user_role
         self.username = username
         self.permissions = permissions or []
+        self.auth_repo = AuthRepository()
         self.badge_controls = {}
         self.has_pending_requests = False
         if "MANAGE_REQUESTS" in self.permissions or self.user_role == "admin":
@@ -21,6 +24,15 @@ class Sidebar(ft.Container):
         self.width = 260
         self.bgcolor = AppColors.BG_DARK
         self.padding = ft.padding.symmetric(vertical=24, horizontal=20)
+
+        # Avatar placeholder/default
+        self.user_avatar = ft.CircleAvatar(
+            radius=18,
+            content=ft.Text(self.username[0].upper() if self.username else "?", size=14),
+            bgcolor=ft.Colors.BLUE_GREY_700,
+            color=ft.Colors.WHITE,
+        )
+        self._load_user_avatar()
 
         self.content_column = self._build_content()
         self.content = self.content_column
@@ -31,9 +43,34 @@ class Sidebar(ft.Container):
             self.bgcolor = ft.Colors.RED_900
             self.update()
 
+    def _load_user_avatar(self):
+        """Loads the user's profile picture from the repository."""
+        try:
+            profile_pic = self.auth_repo.get_user_profile_picture(self.username)
+            if profile_pic:
+                b64_str = base64.b64encode(profile_pic).decode("utf-8")
+                # Create a fresh Image control to avoid caching issues
+                self.user_avatar.content = ft.Image(
+                    src_base64=b64_str,
+                    border_radius=18,
+                    fit=ft.ImageFit.COVER,
+                    gapless_playback=True # Helps with smooth updates
+                )
+                self.user_avatar.bgcolor = ft.Colors.TRANSPARENT
+            else:
+                self.user_avatar.content = ft.Text(self.username[0].upper() if self.username else "?", size=14)
+                self.user_avatar.bgcolor = ft.Colors.BLUE_GREY_700
+        except Exception as e:
+            print(f"Error loading sidebar avatar for {self.username}: {e}")
+
     def _on_message(self, message):
-        if isinstance(message, dict) and message.get("topic") == "requests_updated":
-            self._refresh_pending_requests()
+        if isinstance(message, dict):
+            topic = message.get("topic")
+            if topic == "requests_updated":
+                self._refresh_pending_requests()
+            elif topic == "profile_updated" and message.get("username") == self.username:
+                self._load_user_avatar()
+                self.user_avatar.update()
         elif message == "catastrophe_mode":
             self.bgcolor = ft.Colors.RED_900
             self.update()
@@ -84,21 +121,27 @@ class Sidebar(ft.Container):
                 content=ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        ft.Column(
-                            spacing=2,
+                        ft.Row(
+                            spacing=10,
                             controls=[
-                                ft.Text(
-                                    f"{self.username.upper()}",
-                                    size=12,
-                                    weight=ft.FontWeight.BOLD,
-                                    color="white",
+                                self.user_avatar,
+                                ft.Column(
+                                    spacing=2,
+                                    controls=[
+                                        ft.Text(
+                                            f"{self.username.upper()}",
+                                            size=12,
+                                            weight=ft.FontWeight.BOLD,
+                                            color="white",
+                                        ),
+                                        ft.Text(
+                                            self._get_role_display_name().upper(),
+                                            size=10,
+                                            color="#9ca3af",
+                                        ),
+                                    ],
                                 ),
-                                ft.Text(
-                                    self._get_role_display_name().upper(),
-                                    size=10,
-                                    color="#9ca3af",
-                                ),
-                            ],
+                            ]
                         ),
                         ft.IconButton(
                             icon=ft.Icons.LOGOUT_ROUNDED,

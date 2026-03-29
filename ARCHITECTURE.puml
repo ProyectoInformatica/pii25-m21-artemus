@@ -1,0 +1,68 @@
+@startuml ArtemusPark_Architecture
+
+' Configuración de estilos y colores
+skinparam componentStyle rectangle
+skinparam packageStyle frame
+skinparam shadowing false
+
+skinparam package {
+    BackgroundColor<<View>> #A9D0F5
+    BackgroundColor<<Service>> #C2E0C6
+    BackgroundColor<<Controller>> #FFF2CC
+    BackgroundColor<<Repository>> #F8CECC
+    BackgroundColor<<Model>> #E1D5E7
+    BackgroundColor<<Infrastructure>> #F5F5F5
+}
+
+title Arquitectura Coloreada del Sistema ArtemusPark
+
+package "Capa de Presentación (View)" <<View>> {
+    [Pages] <<Flet>> #B2EBF2
+    [Components] <<Flet>> #B2EBF2
+    [Pages] ..> [Components] : renderiza
+}
+
+package "Capa de Aplicación (Service)" <<Service>> {
+    [Dashboard_Service] #A5D6A7
+    note right of [Dashboard_Service] : Calcula Medias de\nMediciones
+    [Sensor_Services] #A5D6A7
+}
+
+package "Capa de Simulación (Controller)" <<Controller>> {
+    [Sensor_Controllers] #FFF59D
+    [Simulation_Loop] #FFF59D
+    [Simulation_Loop] ..> [Sensor_Controllers] : orquestar
+}
+
+package "Capa de Datos (Repository)" <<Repository>> {
+    [Repositories] #FFAB91
+}
+
+package "Capa de Dominio (Model)" <<Model>> {
+    [Data_Models] #D1C4E9
+    [Sensor_Model] #D1C4E9
+}
+
+package "Infraestructura (BBDD & Config)" <<Infrastructure>> {
+    database "MySQL / MariaDB" as DB #E0E0E0
+    [DatabaseManager] #EEEEEE
+    [Configurations] #EEEEEE
+}
+
+' Relaciones de flujo de datos con lógica de negocio
+[Pages] --> [Dashboard_Service] : solicita promedios
+[Dashboard_Service] --> [Repositories] : consulta histórica
+[Sensor_Services] --> [Repositories] : consulta datos
+
+[Sensor_Controllers] --> [Data_Models] : genera medición
+[Sensor_Controllers] --> [Repositories] : inyecta datos
+
+[Repositories] --> [DatabaseManager] : conexión segura
+[Repositories] ..> [Data_Models] : transforma a
+[Repositories] ..> [Sensor_Model] : identifica dispositivo
+[DatabaseManager] --> DB : persistencia SQL
+
+[Pages] ..> [Configurations] : estilos UI
+[Sensor_Controllers] ..> [Configurations] : límites simulación
+
+@enduml

@@ -891,13 +891,31 @@ class AdminPage(ft.Container):
         
         if e.files:
             file_path = e.files[0].path
+            # Check file size before reading completely (max 2MB)
+            import os
+            file_size = os.path.getsize(file_path)
+            max_size = 2 * 1024 * 1024 # 2MB in bytes
+            
+            if file_size > max_size:
+                self.page.open(ft.SnackBar(
+                    ft.Text(f"La imagen es demasiado pesada ({file_size / (1024*1024):.1f}MB). Máximo permitido: 2MB."),
+                    bgcolor=ft.Colors.RED
+                ))
+                return
+
             with open(file_path, "rb") as f:
                 img_bytes = f.read()
             
             try:
-                self.auth_repo.update_user(self.current_username, profile_picture=img_bytes)
+                # IMPORTANT: update_user expects DNI, not username. Get user data first.
+                user_data = self.auth_repo.get_user_by_username(self.current_username)
+                if not user_data or "dni" not in user_data:
+                    raise Exception("No se pudo obtener el DNI del usuario")
                 
-                # Refresh UI
+                dni = user_data["dni"]
+                self.auth_repo.update_user(dni, profile_picture=img_bytes)
+                
+                # Refresh UI locally
                 new_b64 = base64.b64encode(img_bytes).decode("utf-8")
                 self.admin_avatar.content = ft.Image(
                     src_base64=new_b64,
@@ -906,6 +924,9 @@ class AdminPage(ft.Container):
                 )
                 self.admin_avatar.foreground_image_src = None
                 self.admin_avatar.update()
+                
+                # Notify other components (like Sidebar) to refresh
+                self.page.pubsub.send_all({"topic": "profile_updated", "username": self.current_username})
                 
                 self.page.open(ft.SnackBar(ft.Text("Foto de perfil actualizada"), bgcolor=ft.Colors.GREEN))
             except Exception as ex:

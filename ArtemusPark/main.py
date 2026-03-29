@@ -175,6 +175,7 @@ async def main(page: ft.Page):
             generate_sensor_snapshot(ts, all_users)
 
     page.run_task(sensor_simulation_loop)
+    seed_historical_data_if_needed()
 
     def change_view(page_name, data=None):
         """Changes the current view in the main content area."""

@@ -313,7 +313,13 @@ class AuthRepository:
             cursor = conn.cursor(buffered=True)
             cursor.execute("SELECT profile_picture FROM User WHERE username = %s", (username,))
             row = cursor.fetchone()
-            return row[0] if row else None
+            if row and row[0]:
+                # Ensure we return bytes, as some MySQL connectors might return bytearray
+                return bytes(row[0])
+            return None
+        except Exception as e:
+            print(f"Error retrieving profile picture for {username}: {e}")
+            return None
         finally:
             conn.close()
 
