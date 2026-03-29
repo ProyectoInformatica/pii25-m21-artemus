@@ -208,7 +208,7 @@ class AdminPage(ft.Container):
             self.page.overlay.append(self.file_picker)
             self.page.pubsub.subscribe(self._on_message)
             self.page.update()
-            
+
         self.simulation_running = True
         self._update_button_state()
         self._load_users()
@@ -234,9 +234,11 @@ class AdminPage(ft.Container):
             file_path = e.files[0].path
             with open(file_path, "rb") as f:
                 self.selected_image_bytes = f.read()
-            
+
             # Show preview
-            self.img_preview.src_base64 = base64.b64encode(self.selected_image_bytes).decode("utf-8")
+            self.img_preview.src_base64 = base64.b64encode(
+                self.selected_image_bytes
+            ).decode("utf-8")
             self.img_preview.visible = True
             self.img_preview.update()
 
@@ -381,20 +383,26 @@ class AdminPage(ft.Container):
         )
         tf_dni = ft.TextField(label="DNI", value=user_data.get("dni", ""))
         tf_phone = ft.TextField(label="Teléfono", value=user_data.get("phone", ""))
-        
+
         # Desglose de dirección según tablas.sql
-        tf_street = ft.TextField(label="Calle / Dirección", value=user_data.get("address_street", ""))
+        tf_street = ft.TextField(
+            label="Calle / Dirección", value=user_data.get("address_street", "")
+        )
         tf_city = ft.TextField(label="Ciudad", value=user_data.get("address_city", ""))
-        tf_zip = ft.TextField(label="Código Postal", value=user_data.get("address_zip", ""))
+        tf_zip = ft.TextField(
+            label="Código Postal", value=user_data.get("address_zip", "")
+        )
 
         self.selected_image_bytes = None
         self.img_preview.visible = False
-        
+
         # Load existing image if editing
         if is_edit:
             existing_img = self.auth_repo.get_user_profile_picture(username)
             if existing_img:
-                self.img_preview.src_base64 = base64.b64encode(existing_img).decode("utf-8")
+                self.img_preview.src_base64 = base64.b64encode(existing_img).decode(
+                    "utf-8"
+                )
                 self.img_preview.visible = True
 
         profile_section = ft.Column(
@@ -410,17 +418,20 @@ class AdminPage(ft.Container):
                 tf_zip,
                 ft.Divider(),
                 ft.Text("Foto de Perfil:", weight="bold"),
-                ft.Row([
-                    ft.ElevatedButton(
-                        "Seleccionar Imagen",
-                        icon=ft.Icons.IMAGE,
-                        on_click=lambda _: self.file_picker.pick_files(
-                            allow_multiple=False,
-                            file_type=ft.FilePickerFileType.IMAGE
-                        )
-                    ),
-                    self.img_preview
-                ], alignment=ft.MainAxisAlignment.START)
+                ft.Row(
+                    [
+                        ft.ElevatedButton(
+                            "Seleccionar Imagen",
+                            icon=ft.Icons.IMAGE,
+                            on_click=lambda _: self.file_picker.pick_files(
+                                allow_multiple=False,
+                                file_type=ft.FilePickerFileType.IMAGE,
+                            ),
+                        ),
+                        self.img_preview,
+                    ],
+                    alignment=ft.MainAxisAlignment.START,
+                ),
             ],
         )
 
@@ -701,7 +712,7 @@ class AdminPage(ft.Container):
                     "address_city": payload["address_city"],
                     "address_zip": payload["address_zip"],
                     "supervisors": selected_supervisors,
-                    "subordinates": selected_subordinates
+                    "subordinates": selected_subordinates,
                 }
 
                 # Si el DNI ha cambiado, lo pasamos como new_dni
@@ -723,17 +734,17 @@ class AdminPage(ft.Container):
                     phone=payload["phone"],
                     address_street=payload["address_street"],
                     address_city=payload["address_city"],
-                    address_zip=payload["address_zip"]
+                    address_zip=payload["address_zip"],
                 )
-                
+
                 update_data = {
                     "assigned_sensors": assigned_sensors,
                     "supervisors": selected_supervisors,
-                    "subordinates": selected_subordinates
+                    "subordinates": selected_subordinates,
                 }
                 if self.selected_image_bytes:
                     update_data["profile_picture"] = self.selected_image_bytes
-                    
+
                 self.auth_repo.update_user(payload["dni"], **update_data)
 
             self._load_users()
@@ -764,14 +775,16 @@ class AdminPage(ft.Container):
             # Obtenemos el DNI antes de borrar
             user_data = self.auth_repo.get_user_by_username(username)
             user_dni = user_data.get("dni")
-            
+
             if user_dni:
                 self.auth_repo.delete_user(user_dni)
                 self.page.close(dialog)
                 self._load_users()
                 self.page.open(
                     ft.SnackBar(
-                        content=ft.Text(f"Usuario {username } eliminado", color="white"),
+                        content=ft.Text(
+                            f"Usuario {username } eliminado", color="white"
+                        ),
                         bgcolor=ft.Colors.RED_700,
                     )
                 )
@@ -818,14 +831,16 @@ class AdminPage(ft.Container):
     def _build_admin_profile_section(self):
         admin_full_name = "Super Admin"
         admin_email = "admin@artemus.park"
-        avatar_src = "https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+        avatar_src = (
+            "https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+        )
         avatar_src_base64 = None
 
         if self.current_username:
             user_data = self.auth_repo.get_user_by_username(self.current_username)
             admin_full_name = user_data.get("full_name", admin_full_name)
             admin_email = f"{self .current_username }@artemus.park"
-            
+
             # Load actual profile picture from DB
             profile_pic = self.auth_repo.get_user_profile_picture(self.current_username)
             if profile_pic:
@@ -833,13 +848,15 @@ class AdminPage(ft.Container):
 
         self.admin_avatar = ft.CircleAvatar(
             foreground_image_src=avatar_src if not avatar_src_base64 else None,
-            content=ft.Image(
-                src_base64=avatar_src_base64,
-                border_radius=30,
-                fit=ft.ImageFit.COVER,
-            )
-            if avatar_src_base64
-            else None,
+            content=(
+                ft.Image(
+                    src_base64=avatar_src_base64,
+                    border_radius=30,
+                    fit=ft.ImageFit.COVER,
+                )
+                if avatar_src_base64
+                else None
+            ),
             radius=30,
         )
 
@@ -875,62 +892,77 @@ class AdminPage(ft.Container):
                         style=ft.ButtonStyle(
                             color=ft.Colors.BLUE,
                             bgcolor=ft.Colors.BLUE_50,
-                        )
-                    )
-                ]
+                        ),
+                    ),
+                ],
             ),
         )
 
     def _pick_own_profile_pic(self):
         self.file_picker.on_result = self._on_own_profile_pic_result
-        self.file_picker.pick_files(allow_multiple=False, file_type=ft.FilePickerFileType.IMAGE)
+        self.file_picker.pick_files(
+            allow_multiple=False, file_type=ft.FilePickerFileType.IMAGE
+        )
 
     def _on_own_profile_pic_result(self, e: ft.FilePickerResultEvent):
         # Reset file picker event handler to default after use
         self.file_picker.on_result = self._on_file_result
-        
+
         if e.files:
             file_path = e.files[0].path
             # Check file size before reading completely (max 2MB)
             import os
+
             file_size = os.path.getsize(file_path)
-            max_size = 2 * 1024 * 1024 # 2MB in bytes
-            
+            max_size = 2 * 1024 * 1024  # 2MB in bytes
+
             if file_size > max_size:
-                self.page.open(ft.SnackBar(
-                    ft.Text(f"La imagen es demasiado pesada ({file_size / (1024*1024):.1f}MB). Máximo permitido: 2MB."),
-                    bgcolor=ft.Colors.RED
-                ))
+                self.page.open(
+                    ft.SnackBar(
+                        ft.Text(
+                            f"La imagen es demasiado pesada ({file_size / (1024*1024):.1f}MB). Máximo permitido: 2MB."
+                        ),
+                        bgcolor=ft.Colors.RED,
+                    )
+                )
                 return
 
             with open(file_path, "rb") as f:
                 img_bytes = f.read()
-            
+
             try:
                 # IMPORTANT: update_user expects DNI, not username. Get user data first.
                 user_data = self.auth_repo.get_user_by_username(self.current_username)
                 if not user_data or "dni" not in user_data:
                     raise Exception("No se pudo obtener el DNI del usuario")
-                
+
                 dni = user_data["dni"]
                 self.auth_repo.update_user(dni, profile_picture=img_bytes)
-                
+
                 # Refresh UI locally
                 new_b64 = base64.b64encode(img_bytes).decode("utf-8")
                 self.admin_avatar.content = ft.Image(
-                    src_base64=new_b64,
-                    border_radius=30,
-                    fit=ft.ImageFit.COVER
+                    src_base64=new_b64, border_radius=30, fit=ft.ImageFit.COVER
                 )
                 self.admin_avatar.foreground_image_src = None
                 self.admin_avatar.update()
-                
+
                 # Notify other components (like Sidebar) to refresh
-                self.page.pubsub.send_all({"topic": "profile_updated", "username": self.current_username})
-                
-                self.page.open(ft.SnackBar(ft.Text("Foto de perfil actualizada"), bgcolor=ft.Colors.GREEN))
+                self.page.pubsub.send_all(
+                    {"topic": "profile_updated", "username": self.current_username}
+                )
+
+                self.page.open(
+                    ft.SnackBar(
+                        ft.Text("Foto de perfil actualizada"), bgcolor=ft.Colors.GREEN
+                    )
+                )
             except Exception as ex:
-                self.page.open(ft.SnackBar(ft.Text(f"Error al guardar foto: {ex}"), bgcolor=ft.Colors.RED))
+                self.page.open(
+                    ft.SnackBar(
+                        ft.Text(f"Error al guardar foto: {ex}"), bgcolor=ft.Colors.RED
+                    )
+                )
 
     def _calculate_sensor_load(self) -> dict:
         base_load = 50.0

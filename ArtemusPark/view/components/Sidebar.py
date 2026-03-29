@@ -30,7 +30,9 @@ class Sidebar(ft.Container):
         # Avatar placeholder/default
         self.user_avatar = ft.CircleAvatar(
             radius=18,
-            content=ft.Text(self.username[0].upper() if self.username else "?", size=14),
+            content=ft.Text(
+                self.username[0].upper() if self.username else "?", size=14
+            ),
             bgcolor=ft.Colors.BLUE_GREY_700,
             color=ft.Colors.WHITE,
         )
@@ -56,11 +58,13 @@ class Sidebar(ft.Container):
                     src_base64=b64_str,
                     border_radius=18,
                     fit=ft.ImageFit.COVER,
-                    gapless_playback=True # Helps with smooth updates
+                    gapless_playback=True,  # Helps with smooth updates
                 )
                 self.user_avatar.bgcolor = ft.Colors.TRANSPARENT
             else:
-                self.user_avatar.content = ft.Text(self.username[0].upper() if self.username else "?", size=14)
+                self.user_avatar.content = ft.Text(
+                    self.username[0].upper() if self.username else "?", size=14
+                )
                 self.user_avatar.bgcolor = ft.Colors.BLUE_GREY_700
         except Exception as e:
             print(f"Error loading sidebar avatar for {self.username}: {e}")
@@ -70,7 +74,9 @@ class Sidebar(ft.Container):
             topic = message.get("topic")
             if topic == "requests_updated":
                 self._refresh_pending_requests()
-            elif topic == "profile_updated" and message.get("username") == self.username:
+            elif (
+                topic == "profile_updated" and message.get("username") == self.username
+            ):
                 self._load_user_avatar()
                 self.user_avatar.update()
         elif message == "catastrophe_mode":
@@ -147,7 +153,7 @@ class Sidebar(ft.Container):
                                         ),
                                     ],
                                 ),
-                            ]
+                            ],
                         ),
                         ft.IconButton(
                             icon=ft.Icons.LOGOUT_ROUNDED,
