@@ -80,4 +80,8 @@ class TempChart(ft.Container):
             )
 
         self.main_line.data_points = new_points
-        self.chart.update()
+        if self.chart.page:
+            try:
+                self.chart.update()
+            except Exception:
+                pass

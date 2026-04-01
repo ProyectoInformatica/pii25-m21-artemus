@@ -88,6 +88,62 @@ class DatabaseManager:
             
             cursor.executemany("INSERT IGNORE INTO Role_Permission (id_role, id_permission) VALUES (%s, %s)", role_perms)
 
+            # 3.3. Messaging Infrastructure
+            # Chat table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Chat (
+                    id_chat INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(100),
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # Verify if 'name' column exists in Chat, if not add it.
+            cursor.execute("SHOW COLUMNS FROM Chat LIKE 'name'")
+            if not cursor.fetchone():
+                cursor.execute("ALTER TABLE Chat ADD COLUMN name VARCHAR(100) AFTER id_chat")
+                
+            # Verify if 'encrypted_content' exists and remove it if it does (it should not be here)
+            cursor.execute("SHOW COLUMNS FROM Chat LIKE 'encrypted_content'")
+            if cursor.fetchone():
+                cursor.execute("ALTER TABLE Chat DROP COLUMN encrypted_content")
+            
+            # User_Chat table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS User_Chat (
+                    dni VARCHAR(20),
+                    id_chat INT,
+                    joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (dni, id_chat),
+                    FOREIGN KEY (dni) REFERENCES User(dni) ON UPDATE CASCADE ON DELETE CASCADE,
+                    FOREIGN KEY (id_chat) REFERENCES Chat(id_chat) ON DELETE CASCADE
+                )
+            """)
+
+            # Message table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Message (
+                    id_message INT AUTO_INCREMENT PRIMARY KEY,
+                    id_chat INT NOT NULL,
+                    sender_dni VARCHAR(20) NOT NULL,
+                    content TEXT NOT NULL,
+                    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (id_chat) REFERENCES Chat(id_chat) ON DELETE CASCADE,
+                    FOREIGN KEY (sender_dni) REFERENCES User(dni) ON UPDATE CASCADE ON DELETE CASCADE
+                )
+            """)
+
+            # Create Global Chat if it doesn't exist
+            cursor.execute("SELECT id_chat FROM Chat WHERE name = 'Global'")
+            if not cursor.fetchone():
+                cursor.execute("INSERT INTO Chat (name) VALUES ('Global')")
+                global_chat_id = cursor.lastrowid
+                # Add all existing users to Global Chat
+                cursor.execute("SELECT dni FROM User")
+                users = cursor.fetchall()
+                for (user_dni,) in users:
+                    cursor.execute("INSERT IGNORE INTO User_Chat (dni, id_chat) VALUES (%s, %s)", (user_dni, global_chat_id))
+
             # 4. Default Admin (admin123) - Using REPLACE to force password update
             # Hash of 'admin123': a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3
             admin_sql = """

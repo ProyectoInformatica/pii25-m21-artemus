@@ -34,6 +34,8 @@ from ArtemusPark.view.pages.History_Page import HistoryPage
 from ArtemusPark.view.pages.Maintenance_Page import MaintenancePage
 from ArtemusPark.view.pages.Requests_Page import RequestsPage
 from ArtemusPark.view.pages.Admin_Page import AdminPage
+from ArtemusPark.view.pages.Chat_Page import ChatPage
+from ArtemusPark.view.pages.Profile_Page import ProfilePage
 
 
 def generate_sensor_snapshot(timestamp: float, all_users: list):
@@ -146,10 +148,37 @@ async def main(page: ft.Page):
 
     async def sensor_simulation_loop():
         """Periodically generates random sensor data."""
+        from ArtemusPark.repository.Chat_Repository import ChatRepository
+        chat_repo = ChatRepository()
+        system_dni = "12345678X" # DNI del administrador por defecto
+        last_alert_time = 0
+
         while True:
             now = time.time()
             try:
                 generate_sensor_snapshot(now, all_users)
+                
+                # Check for critical alerts every 20 seconds max to avoid spam
+                if now - last_alert_time > 20:
+                    data = service.get_latest_sensor_data()
+                    if data:
+                        alert_msg = None
+                        if data.get("temperature", 0) > 30:
+                            alert_msg = f"⚠️ ALERTA CRÍTICA: Temperatura elevada ({data['temperature']}ºC) en sector principal."
+                        elif data.get("wind", 0) > 20:
+                            alert_msg = f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados."
+                        elif data.get("air_quality", 0) > 30:
+                            alert_msg = f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (AQI: {data['air_quality']})."
+                            
+                        if alert_msg:
+                            try:
+                                # El chat 1 es el chat Global
+                                chat_repo.send_message(1, system_dni, alert_msg)
+                                page.pubsub.send_all("new_chat_message")
+                                last_alert_time = now
+                            except Exception as chat_err:
+                                print(f"Error enviando alerta: {chat_err}")
+
             except Exception as e:
                 print(f"Error in sensor simulation: {e}")
 
@@ -189,13 +218,6 @@ async def main(page: ft.Page):
             if user_data and user_data.get("full_name"):
                 display_name = user_data["full_name"]
 
-        if page_name == "admin" and current_role != "admin":
-
-            page.snack_bar = ft.SnackBar(ft.Text("Access Denied"))
-            page.snack_bar.open = True
-            page.update()
-            return
-
         content_area.content = None
 
         if page_name == "dashboard":
@@ -217,8 +239,16 @@ async def main(page: ft.Page):
             )
 
         elif page_name == "admin":
-            content_area.content = AdminPage(
-                user_role=current_role, current_username=current_username
+            if current_role == "admin":
+                content_area.content = AdminPage(
+                    user_role=current_role, current_username=current_username
+                )
+            else:
+                content_area.content = ProfilePage(username=current_username)
+
+        elif page_name == "chat":
+            content_area.content = ChatPage(
+                current_username=current_username, current_user_role=current_role
             )
 
         content_area.update()

@@ -240,7 +240,11 @@ class DashboardPage(ft.Container):
                 "¡SISTEMA EN ESTADO CRÍTICO! Siga los protocolos de seguridad.",
                 is_critical=True,
             )
-        self.update()
+        if self.page:
+            try:
+                self.update()
+            except Exception:
+                pass
 
     def _deactivate_catastrophe_protocol(self):
         """Pone todo VERDE/AZUL (Normal)"""
@@ -256,7 +260,11 @@ class DashboardPage(ft.Container):
             self.card_alerts.show_alert(
                 "Sistema Normal", "El protocolo ha sido desactivado.", is_critical=False
             )
-        self.update()
+        if self.page:
+            try:
+                self.update()
+            except Exception:
+                pass
 
     def _build_window_bar(self):
         self.txt_welcome = ft.Text(

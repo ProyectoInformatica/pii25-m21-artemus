@@ -221,10 +221,18 @@ class AdminPage(ft.Container):
     def _on_message(self, message):
         if message == "catastrophe_mode":
             self.bgcolor = ft.Colors.RED_900
-            self.update()
+            if self.page:
+                try:
+                    self.update()
+                except Exception:
+                    pass
         elif message == "normal_mode":
             self.bgcolor = AppColors.BG_MAIN
-            self.update()
+            if self.page:
+                try:
+                    self.update()
+                except Exception:
+                    pass
 
     def will_unmount(self):
         self.simulation_running = False
