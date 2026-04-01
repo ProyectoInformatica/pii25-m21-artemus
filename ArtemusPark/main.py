@@ -149,15 +149,16 @@ async def main(page: ft.Page):
     async def sensor_simulation_loop():
         """Periodically generates random sensor data."""
         from ArtemusPark.repository.Chat_Repository import ChatRepository
+
         chat_repo = ChatRepository()
-        system_dni = "12345678X" # DNI del administrador por defecto
+        system_dni = "12345678X"  # DNI del administrador por defecto
         last_alert_time = 0
 
         while True:
             now = time.time()
             try:
                 generate_sensor_snapshot(now, all_users)
-                
+
                 # Check for critical alerts every 20 seconds max to avoid spam
                 if now - last_alert_time > 20:
                     data = service.get_latest_sensor_data()
@@ -169,7 +170,7 @@ async def main(page: ft.Page):
                             alert_msg = f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados."
                         elif data.get("air_quality", 0) > 30:
                             alert_msg = f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (AQI: {data['air_quality']})."
-                            
+
                         if alert_msg:
                             try:
                                 # El chat 1 es el chat Global

@@ -13,8 +13,8 @@ class HistoryPage(ft.Container):
         self.bgcolor = AppColors.BG_MAIN
 
         self.service = DashboardService()
-        self.range_limits = (0, 1) # Default: Last 24h
-        self.sort_descending = True # Default: Most recent first
+        self.range_limits = (0, 1)  # Default: Last 24h
+        self.sort_descending = True  # Default: Most recent first
         self._is_mounted = False
 
         self.sort_button = ft.IconButton(
@@ -80,7 +80,7 @@ class HistoryPage(ft.Container):
                 ft.Tabs(
                     label_color=ft.Colors.BLACK,
                     unselected_label_color=ft.Colors.BLACK87,
-                    selected_index=2, # Default to '1 dia' tab
+                    selected_index=2,  # Default to '1 dia' tab
                     on_change=self._on_range_change,
                     tabs=[
                         ft.Tab(text="1 mes"),
@@ -138,13 +138,13 @@ class HistoryPage(ft.Container):
         else:
             self.sort_button.icon = ft.Icons.ARROW_UPWARD
             self.sort_button.tooltip = "Orden: Más antiguo primero"
-        
+
         self.sort_button.update()
         self.load_data()
 
     def _on_range_change(self, e):
         index = e.control.selected_index
-        
+
         if index == 0:
             self.range_limits = (28, 35)
         elif index == 1:
@@ -161,11 +161,16 @@ class HistoryPage(ft.Container):
         if logs:
             # Aseguramos ordenamiento numérico por timestamp
             try:
-                logs.sort(key=lambda x: float(x.get("timestamp", 0)), reverse=self.sort_descending)
+                logs.sort(
+                    key=lambda x: float(x.get("timestamp", 0)),
+                    reverse=self.sort_descending,
+                )
             except (ValueError, TypeError):
                 # Fallback por si el timestamp no es convertible a float
-                logs.sort(key=lambda x: x.get("timestamp", 0), reverse=self.sort_descending)
-            
+                logs.sort(
+                    key=lambda x: x.get("timestamp", 0), reverse=self.sort_descending
+                )
+
             # Limitamos a los 50 más relevantes según el orden elegido
             logs = logs[:50]
 
@@ -183,7 +188,7 @@ class HistoryPage(ft.Container):
                         color=ft.Colors.BLACK54,
                         text_align=ft.TextAlign.CENTER,
                     ),
-                    padding=50
+                    padding=50,
                 )
             ]
         else:
