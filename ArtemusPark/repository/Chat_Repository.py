@@ -1,0 +1,131 @@
+from ArtemusPark.bbdd.db_connection import get_connection
+
+
+class ChatRepository:
+    def get_chats_for_user(self, dni):
+        """Returns all chats the user is part of with unread message count."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(dictionary=True, buffered=True)
+            query = """
+                    SELECT c.id_chat,
+                           c.name,
+                           c.created_at,
+                           (SELECT COUNT(*)
+                            FROM Message m
+                            WHERE m.id_chat = c.id_chat
+                              AND m.sender_dni != %s
+                              AND m.is_read = FALSE) as unread_count
+                    FROM Chat c
+                             JOIN User_Chat uc ON c.id_chat = uc.id_chat
+                    WHERE uc.dni = %s \
+                    """
+            cursor.execute(query, (dni, dni))
+            return cursor.fetchall()
+        finally:
+            conn.close()
+
+    def get_messages_in_chat(self, id_chat, current_user_dni):
+        """Returns all messages in a specific chat and marks them as read for the receiver. Decrypts content."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(dictionary=True, buffered=True)
+            # Mark messages not sent by me as read
+            cursor.execute(
+                "UPDATE Message SET is_read = TRUE WHERE id_chat = %s AND sender_dni != %s",
+                (id_chat, current_user_dni)
+            )
+            conn.commit()
+
+            # Using AES_DECRYPT to read the message content
+            query = """
+                    SELECT m.id_message,
+                           CAST(AES_DECRYPT(UNHEX(m.content), 'artemus_master_key') AS CHAR) as content,
+                           m.sent_at,
+                           u.username,
+                           u.full_name,
+                           m.is_read
+                    FROM Message m
+                             JOIN User u ON m.sender_dni = u.dni
+                    WHERE m.id_chat = %s
+                    ORDER BY m.sent_at ASC \
+                    """
+            cursor.execute(query, (id_chat,))
+            messages = cursor.fetchall()
+
+            # Fallback if decryption fails (for older unencrypted messages)
+            if messages:
+                for msg in messages:
+                    if msg['content'] is None:
+                        # Fetch the raw unencrypted content
+                        cursor.execute("SELECT content FROM Message WHERE id_message = %s", (msg['id_message'],))
+                        raw = cursor.fetchone()
+                        msg['content'] = raw['content'] if raw else "Error al desencriptar"
+            return messages
+        finally:
+            conn.close()
+
+    def get_total_unread_count(self, user_dni):
+        """Returns the number of unread messages for the user across all chats."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(buffered=True)
+            query = """
+                    SELECT COUNT(*)
+                    FROM Message m
+                             JOIN User_Chat uc ON m.id_chat = uc.id_chat
+                    WHERE uc.dni = %s
+                      AND m.sender_dni != %s
+                      AND m.is_read = FALSE \
+                    """
+            cursor.execute(query, (user_dni, user_dni))
+            res = cursor.fetchone()
+            return res[0] if res else 0
+        finally:
+            conn.close()
+
+    def send_message(self, id_chat, sender_dni, content):
+        """Inserts a new AES encrypted message into the database."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(buffered=True)
+            # Using AES_ENCRYPT to save the message securely
+            query = """
+                    INSERT INTO Message (id_chat, sender_dni, content)
+                    VALUES (%s, %s, HEX(AES_ENCRYPT(%s, 'artemus_master_key'))) \
+                    """
+            cursor.execute(query, (id_chat, sender_dni, content))
+            conn.commit()
+            return cursor.lastrowid
+        finally:
+            conn.close()
+
+    def create_chat(self, name, participants_dni):
+        """Creates a new chat and adds participants."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(buffered=True)
+            cursor.execute("INSERT INTO Chat (name) VALUES (%s)", (name,))
+            chat_id = cursor.lastrowid
+
+            for dni in participants_dni:
+                cursor.execute(
+                    "INSERT INTO User_Chat (dni, id_chat) VALUES (%s, %s)",
+                    (dni, chat_id)
+                )
+
+            conn.commit()
+            return chat_id
+        finally:
+            conn.close()
+
+    def get_all_users_for_chat_start(self, current_user_dni):
+        """Returns all active users except the current one."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor(dictionary=True, buffered=True)
+            query = "SELECT dni, username, full_name FROM User WHERE active = TRUE AND dni != %s"
+            cursor.execute(query, (current_user_dni,))
+            return cursor.fetchall()
+        finally:
+            conn.close()

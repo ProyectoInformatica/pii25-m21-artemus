@@ -84,6 +84,17 @@ CREATE TABLE User_Chat (
     FOREIGN KEY (id_chat) REFERENCES Chat(id_chat) ON DELETE CASCADE
 );
 
+-- 8.1. Message Table
+CREATE TABLE Message (
+    id_message INT AUTO_INCREMENT PRIMARY KEY,
+    id_chat INT NOT NULL,
+    sender_dni VARCHAR(20) NOT NULL,
+    content TEXT NOT NULL,
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_chat) REFERENCES Chat(id_chat) ON DELETE CASCADE,
+    FOREIGN KEY (sender_dni) REFERENCES User(dni) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 -- 9. Zone Table
 CREATE TABLE Zone (
     id_zone INT AUTO_INCREMENT PRIMARY KEY,
