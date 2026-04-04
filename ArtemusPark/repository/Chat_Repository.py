@@ -33,7 +33,7 @@ class ChatRepository:
             # Mark messages not sent by me as read
             cursor.execute(
                 "UPDATE Message SET is_read = TRUE WHERE id_chat = %s AND sender_dni != %s",
-                (id_chat, current_user_dni)
+                (id_chat, current_user_dni),
             )
             conn.commit()
 
@@ -56,11 +56,16 @@ class ChatRepository:
             # Fallback if decryption fails (for older unencrypted messages)
             if messages:
                 for msg in messages:
-                    if msg['content'] is None:
+                    if msg["content"] is None:
                         # Fetch the raw unencrypted content
-                        cursor.execute("SELECT content FROM Message WHERE id_message = %s", (msg['id_message'],))
+                        cursor.execute(
+                            "SELECT content FROM Message WHERE id_message = %s",
+                            (msg["id_message"],),
+                        )
                         raw = cursor.fetchone()
-                        msg['content'] = raw['content'] if raw else "Error al desencriptar"
+                        msg["content"] = (
+                            raw["content"] if raw else "Error al desencriptar"
+                        )
             return messages
         finally:
             conn.close()
@@ -111,7 +116,7 @@ class ChatRepository:
             for dni in participants_dni:
                 cursor.execute(
                     "INSERT INTO User_Chat (dni, id_chat) VALUES (%s, %s)",
-                    (dni, chat_id)
+                    (dni, chat_id),
                 )
 
             conn.commit()
