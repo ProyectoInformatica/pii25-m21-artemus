@@ -3,7 +3,7 @@ from ArtemusPark.bbdd.db_connection import get_connection
 
 class ChatRepository:
     def get_chats_for_user(self, dni):
-        """Returns all chats the user is part of with unread message count. 
+        """Returns all chats the user is part of with unread message count.
         If it's a 2-person chat, the name is the other participant's name."""
         conn = get_connection()
         try:
@@ -42,7 +42,7 @@ class ChatRepository:
             # Mark messages not sent by me as read
             cursor.execute(
                 "UPDATE Message SET is_read = TRUE WHERE id_chat = %s AND sender_dni != %s",
-                (id_chat, current_user_dni)
+                (id_chat, current_user_dni),
             )
             conn.commit()
 
@@ -68,11 +68,16 @@ class ChatRepository:
             # Fallback if decryption fails (for older unencrypted messages)
             if messages:
                 for msg in messages:
-                    if msg['content'] is None:
+                    if msg["content"] is None:
                         # Fetch the raw unencrypted content
-                        cursor.execute("SELECT content FROM Message WHERE id_message = %s", (msg['id_message'],))
+                        cursor.execute(
+                            "SELECT content FROM Message WHERE id_message = %s",
+                            (msg["id_message"],),
+                        )
                         raw = cursor.fetchone()
-                        msg['content'] = raw['content'] if raw else "Error al desencriptar"
+                        msg["content"] = (
+                            raw["content"] if raw else "Error al desencriptar"
+                        )
             return messages
         finally:
             conn.close()
@@ -82,7 +87,9 @@ class ChatRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)
-            cursor.execute("UPDATE Chat SET name = %s WHERE id_chat = %s", (new_name, id_chat))
+            cursor.execute(
+                "UPDATE Chat SET name = %s WHERE id_chat = %s", (new_name, id_chat)
+            )
             conn.commit()
         finally:
             conn.close()
@@ -143,7 +150,7 @@ class ChatRepository:
             for dni in participants_dni:
                 cursor.execute(
                     "INSERT INTO User_Chat (dni, id_chat) VALUES (%s, %s)",
-                    (dni, chat_id)
+                    (dni, chat_id),
                 )
 
             conn.commit()
@@ -185,7 +192,7 @@ class ChatRepository:
             cursor = conn.cursor(buffered=True)
             cursor.execute(
                 "INSERT IGNORE INTO User_Chat (dni, id_chat) VALUES (%s, %s)",
-                (dni, id_chat)
+                (dni, id_chat),
             )
             conn.commit()
         finally:
@@ -197,8 +204,7 @@ class ChatRepository:
         try:
             cursor = conn.cursor(buffered=True)
             cursor.execute(
-                "DELETE FROM User_Chat WHERE dni = %s AND id_chat = %s",
-                (dni, id_chat)
+                "DELETE FROM User_Chat WHERE dni = %s AND id_chat = %s", (dni, id_chat)
             )
             conn.commit()
         finally:

@@ -16,7 +16,7 @@ class AuthRepository:
             cursor.execute(query, (username,))
             row = cursor.fetchone()
             cursor.close()
-            
+
             if row and row[0]:
                 return [p.strip() for p in row[0].split(",") if p.strip()]
             return []
@@ -61,7 +61,9 @@ class AuthRepository:
                 dni = row["dni"]
 
                 sub_cursor = conn.cursor(buffered=True)
-                sub_cursor.execute("SELECT id_sensor FROM User_Sensor WHERE dni = %s", (dni,))
+                sub_cursor.execute(
+                    "SELECT id_sensor FROM User_Sensor WHERE dni = %s", (dni,)
+                )
                 sensors = [s[0] for s in sub_cursor.fetchall()]
                 sub_cursor.close()
 
@@ -75,7 +77,11 @@ class AuthRepository:
                     "address_city": row["address_city"] or "",
                     "address_zip": row["address_zip"] or "",
                     "assigned_sensors": sensors,
-                    "permissions": [p.strip() for p in (row["permissions_list"] or "").split(",") if p.strip()],
+                    "permissions": [
+                        p.strip()
+                        for p in (row["permissions_list"] or "").split(",")
+                        if p.strip()
+                    ],
                 }
             cursor.close()
             return result
@@ -103,7 +109,9 @@ class AuthRepository:
 
             dni = row["dni"]
             sub_cursor = conn.cursor(buffered=True)
-            sub_cursor.execute("SELECT id_sensor FROM User_Sensor WHERE dni = %s", (dni,))
+            sub_cursor.execute(
+                "SELECT id_sensor FROM User_Sensor WHERE dni = %s", (dni,)
+            )
             sensors = [s[0] for s in sub_cursor.fetchall()]
             sub_cursor.close()
 
@@ -117,7 +125,11 @@ class AuthRepository:
                 "address_city": row["address_city"] or "",
                 "address_zip": row["address_zip"] or "",
                 "assigned_sensors": sensors,
-                "permissions": [p.strip() for p in (row["permissions_list"] or "").split(",") if p.strip()],
+                "permissions": [
+                    p.strip()
+                    for p in (row["permissions_list"] or "").split(",")
+                    if p.strip()
+                ],
             }
             cursor.close()
             return result
@@ -131,7 +143,7 @@ class AuthRepository:
             cursor = conn.cursor(buffered=True)
             cursor.execute("SELECT id_role FROM Role WHERE role = %s", (role,))
             role_row = cursor.fetchone()
-            id_role = role_row[0] if role_row else 3 # Default to user
+            id_role = role_row[0] if role_row else 3  # Default to user
 
             perms_str = ",".join(permissions) if permissions else ""
 
@@ -141,11 +153,21 @@ class AuthRepository:
                      address_street, address_city, address_zip, active, permissions_list)
                 VALUES (%s, %s, %s, %s, SHA2(%s, 256), %s, %s, %s, %s, TRUE, %s)
             """
-            cursor.execute(query, (
-                kwargs.get("dni"), id_role, username, kwargs.get("full_name"),
-                password, kwargs.get("phone"), kwargs.get("address_street"),
-                kwargs.get("address_city"), kwargs.get("address_zip"), perms_str
-            ))
+            cursor.execute(
+                query,
+                (
+                    kwargs.get("dni"),
+                    id_role,
+                    username,
+                    kwargs.get("full_name"),
+                    password,
+                    kwargs.get("phone"),
+                    kwargs.get("address_street"),
+                    kwargs.get("address_city"),
+                    kwargs.get("address_zip"),
+                    perms_str,
+                ),
+            )
             conn.commit()
             cursor.close()
         finally:
@@ -158,23 +180,37 @@ class AuthRepository:
             cursor = conn.cursor(buffered=True)
 
             if "password" in kwargs:
-                cursor.execute("UPDATE User SET password_hash=SHA2(%s, 256) WHERE dni=%s", (kwargs["password"], dni))
+                cursor.execute(
+                    "UPDATE User SET password_hash=SHA2(%s, 256) WHERE dni=%s",
+                    (kwargs["password"], dni),
+                )
 
             if "full_name" in kwargs:
-                cursor.execute("UPDATE User SET full_name=%s WHERE dni=%s", (kwargs["full_name"], dni))
+                cursor.execute(
+                    "UPDATE User SET full_name=%s WHERE dni=%s",
+                    (kwargs["full_name"], dni),
+                )
 
             if "phone" in kwargs:
-                cursor.execute("UPDATE User SET phone=%s WHERE dni=%s", (kwargs["phone"], dni))
+                cursor.execute(
+                    "UPDATE User SET phone=%s WHERE dni=%s", (kwargs["phone"], dni)
+                )
 
             if "role" in kwargs:
-                cursor.execute("SELECT id_role FROM Role WHERE role = %s", (kwargs["role"],))
+                cursor.execute(
+                    "SELECT id_role FROM Role WHERE role = %s", (kwargs["role"],)
+                )
                 row = cursor.fetchone()
                 if row:
-                    cursor.execute("UPDATE User SET id_role=%s WHERE dni=%s", (row[0], dni))
+                    cursor.execute(
+                        "UPDATE User SET id_role=%s WHERE dni=%s", (row[0], dni)
+                    )
 
             if permissions is not None:
                 perms_str = ",".join(permissions)
-                cursor.execute("UPDATE User SET permissions_list=%s WHERE dni=%s", (perms_str, dni))
+                cursor.execute(
+                    "UPDATE User SET permissions_list=%s WHERE dni=%s", (perms_str, dni)
+                )
 
             conn.commit()
             cursor.close()
@@ -186,7 +222,9 @@ class AuthRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)
-            cursor.execute("SELECT profile_picture FROM User WHERE username = %s", (username,))
+            cursor.execute(
+                "SELECT profile_picture FROM User WHERE username = %s", (username,)
+            )
             row = cursor.fetchone()
             return bytes(row[0]) if row and row[0] else None
         finally:
