@@ -3,7 +3,7 @@ from ArtemusPark.config.Colors import AppColors
 
 
 class MapCard(ft.Container):
-    def __init__(self, on_sensor_click=None):
+    def __init__(self, on_sensor_click=None, permissions=None):
         super().__init__()
         self.border_radius = 12
         self.bgcolor = ft.Colors.WHITE
@@ -11,6 +11,7 @@ class MapCard(ft.Container):
         self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.alignment = ft.alignment.center
         self.on_sensor_click = on_sensor_click
+        self.permissions = permissions or []
 
         self.map_size = 400
 

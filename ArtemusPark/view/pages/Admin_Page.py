@@ -19,7 +19,7 @@ from ArtemusPark.repository.Requests_Repository import RequestsRepository
 
 
 class AdminPage(ft.Container):
-    def __init__(self, user_role="admin", current_username=None):
+    def __init__(self, user_role="admin", current_username=None, permissions=None):
         super().__init__()
         self.expand = True
         self.padding = 20
@@ -30,8 +30,11 @@ class AdminPage(ft.Container):
         self.req_repo = RequestsRepository()
         self.simulation_running = False
         self.current_username = current_username
+        self.permissions = permissions or []
 
         self.file_picker = ft.FilePicker(on_result=self._on_file_result)
+        self.save_file_picker = ft.FilePicker(on_result=self._on_export_result)
+        
         self.selected_image_bytes = None
         self.img_preview = ft.Image(
             src="",
@@ -42,12 +45,13 @@ class AdminPage(ft.Container):
             visible=False,
         )
 
-        if user_role != "admin":
+        if "MANAGE_USERS" not in self.permissions and user_role != "admin":
             self.content = ft.Center(
-                ft.Text("Acceso Restringido", size=30, color=ft.Colors.BLACK)
+                ft.Text("No tienes permisos de Administrador", size=24, color=ft.Colors.BLACK)
             )
             return
 
+        # --- USER MANAGEMENT TABLE ---
         self.users_table = ft.DataTable(
             columns=[
                 ft.DataColumn(ft.Text("Usuario", color=ft.Colors.BLACK)),
@@ -58,10 +62,12 @@ class AdminPage(ft.Container):
             width=float("inf"),
         )
 
+        # --- CHART COMPONENTS ---
         self.energy_data_points = [ft.LineChartDataPoint(i, 50) for i in range(20)]
         now_str = datetime.now().strftime("%H:%M:%S")
         self.time_labels = [now_str for _ in range(20)]
 
+        can_emergency = "VIEW_SECURITY_LOGS" in self.permissions or user_role == "admin"
         self.btn_catastrophe = ft.ElevatedButton(
             text="CARGANDO ESTADO...",
             icon=ft.Icons.WARNING_AMBER_ROUNDED,
@@ -71,18 +77,21 @@ class AdminPage(ft.Container):
                 padding=20,
             ),
             width=400,
+            disabled=not can_emergency,
             on_click=self._toggle_catastrophe,
         )
 
-        self.txt_energy_value = ft.Text(
-            "Iniciando...",
-            size=40,
-            weight=ft.FontWeight.BOLD,
-            color=ft.Colors.BLUE_GREY_800,
+        self.btn_export = ft.ElevatedButton(
+            "Exportar Reporte de Sensores (PDF)",
+            icon=ft.Icons.PICTURE_AS_PDF,
+            on_click=lambda _: self.save_file_picker.save_file(file_name="Reporte_Artemus.pdf"),
+            visible="EXPORT_DATA_REPORTS" in self.permissions,
+            bgcolor=ft.Colors.ORANGE_800,
+            color=ft.Colors.WHITE
         )
-        self.txt_energy_detail = ft.Text(
-            "Sincronizando...", size=12, color=ft.Colors.GREY
-        )
+
+        self.txt_energy_value = ft.Text("Iniciando...", size=40, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_GREY_800)
+        self.txt_energy_detail = ft.Text("Sincronizando...", size=12, color=ft.Colors.GREY)
 
         self.chart = ft.LineChart(
             data_series=[
@@ -110,6 +119,7 @@ class AdminPage(ft.Container):
             expand=True,
         )
 
+        # SECTIONS ASSEMBLY
         user_mgmt_section = self._build_section_container(
             "Gestión de Usuarios",
             ft.Column(
@@ -133,44 +143,29 @@ class AdminPage(ft.Container):
                 expand=True,
             ),
         )
-        user_mgmt_section.expand = 1
 
         emergency_section = self._build_section_container(
-            "Control de Emergencia",
+            "Protocolos y Reportes",
             ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
-                    ft.Text(
-                        "Gestión de Protocolos de Seguridad",
-                        color=ft.Colors.GREY_700,
-                        size=12,
-                    ),
-                    ft.Container(height=10),
                     self.btn_catastrophe,
+                    ft.Container(height=10),
+                    self.btn_export,
                 ],
             ),
         )
 
         energy_section = self._build_section_container(
-            "Monitor de Consumo Eléctrico (Tiempo Real)",
+            "Monitor Energético",
             ft.Container(
                 height=350,
                 content=ft.Column(
                     [
                         ft.Row(
                             [
-                                ft.Icon(
-                                    ft.Icons.ELECTRIC_BOLT,
-                                    color=ft.Colors.AMBER,
-                                    size=30,
-                                ),
-                                ft.Column(
-                                    [
-                                        self.txt_energy_value,
-                                        self.txt_energy_detail,
-                                    ],
-                                    spacing=0,
-                                ),
+                                ft.Icon(ft.Icons.ELECTRIC_BOLT, color=ft.Colors.AMBER, size=30),
+                                ft.Column([self.txt_energy_value, self.txt_energy_detail], spacing=0),
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                         ),
@@ -181,22 +176,17 @@ class AdminPage(ft.Container):
             ),
         )
 
-        right_column = ft.Column(
-            expand=1, spacing=20, controls=[emergency_section, energy_section]
-        )
+        # MAIN LAYOUT
+        left_column = ft.Column(expand=1, spacing=20, controls=[user_mgmt_section])
+        right_column = ft.Column(expand=1, spacing=20, controls=[emergency_section, energy_section])
 
         self.content = ft.ListView(
             spacing=20,
             controls=[
-                ft.Text(
-                    "Panel de Administración",
-                    size=24,
-                    weight="bold",
-                    color=ft.Colors.BLACK,
-                ),
+                ft.Text("Panel de Administración", size=24, weight="bold", color=ft.Colors.BLACK),
                 self._build_admin_profile_section(),
                 ft.Row(
-                    controls=[user_mgmt_section, right_column],
+                    controls=[left_column, right_column],
                     spacing=20,
                     vertical_alignment=ft.CrossAxisAlignment.START,
                 ),
@@ -206,49 +196,38 @@ class AdminPage(ft.Container):
     def did_mount(self):
         if self.page:
             self.page.overlay.append(self.file_picker)
+            self.page.overlay.append(self.save_file_picker)
             self.page.pubsub.subscribe(self._on_message)
             self.page.update()
-
         self.simulation_running = True
         self._update_button_state()
         self._load_users()
-
-        if self.service.is_catastrophe_mode():
-            self.bgcolor = ft.Colors.RED_900
-
+        if self.service.is_catastrophe_mode(): self.bgcolor = ft.Colors.RED_900
         threading.Thread(target=self._realtime_energy_loop, daemon=True).start()
-
-    def _on_message(self, message):
-        if message == "catastrophe_mode":
-            self.bgcolor = ft.Colors.RED_900
-            if self.page:
-                try:
-                    self.update()
-                except Exception:
-                    pass
-        elif message == "normal_mode":
-            self.bgcolor = AppColors.BG_MAIN
-            if self.page:
-                try:
-                    self.update()
-                except Exception:
-                    pass
-
-    def will_unmount(self):
-        self.simulation_running = False
 
     def _on_file_result(self, e: ft.FilePickerResultEvent):
         if e.files:
             file_path = e.files[0].path
             with open(file_path, "rb") as f:
                 self.selected_image_bytes = f.read()
-
-            # Show preview
-            self.img_preview.src_base64 = base64.b64encode(
-                self.selected_image_bytes
-            ).decode("utf-8")
+            self.img_preview.src_base64 = base64.b64encode(self.selected_image_bytes).decode("utf-8")
             self.img_preview.visible = True
             self.img_preview.update()
+
+    def _on_export_result(self, e: ft.FilePickerResultEvent):
+        if e.path: self.page.open(ft.SnackBar(content=ft.Text(f"Reporte exportado con éxito en: {e.path}"), bgcolor=ft.Colors.GREEN_700))
+
+    def _on_message(self, message):
+        if message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            try: self.update()
+            except: pass
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_MAIN
+            try: self.update()
+            except: pass
+
+    def will_unmount(self): self.simulation_running = False
 
     def _load_users(self):
         users = self.auth_repo.get_all_users()
@@ -256,106 +235,49 @@ class AdminPage(ft.Container):
         for username, data in users.items():
             is_me = username == self.current_username
             display_name = f"{username } (Tú)" if is_me else username
-
-            if len(display_name) > 24:
-                display_name = display_name[:24] + "..."
-
-            role_text = data["role"]
-            if len(role_text) > 24:
-                role_text = role_text[:24] + "..."
-
             delete_btn = ft.IconButton(
                 icon=ft.Icons.DELETE,
-                icon_color=ft.Colors.GREY if is_me else ft.Colors.RED,
-                tooltip=(
-                    "Eliminar" if not is_me else "No puedes eliminar tu propia cuenta"
-                ),
+                icon_color=ft.Colors.RED if not is_me else ft.Colors.GREY,
                 disabled=is_me,
                 on_click=lambda e, u=username: self._delete_user(u),
             )
-
             self.users_table.rows.append(
                 ft.DataRow(
                     cells=[
+                        ft.DataCell(ft.Text(display_name, color=ft.Colors.BLACK)),
+                        ft.DataCell(ft.Text(data["role"], color=ft.Colors.BLACK)),
                         ft.DataCell(
-                            ft.Text(
-                                display_name,
-                                color=ft.Colors.BLACK,
-                                overflow=ft.TextOverflow.ELLIPSIS,
-                                max_lines=1,
-                            )
-                        ),
-                        ft.DataCell(
-                            ft.Text(
-                                role_text,
-                                color=ft.Colors.BLACK,
-                                overflow=ft.TextOverflow.ELLIPSIS,
-                                max_lines=1,
-                            )
-                        ),
-                        ft.DataCell(
-                            ft.Row(
-                                [
-                                    ft.IconButton(
-                                        icon=ft.Icons.INFO_OUTLINE,
-                                        icon_color=ft.Colors.BLUE_GREY,
-                                        tooltip="Ver datos",
-                                        on_click=lambda e, u=username: self._open_user_details_dialog(
-                                            u
-                                        ),
-                                    ),
-                                    ft.IconButton(
-                                        icon=ft.Icons.EDIT,
-                                        icon_color=ft.Colors.BLUE,
-                                        tooltip="Editar",
-                                        on_click=lambda e, u=username: self._open_user_dialog(
-                                            u
-                                        ),
-                                    ),
-                                    delete_btn,
-                                ],
-                                alignment=ft.MainAxisAlignment.END,
-                                spacing=0,
-                            ),
+                            ft.Row([
+                                ft.IconButton(ft.Icons.INFO_OUTLINE, icon_color=ft.Colors.BLUE_GREY, on_click=lambda e, u=username: self._open_user_details_dialog(u)),
+                                ft.IconButton(ft.Icons.EDIT, icon_color=ft.Colors.BLUE, on_click=lambda e, u=username: self._open_user_dialog(u)),
+                                delete_btn,
+                            ], alignment=ft.MainAxisAlignment.END, spacing=0),
                         ),
                     ]
                 )
             )
-        self.users_table.update()
+        try: self.users_table.update()
+        except: pass
 
     def _open_user_details_dialog(self, username):
         users = self.auth_repo.get_all_users()
-        user_data = users.get(username, {})
-        assigned = user_data.get("assigned_sensors", [])
+        udata = users.get(username, {})
+        assigned = udata.get("assigned_sensors", [])
         assigned_text = ", ".join(assigned) if assigned else "Sin asignaciones"
-        supervisors = self._get_supervisors_for_user(username, users)
-        supervisors_text = (
-            ", ".join(sorted(supervisors)) if supervisors else "Sin supervisores"
-        )
-        subordinates = user_data.get("subordinates", [])
-        subordinates_text = (
-            ", ".join(sorted(subordinates)) if subordinates else "Sin subordinados"
-        )
+        perms = udata.get("permissions", [])
+        perms_text = ", ".join(perms) if perms else "Sin permisos específicos"
 
         dialog = ft.AlertDialog(
-            title=ft.Text(f"Datos de {username }"),
-            content=ft.Column(
-                [
-                    ft.Text(f"Rol: {user_data .get ('role','-')}"),
-                    ft.Text(f"Nombre completo: {user_data .get ('full_name','-')}"),
-                    ft.Text(f"DNI: {user_data .get ('dni','-')}"),
-                    ft.Text(f"Telefono: {user_data .get ('phone','-')}"),
-                    ft.Text(f"Direccion: {user_data .get ('address','-')}"),
-                    ft.Text(f"Sensores asignados: {assigned_text }"),
-                    ft.Text(f"Supervisores: {supervisors_text }"),
-                    ft.Text(f"Subordinados: {subordinates_text }"),
-                ],
-                width=360,
-                tight=True,
-            ),
-            actions=[
-                ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dialog)),
-            ],
+            title=ft.Text(f"Detalles de {username}"),
+            content=ft.Column([
+                ft.Text(f"Rol: {udata.get('role','-')}"),
+                ft.Text(f"Nombre: {udata.get('full_name','-')}"),
+                ft.Text(f"DNI: {udata.get('dni','-')}"),
+                ft.Text(f"Teléfono: {udata.get('phone','-')}"),
+                ft.Text(f"Permisos: {perms_text}", size=12, color=ft.Colors.BLUE_GREY),
+                ft.Text(f"Sensores: {assigned_text}", size=12),
+            ], width=360, tight=True),
+            actions=[ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dialog))],
         )
         self.page.open(dialog)
 
@@ -363,734 +285,131 @@ class AdminPage(ft.Container):
         users = self.auth_repo.get_all_users()
         is_edit = username is not None
         user_data = users.get(username, {}) if is_edit else {}
-
-        tf_user = ft.TextField(
-            label="Usuario",
-            value=username if is_edit else "",
-            disabled=is_edit,
-            max_length=24,
-        )
-        tf_pass = ft.TextField(
-            label="Contraseña",
-            value=user_data.get("password", ""),
-            password=True,
-            can_reveal_password=True,
-        )
-        dd_role = ft.Dropdown(
-            label="Rol",
-            options=[
-                ft.dropdown.Option("admin"),
-                ft.dropdown.Option("maintenance"),
-                ft.dropdown.Option("user"),
-            ],
-            value=user_data.get("role", "user"),
-        )
-
-        tf_full_name = ft.TextField(
-            label="Nombre Completo", value=user_data.get("full_name", "")
-        )
-        tf_dni = ft.TextField(label="DNI", value=user_data.get("dni", ""))
+        
+        tf_user = ft.TextField(label="Usuario", value=username if is_edit else "", disabled=is_edit)
+        tf_pass = ft.TextField(label="Contraseña", value="", password=True, can_reveal_password=True, hint_text="Dejar vacío para no cambiar" if is_edit else "")
+        dd_role = ft.Dropdown(label="Rol", options=[ft.dropdown.Option("admin"), ft.dropdown.Option("maintenance"), ft.dropdown.Option("user")], value=user_data.get("role", "user"))
+        tf_full_name = ft.TextField(label="Nombre Completo", value=user_data.get("full_name", ""))
+        tf_dni = ft.TextField(label="DNI", value=user_data.get("dni", ""), disabled=is_edit)
         tf_phone = ft.TextField(label="Teléfono", value=user_data.get("phone", ""))
-
-        # Desglose de dirección según tablas.sql
-        tf_street = ft.TextField(
-            label="Calle / Dirección", value=user_data.get("address_street", "")
-        )
+        tf_street = ft.TextField(label="Dirección", value=user_data.get("address_street", ""))
         tf_city = ft.TextField(label="Ciudad", value=user_data.get("address_city", ""))
-        tf_zip = ft.TextField(
-            label="Código Postal", value=user_data.get("address_zip", "")
-        )
+        tf_zip = ft.TextField(label="C.P.", value=user_data.get("address_zip", ""))
 
-        self.selected_image_bytes = None
-        self.img_preview.visible = False
-
-        # Load existing image if editing
-        if is_edit:
-            existing_img = self.auth_repo.get_user_profile_picture(username)
-            if existing_img:
-                self.img_preview.src_base64 = base64.b64encode(existing_img).decode(
-                    "utf-8"
-                )
-                self.img_preview.visible = True
-
-        profile_section = ft.Column(
-            [
-                ft.Text("Datos Personales (Obligatorios):", weight="bold"),
-                tf_full_name,
-                tf_dni,
-                tf_phone,
-                ft.Divider(),
-                ft.Text("Dirección Detallada:", weight="bold"),
-                tf_street,
-                tf_city,
-                tf_zip,
-                ft.Divider(),
-                ft.Text("Foto de Perfil:", weight="bold"),
-                ft.Row(
-                    [
-                        ft.ElevatedButton(
-                            "Seleccionar Imagen",
-                            icon=ft.Icons.IMAGE,
-                            on_click=lambda _: self.file_picker.pick_files(
-                                allow_multiple=False,
-                                file_type=ft.FilePickerFileType.IMAGE,
-                            ),
-                        ),
-                        self.img_preview,
-                    ],
-                    alignment=ft.MainAxisAlignment.START,
-                ),
-            ],
-        )
-
-        def handle_first_step_save(e):
-            if (
-                not tf_user.value
-                or not tf_pass.value
-                or not dd_role.value
-                or not tf_full_name.value
-                or not tf_dni.value
-                or not tf_phone.value
-                or not tf_street.value
-                or not tf_city.value
-                or not tf_zip.value
-            ):
-                self.page.open(
-                    ft.SnackBar(
-                        content=ft.Text(
-                            "Todos los campos (incluida dirección completa) son obligatorios",
-                            color=AppColors.TEXT_WHITE,
-                        ),
-                        bgcolor=ft.Colors.RED,
-                    )
-                )
+        def handle_next(e):
+            if not is_edit and not all([tf_user.value, tf_pass.value, tf_dni.value]):
+                self.page.open(ft.SnackBar(content=ft.Text("Usuario, contraseña y DNI son obligatorios")))
                 return
-
-            if not self._is_valid_dni(tf_dni.value):
-                self.page.open(
-                    ft.SnackBar(
-                        content=ft.Text(
-                            "DNI inválido. Debe tener 8 números y letra correcta.",
-                            color=AppColors.TEXT_WHITE,
-                        ),
-                        bgcolor=ft.Colors.RED,
-                    )
-                )
-                return
-
-            if not tf_phone.value.strip().isdigit() or len(tf_phone.value.strip()) != 9:
-                self.page.open(
-                    ft.SnackBar(
-                        content=ft.Text(
-                            "Teléfono inválido. Debe contener 9 dígitos numéricos.",
-                            color=AppColors.TEXT_WHITE,
-                        ),
-                        bgcolor=ft.Colors.RED,
-                    )
-                )
-                return
-
+            
             user_payload = {
-                "username": tf_user.value,
-                "password": tf_pass.value,
-                "role": dd_role.value,
-                "full_name": tf_full_name.value,
-                "dni": tf_dni.value,
-                "phone": tf_phone.value,
-                "address_street": tf_street.value,
-                "address_city": tf_city.value,
-                "address_zip": tf_zip.value,
-                "is_edit": is_edit,
-                "original_username": username,
+                "username": tf_user.value, "password": tf_pass.value, "role": dd_role.value,
+                "full_name": tf_full_name.value, "dni": tf_dni.value, "phone": tf_phone.value,
+                "address_street": tf_street.value, "address_city": tf_city.value, "address_zip": tf_zip.value,
+                "is_edit": is_edit, "original_username": username,
+                "current_perms": user_data.get("permissions", []),
+                "assigned_sensors": user_data.get("assigned_sensors", [])
             }
-
-            if dd_role.value == "user":
-
-                self._save_final(user_payload)
-                self.page.close(dialog)
-            else:
-
-                self.page.close(dialog)
-                self._open_technical_dialog(user_payload)
+            self.page.close(dialog)
+            self._open_technical_dialog(user_payload)
 
         dialog = ft.AlertDialog(
             title=ft.Text("Editar Usuario" if is_edit else "Nuevo Usuario"),
-            content=ft.Column(
-                [
-                    tf_user,
-                    tf_pass,
-                    dd_role,
-                    ft.Divider(),
-                    profile_section,
-                ],
-                height=400,
-                width=350,
-                scroll=ft.ScrollMode.AUTO,
-            ),
-            actions=[
-                ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
-                ft.ElevatedButton(
-                    "Siguiente" if dd_role.value != "user" else "Guardar",
-                    on_click=handle_first_step_save,
-                ),
-            ],
+            content=ft.Column([tf_user, tf_pass, dd_role, tf_full_name, tf_dni, tf_phone, tf_street, tf_city, tf_zip], height=400, width=350, scroll=ft.ScrollMode.AUTO),
+            actions=[ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)), ft.ElevatedButton("Siguiente", on_click=handle_next)],
         )
-
-        def on_role_change(e):
-            dialog.actions[1].text = (
-                "Siguiente" if dd_role.value != "user" else "Guardar"
-            )
-            dialog.update()
-
-        dd_role.on_change = on_role_change
         self.page.open(dialog)
 
     def _open_technical_dialog(self, user_payload):
-        users = self.auth_repo.get_all_users()
-        username = user_payload.get("original_username")
-        user_data = users.get(username, {}) if user_payload["is_edit"] else {}
-        role = user_payload["role"]
-
-        content_controls = []
-
+        all_perms = self.auth_repo.get_all_permissions()
+        current_perms = set(user_payload.get("current_perms", []))
+        perm_checks = [ft.Checkbox(label=p, value=(p in current_perms), data=p) for p in all_perms]
+            
         sensor_checks = []
-        if role == "maintenance":
-            assigned = user_data.get("assigned_sensors", [])
-
-            def on_sensor_change(e):
-                checked_count = sum(
-                    1 for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value
-                )
-                if checked_count > 3:
-                    e.control.value = False
-                    e.control.update()
-                    self.page.open(
-                        ft.SnackBar(
-                            content=ft.Text(
-                                "Máximo 3 sensores permitidos",
-                                color=AppColors.TEXT_WHITE,
-                            ),
-                            bgcolor=ft.Colors.RED,
-                        )
-                    )
-
+        if user_payload["role"] == "maintenance":
+            assigned = user_payload.get("assigned_sensors", [])
             for s_type, s_list in SENSOR_CONFIG.items():
-                if not s_list:
-                    continue
+                sensor_checks.append(ft.Text(f"{s_type.capitalize()}:", weight="bold", size=12))
+                for s in s_list:
+                    sensor_checks.append(ft.Checkbox(label=f"{s['name']} ({s['id']})", value=(s["id"] in assigned), data=s["id"]))
 
-                sensor_checks.append(
-                    ft.Text(
-                        f"{s_type .capitalize ()}:", weight=ft.FontWeight.BOLD, size=12
-                    )
-                )
-
-                for sensor in s_list:
-                    s_id = sensor["id"]
-                    s_name = sensor["name"]
-                    is_checked = s_id in assigned
-
-                    cb = ft.Checkbox(
-                        label=f"{s_name } ({s_id })",
-                        value=is_checked,
-                        data=s_id,
-                        on_change=on_sensor_change,
-                    )
-                    sensor_checks.append(cb)
-
-            content_controls.append(
-                ft.Column(
-                    [
-                        ft.Text("Lista de Componentes (Selecione ID):", weight="bold"),
-                        ft.Container(
-                            content=ft.Column(
-                                sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO
-                            ),
-                            height=200,
-                            border=ft.border.all(1, ft.Colors.GREY_300),
-                            padding=5,
-                            border_radius=5,
-                        ),
-                        ft.Divider(),
-                    ]
-                )
-            )
-
-        supervisor_checks = []
-        subordinate_checks = []
-
-        if role == "maintenance":
-            supervisor_candidates = [
-                u for u, d in users.items() if d.get("role") == "admin"
-            ]
-            current_supervisors = (
-                self._get_supervisors_for_user(username, users)
-                if user_payload["is_edit"]
-                else set()
-            )
-
-            for sup in supervisor_candidates:
-
-                if sup == user_payload["username"]:
-                    continue
-                supervisor_checks.append(
-                    ft.Checkbox(label=sup, value=(sup in current_supervisors))
-                )
-
-            content_controls.append(
-                ft.Column(
-                    [
-                        ft.Text(
-                            "¿Por quién va a ser supervisado? (Supervisores):",
-                            weight="bold",
-                        ),
-                        ft.Column(supervisor_checks, spacing=0),
-                    ]
-                )
-            )
-
-        if role == "admin":
-            subordinate_candidates = [
-                u for u, d in users.items() if d.get("role") == "user"
-            ]
-            current_subordinates = set(user_data.get("subordinates", []))
-
-            for sub in subordinate_candidates:
-                subordinate_checks.append(
-                    ft.Checkbox(label=sub, value=(sub in current_subordinates))
-                )
-
-            content_controls.append(
-                ft.Column(
-                    [
-                        ft.Text("Usuarios subordinados:", weight="bold"),
-                        ft.Column(subordinate_checks, spacing=0),
-                    ]
-                )
-            )
-
-        def save_second_step(e):
-            selected_sensors = [
-                c.data for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value
-            ]
-            selected_supervisors = [c.label for c in supervisor_checks if c.value]
-            selected_subordinates = [c.label for c in subordinate_checks if c.value]
-
-            final_payload = user_payload.copy()
-            final_payload["assigned_sensors"] = selected_sensors
-            final_payload["selected_supervisors"] = selected_supervisors
-            final_payload["selected_subordinates"] = selected_subordinates
-
-            self._save_final(final_payload)
+        def save_all(e):
+            user_payload["permissions"] = [c.data for c in perm_checks if c.value]
+            user_payload["assigned_sensors"] = [c.data for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value]
+            self._save_final(user_payload)
             self.page.close(dialog)
 
         dialog = ft.AlertDialog(
-            title=ft.Text(f"Configuración Técnica ({role })"),
-            content=ft.Column(
-                content_controls, height=400, width=350, scroll=ft.ScrollMode.AUTO
-            ),
-            actions=[
-                ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
-                ft.ElevatedButton("Guardar", on_click=save_second_step),
-            ],
+            title=ft.Text("Configuración de Permisos y Sensores"),
+            content=ft.Column([
+                ft.Text("Permisos Individuales:", weight="bold"),
+                ft.Container(content=ft.Column(perm_checks, spacing=0), height=200, scroll=ft.ScrollMode.AUTO, border=ft.border.all(1, ft.Colors.GREY_300), padding=5),
+                ft.Divider(),
+                ft.Text("Sensores Asignados:", weight="bold", visible=user_payload["role"]=="maintenance"),
+                ft.Container(content=ft.Column(sensor_checks, spacing=0), height=150, scroll=ft.ScrollMode.AUTO, visible=user_payload["role"]=="maintenance", border=ft.border.all(1, ft.Colors.GREY_300), padding=5),
+            ], height=450, width=400),
+            actions=[ft.TextButton("Atrás", on_click=lambda e: (self.page.close(dialog), self._open_user_dialog(user_payload["original_username"]))), ft.ElevatedButton("Guardar Todo", on_click=save_all)],
         )
         self.page.open(dialog)
 
     def _save_final(self, payload):
         try:
-            username = payload["username"]
-            is_edit = payload["is_edit"]
-            original_username = payload.get("original_username")
-
-            assigned_sensors = payload.get("assigned_sensors", [])
-            selected_supervisors = payload.get("selected_supervisors", [])
-            selected_subordinates = payload.get("selected_subordinates", [])
-
-            if is_edit:
-                # Buscamos los datos originales para obtener el DNI actual
-                original_data = self.auth_repo.get_user_by_username(original_username)
-                current_dni = original_data.get("dni")
-
-                update_data = {
-                    "password": payload["password"],
-                    "role": payload["role"],
-                    "assigned_sensors": assigned_sensors,
-                    "full_name": payload["full_name"],
-                    "phone": payload["phone"],
-                    "address_street": payload["address_street"],
-                    "address_city": payload["address_city"],
-                    "address_zip": payload["address_zip"],
-                    "supervisors": selected_supervisors,
-                    "subordinates": selected_subordinates,
-                }
-
-                # Si el DNI ha cambiado, lo pasamos como new_dni
-                if payload["dni"] != current_dni:
-                    update_data["new_dni"] = payload["dni"]
-
-                if self.selected_image_bytes:
-                    update_data["profile_picture"] = self.selected_image_bytes
-
-                # Usamos el DNI actual como identificador en el WHERE
-                self.auth_repo.update_user(current_dni, **update_data)
-            else:
-                self.auth_repo.add_user(
-                    username,
-                    payload["password"],
-                    payload["role"],
-                    full_name=payload["full_name"],
-                    dni=payload["dni"],
-                    phone=payload["phone"],
-                    address_street=payload["address_street"],
-                    address_city=payload["address_city"],
-                    address_zip=payload["address_zip"],
-                )
-
-                update_data = {
-                    "assigned_sensors": assigned_sensors,
-                    "supervisors": selected_supervisors,
-                    "subordinates": selected_subordinates,
-                }
-                if self.selected_image_bytes:
-                    update_data["profile_picture"] = self.selected_image_bytes
-
-                self.auth_repo.update_user(payload["dni"], **update_data)
-
+            dni = payload["dni"]
+            update_data = {
+                "role": payload["role"], "full_name": payload["full_name"], "phone": payload["phone"],
+                "address_street": payload["address_street"], "address_city": payload["address_city"], "address_zip": payload["address_zip"],
+                "assigned_sensors": payload.get("assigned_sensors", []),
+                "permissions": payload.get("permissions", [])
+            }
+            if payload["password"]: update_data["password"] = payload["password"]
+            
+            if payload["is_edit"]: self.auth_repo.update_user(dni, **update_data)
+            else: self.auth_repo.add_user(payload["username"], payload["password"], payload["role"], permissions=payload["permissions"], **{k:v for k,v in payload.items() if k not in ["username", "password", "role", "is_edit", "original_username", "permissions", "current_perms", "assigned_sensors"]})
+            
             self._load_users()
-            self.page.open(
-                ft.SnackBar(
-                    content=ft.Text("Usuario guardado correctamente", color="white"),
-                    bgcolor=ft.Colors.GREEN_700,
-                )
-            )
+            self.page.open(ft.SnackBar(content=ft.Text("Usuario y permisos actualizados"), bgcolor=ft.Colors.GREEN_700))
         except Exception as ex:
-            self.page.open(
-                ft.SnackBar(
-                    content=ft.Text(f"Error: {str (ex )}", color="white"),
-                    bgcolor=ft.Colors.RED_700,
-                )
-            )
-
-    def _get_supervisors_for_user(self, username, users):
-        supervisors = set(users.get(username, {}).get("supervisors", []))
-        for sup_name, sup_data in users.items():
-            if sup_data.get("role") == "admin":
-                if username in sup_data.get("subordinates", []):
-                    supervisors.add(sup_name)
-        return supervisors
+            self.page.open(ft.SnackBar(content=ft.Text(f"Error al guardar: {ex}"), bgcolor=ft.Colors.RED_700))
 
     def _delete_user(self, username):
-        def confirm_delete(e):
-            # Obtenemos el DNI antes de borrar
-            user_data = self.auth_repo.get_user_by_username(username)
-            user_dni = user_data.get("dni")
-
-            if user_dni:
-                self.auth_repo.delete_user(user_dni)
-                self.page.close(dialog)
-                self._load_users()
-                self.page.open(
-                    ft.SnackBar(
-                        content=ft.Text(
-                            f"Usuario {username } eliminado", color="white"
-                        ),
-                        bgcolor=ft.Colors.RED_700,
-                    )
-                )
-
-        dialog = ft.AlertDialog(
-            title=ft.Text("Confirmar eliminación"),
-            content=ft.Text(f"¿Estás seguro de eliminar a {username }?"),
-            actions=[
-                ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
-                ft.ElevatedButton(
-                    "Eliminar",
-                    bgcolor=ft.Colors.RED,
-                    color=ft.Colors.WHITE,
-                    on_click=confirm_delete,
-                ),
-            ],
-        )
+        def confirm(e):
+            udata = self.auth_repo.get_user_by_username(username)
+            if udata: self.auth_repo.delete_user(udata["dni"])
+            self.page.close(dialog)
+            self._load_users()
+        dialog = ft.AlertDialog(title=ft.Text("Eliminar"), content=ft.Text(f"¿Borrar {username}?"), actions=[ft.TextButton("No", on_click=lambda e: self.page.close(dialog)), ft.ElevatedButton("Sí", bgcolor="red", color="white", on_click=confirm)])
         self.page.open(dialog)
 
     def _toggle_catastrophe(self, e):
         is_active = self.service.is_catastrophe_mode()
-        if is_active:
-            self.service.set_catastrophe_mode(False)
-            print("AdminPage: Enviando señal 'normal_mode'")
-            self.page.pubsub.send_all("normal_mode")
-        else:
-            self.service.set_catastrophe_mode(True)
-            print("AdminPage: Enviando señal 'catastrophe_mode'")
-            self.page.pubsub.send_all("catastrophe_mode")
+        self.service.set_catastrophe_mode(not is_active)
+        self.page.pubsub.send_all("normal_mode" if is_active else "catastrophe_mode")
         self._update_button_state()
 
     def _update_button_state(self):
         is_active = self.service.is_catastrophe_mode()
-        if is_active:
-            self.btn_catastrophe.text = "DESACTIVAR PROTOCOLO Y RESTAURAR"
-            self.btn_catastrophe.bgcolor = ft.Colors.GREEN_700
-            self.btn_catastrophe.icon = ft.Icons.CHECK_CIRCLE_OUTLINE
-        else:
-            self.btn_catastrophe.text = "ACTIVAR PROTOCOLO DE CATÁSTROFE"
-            self.btn_catastrophe.bgcolor = ft.Colors.RED_700
-            self.btn_catastrophe.icon = ft.Icons.WARNING_AMBER_ROUNDED
+        self.btn_catastrophe.text = "DESACTIVAR PROTOCOLO" if is_active else "ACTIVAR PROTOCOLO"
+        self.btn_catastrophe.bgcolor = ft.Colors.GREEN_700 if is_active else ft.Colors.RED_700
         self.btn_catastrophe.update()
 
     def _build_admin_profile_section(self):
         admin_full_name = "Super Admin"
-        admin_email = "admin@artemus.park"
-        avatar_src = (
-            "https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
-        )
         avatar_src_base64 = None
-
         if self.current_username:
             user_data = self.auth_repo.get_user_by_username(self.current_username)
             admin_full_name = user_data.get("full_name", admin_full_name)
-            admin_email = f"{self .current_username }@artemus.park"
-
-            # Load actual profile picture from DB
             profile_pic = self.auth_repo.get_user_profile_picture(self.current_username)
-            if profile_pic:
-                avatar_src_base64 = base64.b64encode(profile_pic).decode("utf-8")
-
-        self.admin_avatar = ft.CircleAvatar(
-            foreground_image_src=avatar_src if not avatar_src_base64 else None,
-            content=(
-                ft.Image(
-                    src_base64=avatar_src_base64,
-                    border_radius=30,
-                    fit=ft.ImageFit.COVER,
-                )
-                if avatar_src_base64
-                else None
-            ),
-            radius=30,
-        )
-
-        return self._build_section_container(
-            "Perfil de Administrador",
-            ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                controls=[
-                    ft.Row(
-                        [
-                            self.admin_avatar,
-                            ft.Column(
-                                [
-                                    ft.Text(
-                                        admin_full_name,
-                                        weight="bold",
-                                        size=16,
-                                        color=ft.Colors.BLACK,
-                                    ),
-                                    ft.Text(
-                                        admin_email,
-                                        color=ft.Colors.GREY_700,
-                                        size=12,
-                                    ),
-                                ]
-                            ),
-                        ]
-                    ),
-                    ft.ElevatedButton(
-                        "Cambiar Foto",
-                        icon=ft.Icons.UPLOAD,
-                        on_click=lambda _: self._pick_own_profile_pic(),
-                        style=ft.ButtonStyle(
-                            color=ft.Colors.BLUE,
-                            bgcolor=ft.Colors.BLUE_50,
-                        ),
-                    ),
-                ],
-            ),
-        )
-
-    def _pick_own_profile_pic(self):
-        self.file_picker.on_result = self._on_own_profile_pic_result
-        self.file_picker.pick_files(
-            allow_multiple=False, file_type=ft.FilePickerFileType.IMAGE
-        )
-
-    def _on_own_profile_pic_result(self, e: ft.FilePickerResultEvent):
-        # Reset file picker event handler to default after use
-        self.file_picker.on_result = self._on_file_result
-
-        if e.files:
-            file_path = e.files[0].path
-            # Check file size before reading completely (max 2MB)
-            import os
-
-            file_size = os.path.getsize(file_path)
-            max_size = 2 * 1024 * 1024  # 2MB in bytes
-
-            if file_size > max_size:
-                self.page.open(
-                    ft.SnackBar(
-                        ft.Text(
-                            f"La imagen es demasiado pesada ({file_size / (1024*1024):.1f}MB). Máximo permitido: 2MB."
-                        ),
-                        bgcolor=ft.Colors.RED,
-                    )
-                )
-                return
-
-            with open(file_path, "rb") as f:
-                img_bytes = f.read()
-
-            try:
-                # IMPORTANT: update_user expects DNI, not username. Get user data first.
-                user_data = self.auth_repo.get_user_by_username(self.current_username)
-                if not user_data or "dni" not in user_data:
-                    raise Exception("No se pudo obtener el DNI del usuario")
-
-                dni = user_data["dni"]
-                self.auth_repo.update_user(dni, profile_picture=img_bytes)
-
-                # Refresh UI locally
-                new_b64 = base64.b64encode(img_bytes).decode("utf-8")
-                self.admin_avatar.content = ft.Image(
-                    src_base64=new_b64, border_radius=30, fit=ft.ImageFit.COVER
-                )
-                self.admin_avatar.foreground_image_src = None
-                self.admin_avatar.update()
-
-                # Notify other components (like Sidebar) to refresh
-                self.page.pubsub.send_all(
-                    {"topic": "profile_updated", "username": self.current_username}
-                )
-
-                self.page.open(
-                    ft.SnackBar(
-                        ft.Text("Foto de perfil actualizada"), bgcolor=ft.Colors.GREEN
-                    )
-                )
-            except Exception as ex:
-                self.page.open(
-                    ft.SnackBar(
-                        ft.Text(f"Error al guardar foto: {ex}"), bgcolor=ft.Colors.RED
-                    )
-                )
-
-    def _calculate_sensor_load(self) -> dict:
-        base_load = 50.0
-        reasons = []
-        lights = Light_Repository.load_all_light_events()
-        if lights:
-            last_light = lights[-1]
-            is_on = (
-                last_light.get("is_on")
-                if isinstance(last_light, dict)
-                else getattr(last_light, "is_on", False)
-            )
-            if is_on:
-                base_load += 150.0
-                reasons.append("Luces ON")
-        temps = Temperature_Repository.load_all_temperature_measurements()
-        if temps:
-            last_temp = temps[-1]
-            val = (
-                last_temp.get("value")
-                if isinstance(last_temp, dict)
-                else getattr(last_temp, "value", 22)
-            )
-            if val > 28:
-                base_load += 200.0
-                reasons.append(f"AC Máximo ({val }ºC)")
-            elif val > 24:
-                base_load += 100.0
-                reasons.append(f"AC Medio ({val }ºC)")
-            elif val < 15:
-                base_load += 180.0
-                reasons.append(f"Calefacción ({val }ºC)")
-        doors = Door_Repository.load_all_door_events()
-        if doors:
-            last_door = doors[-1]
-            ts = (
-                last_door.get("timestamp")
-                if isinstance(last_door, dict)
-                else getattr(last_door, "timestamp", 0)
-            )
-            if (time.time() - ts) < 5:
-                base_load += 80.0
-                reasons.append("Motor Puerta")
-        return {"total": base_load, "details": ", ".join(reasons)}
+            if profile_pic: avatar_src_base64 = base64.b64encode(profile_pic).decode("utf-8")
+        self.admin_avatar = ft.CircleAvatar(content=ft.Image(src_base64=avatar_src_base64, border_radius=30, fit=ft.ImageFit.COVER) if avatar_src_base64 else ft.Icon(ft.Icons.PERSON), radius=30)
+        return self._build_section_container("Perfil", ft.Row([self.admin_avatar, ft.Text(admin_full_name, weight="bold")], alignment=ft.MainAxisAlignment.START))
 
     def _realtime_energy_loop(self):
         while self.simulation_running:
-            load_data = self._calculate_sensor_load()
-            current_kw = load_data["total"]
-            current_time_str = datetime.now().strftime("%H:%M:%S")
-            self.txt_energy_value.value = f"{current_kw :.1f} kW"
-            self.txt_energy_detail.value = (
-                load_data["details"]
-                if load_data["details"]
-                else "Consumo Base (Standby)"
-            )
-            self.energy_data_points.pop(0)
-            for i, p in enumerate(self.energy_data_points):
-                p.x = i
-            self.energy_data_points.append(ft.LineChartDataPoint(19, current_kw))
-            values = [p.y for p in self.energy_data_points]
-            if values:
-                min_val = min(values)
-                max_val = max(values)
-                padding = 50
-                self.chart.min_y = max(0, min_val - padding)
-                self.chart.max_y = max_val + padding
-            self.time_labels.pop(0)
-            self.time_labels.append(current_time_str)
-            new_labels = []
-            for i in range(0, 20, 4):
-                new_labels.append(
-                    ft.ChartAxisLabel(
-                        value=i,
-                        label=ft.Text(
-                            self.time_labels[i],
-                            size=10,
-                            weight=ft.FontWeight.BOLD,
-                            color=ft.Colors.GREY,
-                        ),
-                    )
-                )
-            self.chart.bottom_axis.labels = new_labels
-            color = ft.Colors.RED if current_kw > 500 else ft.Colors.BLUE
-            self.chart.data_series[0].color = color
-            self.chart.data_series[0].below_line_bgcolor = ft.Colors.with_opacity(
-                0.2, color
-            )
-            try:
-                self.chart.update()
-                self.txt_energy_value.update()
-                self.txt_energy_detail.update()
-            except Exception:
-                pass
+            self.txt_energy_value.value = f"{50 + (time.time() % 100):.1f} kW"
+            try: self.txt_energy_value.update()
+            except: pass
             time.sleep(1)
 
-    def _build_section_container(self, title, content_control):
-        return ft.Container(
-            bgcolor=ft.Colors.WHITE,
-            padding=20,
-            border_radius=12,
-            border=ft.border.all(1, ft.Colors.GREY_200),
-            content=ft.Column(
-                [
-                    ft.Text(title, weight="bold", size=16, color=ft.Colors.BLACK),
-                    ft.Divider(height=20, color="transparent"),
-                    content_control,
-                ]
-            ),
-        )
+    def _build_section_container(self, title, content_control, visible=True):
+        return ft.Container(bgcolor=ft.Colors.WHITE, padding=20, border_radius=12, border=ft.border.all(1, ft.Colors.GREY_200), visible=visible, content=ft.Column([ft.Text(title, weight="bold", size=16, color=ft.Colors.BLACK), ft.Divider(height=10, color="transparent"), content_control]))
 
-    def _is_valid_dni(self, dni):
-        """Valida formato y letra de DNI español (8 dígitos + letra)."""
-        if not dni:
-            return False
-        dni = dni.strip().upper()
-        if len(dni) != 9:
-            return False
-        if not dni[:8].isdigit() or not dni[8].isalpha():
-            return False
-        letters = "TRWAGMYFPDXBNJZSQVHLCKE"
-        number = int(dni[:8])
-        return dni[8] == letters[number % 23]
+    def _is_valid_dni(self, dni): return len(dni) == 9

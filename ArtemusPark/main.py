@@ -223,7 +223,10 @@ async def main(page: ft.Page):
 
         if page_name == "dashboard":
             content_area.content = DashboardPage(
-                user_name=display_name, user_role=current_role, on_navigate=change_view
+                user_name=display_name, 
+                user_role=current_role, 
+                on_navigate=change_view,
+                permissions=session.get("permissions", [])
             )
 
         elif page_name == "history":
@@ -242,14 +245,18 @@ async def main(page: ft.Page):
         elif page_name == "admin":
             if current_role == "admin":
                 content_area.content = AdminPage(
-                    user_role=current_role, current_username=current_username
+                    user_role=current_role, 
+                    current_username=current_username,
+                    permissions=session.get("permissions", [])
                 )
             else:
                 content_area.content = ProfilePage(username=current_username)
 
         elif page_name == "chat":
             content_area.content = ChatPage(
-                current_username=current_username, current_user_role=current_role
+                current_username=current_username, 
+                current_user_role=current_role,
+                permissions=session.get("permissions", [])
             )
 
         content_area.update()

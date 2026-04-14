@@ -190,6 +190,33 @@ CREATE TABLE Door_Control (
 
 INSERT IGNORE INTO Role (role) VALUES ('admin'), ('maintenance'), ('user');
 
+INSERT IGNORE INTO Permission (description) VALUES 
+('VIEW_DASHBOARD'),
+('VIEW_SENSORS'),
+('EDIT_SENSORS'),
+('VIEW_HISTORY'),
+('MANAGE_USERS'),
+('VIEW_CHATS'),
+('SEND_MESSAGES'),
+('MANAGE_CHATS'),
+('VIEW_MAINTENANCE'),
+('MANAGE_TICKETS');
+
+-- Role-Permission Assignments
+-- Admin: Todo
+INSERT IGNORE INTO Role_Permission (id_role, id_permission)
+SELECT r.id_role, p.id_permission FROM Role r, Permission p WHERE r.role = 'admin';
+
+-- Maintenance: Sensores, Historial, Chats, Tickets
+INSERT IGNORE INTO Role_Permission (id_role, id_permission)
+SELECT r.id_role, p.id_permission FROM Role r, Permission p 
+WHERE r.role = 'maintenance' AND p.description IN ('VIEW_DASHBOARD', 'VIEW_SENSORS', 'VIEW_HISTORY', 'VIEW_CHATS', 'SEND_MESSAGES', 'VIEW_MAINTENANCE', 'MANAGE_TICKETS');
+
+-- User: Solo Dashboard, Chats básicos
+INSERT IGNORE INTO Role_Permission (id_role, id_permission)
+SELECT r.id_role, p.id_permission FROM Role r, Permission p 
+WHERE r.role = 'user' AND p.description IN ('VIEW_DASHBOARD', 'VIEW_CHATS', 'SEND_MESSAGES');
+
 INSERT IGNORE INTO Type (description) VALUES 
 ('Temperature'), ('Humidity'), ('Wind'), ('Air_Quality'), ('Lighting'), ('Door');
 

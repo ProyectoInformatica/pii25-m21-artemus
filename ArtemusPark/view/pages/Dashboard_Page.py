@@ -13,13 +13,14 @@ from ArtemusPark.config.Park_Config import OPEN_HOUR, CLOSE_HOUR
 
 
 class DashboardPage(ft.Container):
-    def __init__(self, user_name="Usuario", user_role="user", on_navigate=None):
+    def __init__(self, user_name="Usuario", user_role="user", on_navigate=None, permissions=None):
         super().__init__()
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
         self.padding = 18
         self.user_name = user_name
         self.user_role = user_role
+        self.permissions = permissions or []
         self.service = DashboardService()
         self.on_navigate = on_navigate
         self._is_mounted = False
@@ -38,7 +39,8 @@ class DashboardPage(ft.Container):
         for c in [self.card_temp, self.card_hum, self.card_wind, self.card_air]:
             c.expand = 1
 
-        self.card_map = MapCard(on_sensor_click=self._handle_sensor_click)
+        # Revertido: El mapa ya no necesita manejar permisos complejos para luces aquí
+        self.card_map = MapCard(on_sensor_click=self._handle_sensor_click, permissions=self.permissions)
         self.chart_component = TempChart()
         self.panel_events = EventsPanel(self.service.get_recent_events())
 
@@ -50,7 +52,11 @@ class DashboardPage(ft.Container):
         )
 
     def _handle_sensor_click(self, sensor_type):
-        """Maneja el clic en los sensores del mapa y muestra detalles."""
+        """Maneja el clic en los sensores del mapa y muestra detalles (Solo lectura)."""
+        if "VIEW_SENSORS" not in self.permissions and self.user_role != "admin":
+             self.page.open(ft.SnackBar(content=ft.Text("No tienes permiso para ver detalles de sensores")))
+             return
+
         type_map = {
             "lights": "light",
             "capacity": "door",
@@ -61,17 +67,7 @@ class DashboardPage(ft.Container):
         }
 
         target_type = type_map.get(sensor_type, sensor_type)
-
-        title_map = {
-            "light": "Iluminación",
-            "door": "Accesos (Puertas)",
-            "smoke": "Calidad del Aire",
-            "temperature": "Temperatura",
-            "humidity": "Humedad",
-            "wind": "Viento",
-        }
-
-        display_title = title_map.get(target_type, target_type.capitalize())
+        display_title = target_type.capitalize()
 
         all_sensors = self.service.get_sensors_health_status()
         filtered_sensors = [s for s in all_sensors if s["type"] == target_type]
@@ -85,11 +81,8 @@ class DashboardPage(ft.Container):
                         ft.DataCell(
                             ft.Container(
                                 content=ft.Text(s["status"], size=12, color="white"),
-                                bgcolor=(
-                                    ft.Colors.GREEN if s["is_online"] else ft.Colors.RED
-                                ),
-                                padding=5,
-                                border_radius=5,
+                                bgcolor=(ft.Colors.GREEN if s["is_online"] else ft.Colors.RED),
+                                padding=5, border_radius=5,
                             )
                         ),
                         ft.DataCell(ft.Text(str(s["last_value"]))),
@@ -98,16 +91,7 @@ class DashboardPage(ft.Container):
                 )
             )
 
-        if not rows:
-            self.page.open(
-                ft.SnackBar(
-                    content=ft.Text(
-                        "No hay sensores de ese tipo", color=ft.Colors.WHITE
-                    ),
-                    bgcolor=ft.Colors.RED,
-                )
-            )
-        else:
+        if rows:
             content = ft.DataTable(
                 columns=[
                     ft.DataColumn(ft.Text("Nombre")),
@@ -117,78 +101,31 @@ class DashboardPage(ft.Container):
                 ],
                 rows=rows,
                 border=ft.border.all(1, ft.Colors.GREY_300),
-                vertical_lines=ft.border.BorderSide(1, ft.Colors.GREY_200),
-                horizontal_lines=ft.border.BorderSide(1, ft.Colors.GREY_200),
             )
 
             dialog = ft.AlertDialog(
-                title=ft.Text(f"Sensores de {display_title }"),
-                content=ft.Column(
-                    [content],
-                    height=300,
-                    width=650,
-                    scroll=ft.ScrollMode.AUTO,
-                    tight=True,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                ),
-                actions=[
-                    ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dialog))
-                ],
+                title=ft.Text(f"Detalle de {display_title}"),
+                content=ft.Column([content], height=300, width=650, scroll=ft.ScrollMode.AUTO, tight=True),
+                actions=[ft.TextButton("Cerrar", on_click=lambda e: self.page.close(dialog))],
             )
             self.page.open(dialog)
 
-    def _build_sensor_row(self, name, status, bg_color):
-        return ft.Container(
-            padding=10,
-            bgcolor=bg_color,
-            border_radius=8,
-            border=ft.border.all(
-                1, ft.Colors.GREY_300 if bg_color == ft.Colors.WHITE else "transparent"
-            ),
-            content=ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                controls=[
-                    ft.Text(name, weight=ft.FontWeight.BOLD, color="black"),
-                    ft.Container(
-                        padding=ft.padding.symmetric(horizontal=8, vertical=4),
-                        bgcolor="green" if status == "En línea" else "grey",
-                        border_radius=4,
-                        content=ft.Text(status, size=10, color="white"),
-                    ),
-                ],
-            ),
-        )
-
     def did_mount(self):
-        """Suscribe a eventos y verifica estado inicial."""
         self._is_mounted = True
         self._clock_running = True
         self.page.run_task(self._clock_loop)
         self.page.pubsub.subscribe(self._on_message)
         self._on_message("refresh_dashboard")
-
         if self.service.is_catastrophe_mode():
             self._activate_catastrophe_protocol()
 
-    def will_unmount(self):
-        """Desuscribe eventos."""
-        self._is_mounted = False
-        self._clock_running = False
-
     def _on_message(self, message):
-        """Gestor de mensajes centralizado"""
-
-        if not self._is_mounted or not self.page:
-            return
-
+        if not self._is_mounted or not self.page: return
         if message == "refresh_dashboard":
             data = self.service.get_latest_sensor_data()
-            if data:
-                self.card_capacity.update_occupancy(data.get("occupancy", 0))
-
+            if data: self.card_capacity.update_occupancy(data.get("occupancy", 0))
             avg_data = self.service.get_average_sensor_data()
             if avg_data:
-
                 def update_sensor_ui(card, map_key, value):
                     if value is None:
                         card.update_value("--")
@@ -196,207 +133,81 @@ class DashboardPage(ft.Container):
                     else:
                         card.update_value(value)
                         self.card_map.update_marker_status_by_type(map_key, True)
-
-                update_sensor_ui(
-                    self.card_temp, "temperature", avg_data.get("temperature")
-                )
+                update_sensor_ui(self.card_temp, "temperature", avg_data.get("temperature"))
                 update_sensor_ui(self.card_hum, "humidity", avg_data.get("humidity"))
                 update_sensor_ui(self.card_wind, "wind", avg_data.get("wind"))
-                update_sensor_ui(
-                    self.card_air, "air_quality", avg_data.get("air_quality")
-                )
-
+                update_sensor_ui(self.card_air, "air_quality", avg_data.get("air_quality"))
                 self.card_map.update_sensor_data(data)
-
             chart_data = self.service.get_temp_chart_data()
             self.chart_component.update_data(chart_data)
-
-            new_events = self.service.get_recent_events()
-            self.panel_events.update_events(new_events)
-
-            if not self.service.is_catastrophe_mode():
-
-                pass
-
-        elif message == "catastrophe_mode":
-            self._activate_catastrophe_protocol()
-
-        elif message == "normal_mode":
-            self._deactivate_catastrophe_protocol()
+            if "VIEW_SECURITY_LOGS" in self.permissions or self.user_role == "admin":
+                new_events = self.service.get_recent_events()
+                self.panel_events.update_events(new_events)
+            else:
+                self.panel_events.update_events([])
+        elif message == "catastrophe_mode": self._activate_catastrophe_protocol()
+        elif message == "normal_mode": self._deactivate_catastrophe_protocol()
 
     def _activate_catastrophe_protocol(self):
-        """Pone todo ROJO"""
         self.bgcolor = ft.Colors.RED_900
         self.main_card_container.bgcolor = ft.Colors.RED_50
-
-        self.txt_welcome.color = ft.Colors.WHITE
-        self.txt_dashboard.color = ft.Colors.WHITE
-        self.txt_sensors_title.color = ft.Colors.RED_900
-        self.txt_events_title.color = ft.Colors.RED_900
-
-        if self.card_alerts:
-            self.card_alerts.show_alert(
-                "ALERTA CATÁSTROFE",
-                "¡SISTEMA EN ESTADO CRÍTICO! Siga los protocolos de seguridad.",
-                is_critical=True,
-            )
-        if self.page:
-            try:
-                self.update()
-            except Exception:
-                pass
+        if self.card_alerts: self.card_alerts.show_alert("ALERTA CATÁSTROFE", "¡SISTEMA CRÍTICO!", is_critical=True)
+        try: self.update()
+        except: pass
 
     def _deactivate_catastrophe_protocol(self):
-        """Pone todo VERDE/AZUL (Normal)"""
         self.bgcolor = AppColors.BG_MAIN
         self.main_card_container.bgcolor = AppColors.GLASS_WHITE
-
-        self.txt_welcome.color = AppColors.TEXT_MUTED
-        self.txt_dashboard.color = AppColors.TEXT_MUTED
-        self.txt_sensors_title.color = AppColors.TEXT_MAIN
-        self.txt_events_title.color = "#6b7280"
-
-        if self.card_alerts:
-            self.card_alerts.show_alert(
-                "Sistema Normal", "El protocolo ha sido desactivado.", is_critical=False
-            )
-        if self.page:
-            try:
-                self.update()
-            except Exception:
-                pass
+        if self.card_alerts: self.card_alerts.show_alert("Sistema Normal", "Protocolo desactivado.", is_critical=False)
+        try: self.update()
+        except: pass
 
     def _build_window_bar(self):
-        self.txt_welcome = ft.Text(
-            f"Bienvenido/a {self .user_name }",
-            weight=ft.FontWeight.BOLD,
-            color=AppColors.TEXT_MUTED,
-        )
+        self.txt_welcome = ft.Text(f"Bienvenido/a {self.user_name}", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED)
         now = datetime.now()
         self.clock_icon = ft.Icon(ft.Icons.WB_SUNNY, size=18)
-        self.txt_clock = ft.Text(
-            now.strftime("%H:%M:%S"),
-            weight=ft.FontWeight.BOLD,
-            size=18,
-        )
-        self.clock_container = ft.Container(
-            padding=ft.padding.symmetric(horizontal=14, vertical=8),
-            border_radius=999,
-            content=ft.Row(
-                spacing=8,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[self.clock_icon, self.txt_clock],
-            ),
-        )
+        self.txt_clock = ft.Text(now.strftime("%H:%M:%S"), weight=ft.FontWeight.BOLD, size=18)
+        self.clock_container = ft.Container(padding=ft.padding.symmetric(horizontal=14, vertical=8), border_radius=999, content=ft.Row(spacing=8, controls=[self.clock_icon, self.txt_clock]))
         self._update_clock_pill(now)
-        self.txt_dashboard = ft.Text(
-            "Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED
-        )
-        return ft.Row(
-            controls=[
-                self.txt_welcome,
-                self.clock_container,
-                self.txt_dashboard,
-            ],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
-        )
+        return ft.Row(controls=[self.txt_welcome, self.clock_container, ft.Text("Dashboard", weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MUTED)], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
 
-    async def _clock_loop(self) -> None:
+    async def _clock_loop(self):
         while self._clock_running:
             now = datetime.now()
             self.txt_clock.value = now.strftime("%H:%M:%S")
             self._update_clock_pill(now)
-            try:
-                self.clock_container.update()
-            except Exception:
-                pass
+            try: self.clock_container.update()
+            except: pass
             await asyncio.sleep(1)
 
-    def _update_clock_pill(self, now: datetime) -> None:
+    def _update_clock_pill(self, now):
         hour = now.hour
         if OPEN_HOUR <= hour < CLOSE_HOUR:
             self.clock_icon.name = ft.Icons.WB_SUNNY
-            self.clock_icon.color = ft.Colors.ORANGE
             self.clock_container.bgcolor = ft.Colors.AMBER_50
-            self.clock_container.border = ft.border.all(1, ft.Colors.AMBER_200)
-            self.txt_clock.color = ft.Colors.BLACK87
         else:
             self.clock_icon.name = ft.Icons.NIGHTLIGHT_ROUND
-            self.clock_icon.color = ft.Colors.BLUE_200
             self.clock_container.bgcolor = ft.Colors.INDIGO_900
-            self.clock_container.border = ft.border.all(1, ft.Colors.INDIGO_800)
-            self.txt_clock.color = ft.Colors.WHITE
 
     def _build_main_card(self):
-        self.txt_sensors_title = ft.Text(
-            "Sensores (Media)",
-            size=16,
-            weight=ft.FontWeight.BOLD,
-            color=AppColors.TEXT_MAIN,
-        )
-        self.txt_events_title = ft.Text(
-            "Eventos Recientes",
-            weight=ft.FontWeight.BOLD,
-            color="#6b7280",
-        )
-
-        return ft.Container(
-            expand=True,
-            bgcolor=AppColors.GLASS_WHITE,
-            border_radius=12,
-            padding=20,
-            content=ft.Column(
-                spacing=20,
-                controls=[
-                    ft.Row(controls=[self.card_capacity, self.card_alerts]),
-                    ft.Divider(height=10, color=AppColors.BG_MAIN),
-                    self.txt_sensors_title,
-                    ft.Row(
-                        spacing=15,
-                        controls=[
-                            self.card_temp,
-                            self.card_hum,
-                            self.card_wind,
-                            self.card_air,
-                        ],
-                    ),
-                    ft.Divider(height=10, color=AppColors.BG_MAIN),
-                    ft.Row(
-                        height=500,
-                        controls=[
-                            ft.Container(
-                                content=self.card_map, alignment=ft.alignment.top_center
-                            ),
-                            ft.Container(width=20),
-                            ft.Column(
-                                expand=True,
-                                spacing=15,
-                                controls=[
-                                    ft.Container(
-                                        expand=1, content=self.chart_component
-                                    ),
-                                    ft.Container(height=5),
-                                    ft.Container(
-                                        expand=1,
-                                        bgcolor="white",
-                                        border_radius=12,
-                                        border=ft.border.all(1, ft.Colors.GREY_300),
-                                        padding=15,
-                                        content=ft.Column(
-                                            controls=[
-                                                self.txt_events_title,
-                                                ft.Divider(
-                                                    height=1, color=AppColors.BG_MAIN
-                                                ),
-                                                self.panel_events,
-                                            ]
-                                        ),
-                                    ),
-                                ],
-                            ),
-                        ],
-                    ),
-                ],
-            ),
-        )
+        self.txt_sensors_title = ft.Text("Sensores (Media)", size=16, weight=ft.FontWeight.BOLD, color=AppColors.TEXT_MAIN)
+        self.txt_events_title = ft.Text("Eventos Recientes", weight=ft.FontWeight.BOLD, color="#6b7280")
+        return ft.Container(expand=True, bgcolor=AppColors.GLASS_WHITE, border_radius=12, padding=20, content=ft.Column(spacing=20, controls=[
+            ft.Row(controls=[self.card_capacity, self.card_alerts]),
+            ft.Divider(height=10, color=AppColors.BG_MAIN),
+            self.txt_sensors_title,
+            ft.Row(spacing=15, controls=[self.card_temp, self.card_hum, self.card_wind, self.card_air]),
+            ft.Divider(height=10, color=AppColors.BG_MAIN),
+            ft.Row(height=500, controls=[
+                ft.Container(content=self.card_map, alignment=ft.alignment.top_center),
+                ft.Container(width=20),
+                ft.Column(expand=True, spacing=15, controls=[
+                    ft.Container(expand=1, content=self.chart_component),
+                    ft.Container(expand=1, bgcolor="white", border_radius=12, border=ft.border.all(1, ft.Colors.GREY_300), padding=15, content=ft.Column([
+                        self.txt_events_title,
+                        ft.Divider(height=1, color=AppColors.BG_MAIN),
+                        self.panel_events,
+                    ])),
+                ]),
+            ]),
+        ]))
