@@ -2,6 +2,7 @@ import flet as ft
 import time
 import threading
 import base64
+import os
 from datetime import datetime
 
 from flet.core.types import MainAxisAlignment
@@ -244,14 +245,170 @@ class AdminPage(ft.Container):
             self.img_preview.visible = True
             self.img_preview.update()
 
+
     def _on_export_result(self, e: ft.FilePickerResultEvent):
-        if e.path:
+        if not e.path:
+            return
+
+        try:
+            report_rows = self.service.get_sensors_health_status()
+            output_path = e.path if e.path.lower().endswith(".pdf") else f"{e.path}.pdf"
+            self._export_sensor_report_pdf(output_path, report_rows)
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text(f"Reporte exportado con éxito en: {e.path}"),
+                    content=ft.Text(f"Reporte exportado con éxito en: {output_path}"),
                     bgcolor=ft.Colors.GREEN_700,
                 )
             )
+        except Exception as ex:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text(f"Error al exportar reporte: {ex}"),
+                    bgcolor=ft.Colors.RED_700,
+                )
+            )
+
+    def _export_sensor_report_pdf(self, output_path, report_rows):
+        pdf_bytes = self._build_simple_pdf(report_rows, output_path)
+        with open(output_path, "wb") as pdf_file:
+            pdf_file.write(pdf_bytes)
+
+
+    def _build_simple_pdf(self, report_rows, output_path=None):
+        report_title = "Reporte de Sensores Artemus"
+        _ = os.path.basename(output_path) if isinstance(output_path, str) else "Reporte_Artemus.pdf"
+
+        generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        lines = [
+            report_title,
+            f"Generado: {generated_at}",
+            "",
+        ]
+
+        if not report_rows:
+            lines.append("No hay datos de sensores disponibles.")
+        else:
+            for index, row in enumerate(report_rows, start=1):
+                if isinstance(row, dict):
+                    sensor_name = row.get("name") or row.get("sensor") or row.get("id") or f"Sensor {index}"
+                    sensor_type = row.get("type", "-")
+                    sensor_status = row.get("status", "-")
+                    last_seen = row.get("last_seen", "-")
+                    last_value = row.get("last_value", "-")
+                else:
+                    sensor_name = f"Sensor {index}"
+                    sensor_type = "-"
+                    sensor_status = str(row)
+                    last_seen = "-"
+                    last_value = "-"
+
+                lines.extend(
+                    [
+                        f"{index}. {sensor_name}",
+                        f"   Tipo: {sensor_type}",
+                        f"   Estado: {sensor_status}",
+                        f"   Ultima lectura: {last_value}",
+                        f"   Ultima vez visto: {last_seen}",
+                        "",
+                    ]
+                )
+
+        return self._create_basic_pdf(lines)
+
+
+    def _create_basic_pdf(self, lines):
+        def escape_pdf_text(text):
+            return (
+                str(text)
+                .replace("\\", "\\\\")
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+            )
+
+        page_width = 595
+        page_height = 842
+        start_y = 800
+        line_height = 16
+        margin_bottom = 40
+
+        pages = []
+        current_page = []
+        current_y = start_y
+
+        for line in lines:
+            safe_line = escape_pdf_text(line)
+            current_page.append(f"BT /F1 11 Tf 40 {current_y} Td ({safe_line}) Tj ET")
+            current_y -= line_height
+            if current_y < margin_bottom:
+                pages.append("\n".join(current_page))
+                current_page = []
+                current_y = start_y
+
+        if current_page:
+            pages.append("\n".join(current_page))
+
+        if not pages:
+            pages.append("BT /F1 11 Tf 40 800 Td (Sin datos) Tj ET")
+
+        objects = []
+        page_object_numbers = []
+
+        objects.append("1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj")
+
+        kids_refs = []
+        next_object_number = 3
+        font_object_number = 3 + (2 * len(pages))
+
+        for _ in pages:
+            page_object_number = next_object_number
+            content_object_number = next_object_number + 1
+            page_object_numbers.append(page_object_number)
+            kids_refs.append(f"{page_object_number} 0 R")
+            next_object_number += 2
+
+        objects.append(
+            f"2 0 obj << /Type /Pages /Count {len(pages)} /Kids [{' '.join(kids_refs)}] >> endobj"
+        )
+
+        for page_object_number, page_content in zip(page_object_numbers, pages):
+            content_object_number = page_object_number + 1
+            content_bytes = page_content.encode("latin-1", errors="replace")
+
+            objects.append(
+                f"{page_object_number} 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 {page_width} {page_height}] /Resources << /Font << /F1 {font_object_number} 0 R >> >> /Contents {content_object_number} 0 R >> endobj"
+            )
+            objects.append(
+                f"{content_object_number} 0 obj << /Length {len(content_bytes)} >> stream\n{page_content}\nendstream endobj"
+            )
+
+        objects.append(
+            f"{font_object_number} 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj"
+        )
+
+        pdf_parts = [b"%PDF-1.4\n"]
+        offsets = [0]
+        current_offset = len(pdf_parts[0])
+
+        for obj in objects:
+            obj_bytes = (obj + "\n").encode("latin-1", errors="replace")
+            offsets.append(current_offset)
+            pdf_parts.append(obj_bytes)
+            current_offset += len(obj_bytes)
+
+        xref_offset = current_offset
+        xref_lines = [f"xref\n0 {len(offsets)}\n", "0000000000 65535 f \n"]
+        for offset in offsets[1:]:
+            xref_lines.append(f"{offset:010d} 00000 n \n")
+
+        trailer = (
+            f"trailer << /Size {len(offsets)} /Root 1 0 R >>\n"
+            f"startxref\n{xref_offset}\n%%EOF"
+        )
+
+        pdf_parts.append("".join(xref_lines).encode("latin-1"))
+        pdf_parts.append(trailer.encode("latin-1"))
+        return b"".join(pdf_parts)
 
     def _on_message(self, message):
         if message == "catastrophe_mode":
