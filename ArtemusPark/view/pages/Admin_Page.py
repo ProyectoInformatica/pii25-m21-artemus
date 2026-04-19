@@ -250,6 +250,9 @@ class AdminPage(ft.Container):
             return
 
         try:
+            if self.save_file_picker not in self.page.overlay:
+                self.page.overlay.append(self.save_file_picker)
+
             self.page.open(
                 ft.SnackBar(
                     content=ft.Text("Abriendo selector de ubicación para exportar PDF..."),
