@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="cambie la funcion para que llame una nuebva que empiece el proceso para guardar">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/pages/Admin_Page.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/pages/Admin_Page.py" afterDir="false" />
-    </list>
+    <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="en toeria debe incializar el proceso para solicitar la direccion en donde se guarde el reporte pero no aparece todavia, quiero ver si solo es un problema de mac" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -74,6 +71,9 @@
     }
   ]
 }</component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="7cdacd35-11dd-4172-9c63-786d12d59ee5" />
+  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/ProyectoInformatica/pii25-m21-artemus.git&quot;,
@@ -138,7 +138,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.keymap",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -329,7 +329,7 @@
       <workItem from="1775060644195" duration="6976000" />
       <workItem from="1775302456087" duration="990000" />
       <workItem from="1776247349957" duration="1470000" />
-      <workItem from="1776638737286" duration="1675000" />
+      <workItem from="1776638737286" duration="1956000" />
     </task>
     <task id="LOCAL-00001" summary="logs">
       <option name="closed" value="true" />
@@ -451,7 +451,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776639844978</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="en toeria debe incializar el proceso para solicitar la direccion en donde se guarde el reporte pero no aparece todavia, quiero ver si solo es un problema de mac">
+      <option name="closed" value="true" />
+      <created>1776640640113</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1776640640113</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +486,8 @@
     <MESSAGE value="new implementations" />
     <MESSAGE value="feat(export): enhance sensor report export functionality and improve error handling" />
     <MESSAGE value="cambie la funcion para que llame una nuebva que empiece el proceso para guardar" />
-    <option name="LAST_COMMIT_MESSAGE" value="cambie la funcion para que llame una nuebva que empiece el proceso para guardar" />
+    <MESSAGE value="en toeria debe incializar el proceso para solicitar la direccion en donde se guarde el reporte pero no aparece todavia, quiero ver si solo es un problema de mac" />
+    <option name="LAST_COMMIT_MESSAGE" value="en toeria debe incializar el proceso para solicitar la direccion en donde se guarde el reporte pero no aparece todavia, quiero ver si solo es un problema de mac" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$migrate_schema_v2.coverage" NAME="migrate_schema_v2 Coverage Results" MODIFIED="1774456473394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -486,7 +495,7 @@
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$generar_inserts.coverage" NAME="generar_inserts Coverage Results" MODIFIED="1774616829847" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$migrar_datos.coverage" NAME="migrar_datos Coverage Results" MODIFIED="1774528687134" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$Sensor_Controller.coverage" NAME="Sensor_Controller Coverage Results" MODIFIED="1763402088675" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/controller" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1776640077807" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1776640572190" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$Sensor_Card.coverage" NAME="Sensor_Card Coverage Results" MODIFIED="1765461311789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view/components" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$añadir_datos_test.coverage" NAME="añadir_datos_test Coverage Results" MODIFIED="1774529908855" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$conexion_bbdd.coverage" NAME="conexion_bbdd Coverage Results" MODIFIED="1774370134713" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/bbdd" />
