@@ -255,7 +255,9 @@ class AdminPage(ft.Container):
 
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text("Abriendo selector de ubicación para exportar PDF..."),
+                    content=ft.Text(
+                        "Abriendo selector de ubicación para exportar PDF..."
+                    ),
                     bgcolor=ft.Colors.BLUE_700,
                 )
             )
@@ -274,13 +276,13 @@ class AdminPage(ft.Container):
                 )
             )
 
-
-
     def _on_export_result(self, e: ft.FilePickerResultEvent):
         if not e.path:
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text("Exportación cancelada o no se recibió una ruta de guardado."),
+                    content=ft.Text(
+                        "Exportación cancelada o no se recibió una ruta de guardado."
+                    ),
                     bgcolor=ft.Colors.ORANGE_700,
                 )
             )
@@ -309,10 +311,13 @@ class AdminPage(ft.Container):
         with open(output_path, "wb") as pdf_file:
             pdf_file.write(pdf_bytes)
 
-
     def _build_simple_pdf(self, report_rows, output_path=None):
         report_title = "Reporte de Sensores Artemus"
-        _ = os.path.basename(output_path) if isinstance(output_path, str) else "Reporte_Artemus.pdf"
+        _ = (
+            os.path.basename(output_path)
+            if isinstance(output_path, str)
+            else "Reporte_Artemus.pdf"
+        )
 
         generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -327,7 +332,12 @@ class AdminPage(ft.Container):
         else:
             for index, row in enumerate(report_rows, start=1):
                 if isinstance(row, dict):
-                    sensor_name = row.get("name") or row.get("sensor") or row.get("id") or f"Sensor {index}"
+                    sensor_name = (
+                        row.get("name")
+                        or row.get("sensor")
+                        or row.get("id")
+                        or f"Sensor {index}"
+                    )
                     sensor_type = row.get("type", "-")
                     sensor_status = row.get("status", "-")
                     last_seen = row.get("last_seen", "-")
@@ -352,14 +362,10 @@ class AdminPage(ft.Container):
 
         return self._create_basic_pdf(lines)
 
-
     def _create_basic_pdf(self, lines):
         def escape_pdf_text(text):
             return (
-                str(text)
-                .replace("\\", "\\\\")
-                .replace("(", "\\(")
-                .replace(")", "\\)")
+                str(text).replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
             )
 
         page_width = 595
