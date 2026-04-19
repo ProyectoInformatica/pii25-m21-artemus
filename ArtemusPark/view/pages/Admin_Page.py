@@ -89,9 +89,7 @@ class AdminPage(ft.Container):
         self.btn_export = ft.ElevatedButton(
             "Exportar Reporte de Sensores (PDF)",
             icon=ft.Icons.PICTURE_AS_PDF,
-            on_click=lambda _: self.save_file_picker.save_file(
-                file_name="Reporte_Artemus.pdf"
-            ),
+            on_click=self._start_export_flow,
             visible="EXPORT_DATA_REPORTS" in self.permissions,
             bgcolor=ft.Colors.ORANGE_800,
             color=ft.Colors.WHITE,
@@ -223,8 +221,10 @@ class AdminPage(ft.Container):
 
     def did_mount(self):
         if self.page:
-            self.page.overlay.append(self.file_picker)
-            self.page.overlay.append(self.save_file_picker)
+            if self.file_picker not in self.page.overlay:
+                self.page.overlay.append(self.file_picker)
+            if self.save_file_picker not in self.page.overlay:
+                self.page.overlay.append(self.save_file_picker)
             self.page.pubsub.subscribe(self._on_message)
             self.page.update()
         self.simulation_running = True
@@ -245,9 +245,41 @@ class AdminPage(ft.Container):
             self.img_preview.visible = True
             self.img_preview.update()
 
+    def _start_export_flow(self, e):
+        if not self.page:
+            return
+
+        try:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text("Abriendo selector de ubicación para exportar PDF..."),
+                    bgcolor=ft.Colors.BLUE_700,
+                )
+            )
+            self.page.update()
+            self.save_file_picker.save_file(
+                dialog_title="Guardar reporte de sensores",
+                file_name="Reporte_Artemus.pdf",
+                file_type=ft.FilePickerFileType.CUSTOM,
+                allowed_extensions=["pdf"],
+            )
+        except Exception as ex:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text(f"No se pudo abrir el selector de archivo: {ex}"),
+                    bgcolor=ft.Colors.RED_700,
+                )
+            )
+
 
     def _on_export_result(self, e: ft.FilePickerResultEvent):
         if not e.path:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text("Exportación cancelada o no se recibió una ruta de guardado."),
+                    bgcolor=ft.Colors.ORANGE_700,
+                )
+            )
             return
 
         try:

@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="new implementations">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ArtemusPark/bbdd/db_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/bbdd/db_connection.py" afterDir="false" />
+    <list default="true" id="9c0698eb-5347-4b3d-8060-e38fe5c420a9" name="Changes" comment="feat(export): enhance sensor report export functionality and improve error handling">
+      <change beforePath="$PROJECT_DIR$/ArtemusPark/view/pages/Admin_Page.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArtemusPark/view/pages/Admin_Page.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -329,7 +328,7 @@
       <workItem from="1775060644195" duration="6976000" />
       <workItem from="1775302456087" duration="990000" />
       <workItem from="1776247349957" duration="1470000" />
-      <workItem from="1776638737286" duration="687000" />
+      <workItem from="1776638737286" duration="1034000" />
     </task>
     <task id="LOCAL-00001" summary="logs">
       <option name="closed" value="true" />
@@ -435,7 +434,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775073783843</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="feat(export): enhance sensor report export functionality and improve error handling">
+      <option name="closed" value="true" />
+      <created>1776639575157</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1776639575157</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -460,7 +467,8 @@
     <MESSAGE value="new features with new data in DB" />
     <MESSAGE value="defintive" />
     <MESSAGE value="new implementations" />
-    <option name="LAST_COMMIT_MESSAGE" value="new implementations" />
+    <MESSAGE value="feat(export): enhance sensor report export functionality and improve error handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(export): enhance sensor report export functionality and improve error handling" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$migrate_schema_v2.coverage" NAME="migrate_schema_v2 Coverage Results" MODIFIED="1774456473394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -468,7 +476,7 @@
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$generar_inserts.coverage" NAME="generar_inserts Coverage Results" MODIFIED="1774616829847" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$migrar_datos.coverage" NAME="migrar_datos Coverage Results" MODIFIED="1774528687134" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$Sensor_Controller.coverage" NAME="Sensor_Controller Coverage Results" MODIFIED="1763402088675" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/controller" />
-    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1776639121911" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
+    <SUITE FILE_PATH="coverage/pii25_m21_artemus$main.coverage" NAME="main Coverage Results" MODIFIED="1776639678464" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$Sensor_Card.coverage" NAME="Sensor_Card Coverage Results" MODIFIED="1765461311789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/view/components" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$añadir_datos_test.coverage" NAME="añadir_datos_test Coverage Results" MODIFIED="1774529908855" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pii25_m21_artemus$conexion_bbdd.coverage" NAME="conexion_bbdd Coverage Results" MODIFIED="1774370134713" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ArtemusPark/bbdd" />
