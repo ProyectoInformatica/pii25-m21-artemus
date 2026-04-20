@@ -3,6 +3,7 @@ from datetime import datetime
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
 from ArtemusPark.repository.Auth_Repository import AuthRepository
+from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class RequestsPage(ft.Container):
@@ -30,7 +31,18 @@ class RequestsPage(ft.Container):
         )
 
     def did_mount(self):
+        self.page.pubsub.subscribe(self._on_message)
         self._load_requests()
+        if DashboardService().is_catastrophe_mode():
+            self.bgcolor = ft.Colors.RED_900
+
+    def _on_message(self, message):
+        if message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_MAIN
+            self.update()
 
     def _load_requests(self):
         reqs = self.req_repo.get_all_requests()

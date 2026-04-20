@@ -1,10 +1,8 @@
 import logging
 import time
-import json
 import flet as ft
-from pathlib import Path
 from typing import Dict, Any, List
-from datetime import datetime
+from datetime import datetime, timedelta
 from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
 
 from ArtemusPark.model.Door_Model import DoorModel
@@ -159,30 +157,35 @@ class DashboardService:
         return combined[:15]
 
     def get_history_by_date(self, date_str: str) -> List[Dict[str, Any]]:
-        """Carga el historial de una fecha específica desde los archivos JSON."""
+        """Carga el historial de una fecha específica desde la BBDD."""
         history = []
-        base_dir = Path(__file__).resolve().parent.parent / "json"
 
         sources = [
-            ("temperature", "temp", "Temperatura", "value"),
-            ("humidity", "hum", "Humedad", "value"),
-            ("wind", "wind", "Viento", "speed"),
-            ("smoke", "smoke", "Calidad Aire", "value"),
-            ("door", "door", "Puerta", "name"),
-            ("light", "light", "Luz", "value"),
+            (
+                Temperature_Repository.load_temperature_measurements_by_date(date_str),
+                "Temperatura",
+                "value",
+            ),
+            (
+                Humidity_Repository.load_humidity_measurements_by_date(date_str),
+                "Humedad",
+                "value",
+            ),
+            (
+                Wind_Repository.load_wind_measurements_by_date(date_str),
+                "Viento",
+                "speed",
+            ),
+            (
+                Smoke_Repository.load_smoke_measurements_by_date(date_str),
+                "Calidad Aire",
+                "value",
+            ),
+            (Door_Repository.load_door_events_by_date(date_str), "Puerta", "is_open"),
+            (Light_Repository.load_light_events_by_date(date_str), "Luz", "value"),
         ]
 
-        def load_file(subdir, prefix):
-            file_path = base_dir / subdir / f"{prefix }_{date_str }.json"
-            if file_path.exists():
-                try:
-                    return json.loads(file_path.read_text(encoding="utf-8"))
-                except:
-                    return []
-            return []
-
-        for subdir, prefix, type_label, detail_key in sources:
-            data_list = load_file(subdir, prefix)
+        for data_list, type_label, detail_key in sources:
             for item in data_list:
                 ts = item.get("timestamp", 0)
                 val = item.get(detail_key, "--")
@@ -195,7 +198,7 @@ class DashboardService:
 
                 try:
                     time_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
-                except:
+                except Exception:
                     time_str = "Error fecha"
 
                 history.append(
@@ -204,7 +207,7 @@ class DashboardService:
                         "time_str": time_str,
                         "type": type_label,
                         "location": "Zona Parque",
-                        "detail": f"{val }",
+                        "detail": f"{val}",
                         "status": str(status),
                     }
                 )
@@ -216,85 +219,16 @@ class DashboardService:
         self, min_days: int, max_days: int
     ) -> List[Dict[str, Any]]:
         """
-        Carga el historial filtrando los archivos JSON existentes cuya fecha
-        caiga dentro del rango de días relativos a hoy.
+        Carga el historial cuya fecha caiga dentro del rango de días relativos a hoy.
         min_days: Días atrás mínimos (ej. 6).
         max_days: Días atrás máximos (ej. 8).
         """
         history = []
-        base_dir = Path(__file__).resolve().parent.parent / "json"
         today = datetime.now().date()
 
-        sources = [
-            ("temperature", "temp", "Temperatura", "value"),
-            ("humidity", "hum", "Humedad", "value"),
-            ("wind", "wind", "Viento", "speed"),
-            ("smoke", "smoke", "Calidad Aire", "value"),
-            ("door", "door", "Puerta", "name"),
-            ("light", "light", "Luz", "value"),
-        ]
-
-        for subdir, prefix, type_label, detail_key in sources:
-            dir_path = base_dir / subdir
-            if not dir_path.exists():
-                continue
-
-            for file_path in dir_path.glob(f"{prefix }_*.json"):
-                try:
-                    file_date_str = file_path.stem.replace(f"{prefix }_", "")
-                    file_date = datetime.strptime(file_date_str, "%Y-%m-%d").date()
-
-                    days_diff = (today - file_date).days
-
-                    if min_days <= days_diff <= max_days:
-                        content = json.loads(file_path.read_text(encoding="utf-8"))
-                        if isinstance(content, list):
-                            for item in content:
-                                ts = item.get("timestamp", 0)
-                                val = item.get(detail_key, "--")
-                                status = item.get("status", "Info")
-
-                                if type_label == "Puerta":
-                                    status = (
-                                        "Abierta" if item.get("is_open") else "Cerrada"
-                                    )
-                                elif type_label == "Luz":
-                                    status = "ON" if item.get("is_on") else "OFF"
-
-                                try:
-                                    time_str = datetime.fromtimestamp(ts).strftime(
-                                        "%Y-%m-%d %H:%M:%S"
-                                    )
-                                except:
-                                    time_str = "Error fecha"
-
-                                history.append(
-                                    {
-                                        "timestamp": ts,
-                                        "time_str": time_str,
-                                        "type": type_label,
-                                        "location": "Zona Parque",
-                                        "detail": f"{val }",
-                                        "status": str(status),
-                                    }
-                                )
-                        else:
-                            logging.warning(
-                                f"  File {file_path .name } content is not a list. Skipping."
-                            )
-                except ValueError as ve:
-                    logging.error(
-                        f"Error al parsear la fecha del archivo {file_path .name }: {ve }"
-                    )
-                    continue
-                except json.JSONDecodeError as jde:
-                    logging.error(
-                        f"Error al decodificar JSON de {file_path .name }: {jde }"
-                    )
-                    continue
-                except Exception as e:
-                    logger.error(f"Error procesando archivo {file_path }: {e }")
-                    continue
+        for days_back in range(min_days, max_days + 1):
+            date_str = (today - timedelta(days=days_back)).strftime("%Y-%m-%d")
+            history.extend(self.get_history_by_date(date_str))
 
         history.sort(key=lambda x: x["timestamp"], reverse=True)
         return history
