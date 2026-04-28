@@ -11,6 +11,12 @@ class AuthRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)
+            # Primero obtenemos el rol del usuario para los permisos por defecto
+            cursor.execute("SELECT r.role FROM User u JOIN Role r ON u.id_role = r.id_role WHERE u.username = %s", (username,))
+            role_row = cursor.fetchone()
+            user_role = role_row[0] if role_row else "user"
+
+            # Intentamos obtener permisos de la tabla asociativa
             query = """
                 SELECT p.description 
                 FROM Permission p
@@ -21,6 +27,16 @@ class AuthRepository:
             cursor.execute(query, (username,))
             perms = [row[0] for row in cursor.fetchall()]
             cursor.close()
+
+            # SI NO HAY PERMISOS EN LA BD, ASIGNAMOS LOS BÁSICOS POR CÓDIGO (Fallback)
+            if not perms:
+                if user_role == "admin":
+                    return ["MANAGE_USERS", "VIEW_SECURITY_LOGS", "EXPORT_DATA_REPORTS", "MANAGE_SENSORS", "VIEW_DASHBOARD", "CHAT_ACCESS"]
+                elif user_role == "maintenance":
+                    return ["VIEW_DASHBOARD", "VIEW_MAINTENANCE", "CHAT_ACCESS"]
+                else:
+                    return ["VIEW_DASHBOARD", "CHAT_ACCESS"]
+
             return perms
         finally:
             conn.close()
