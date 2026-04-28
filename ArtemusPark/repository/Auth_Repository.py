@@ -72,12 +72,15 @@ class AuthRepository:
 
                 # Get permissions based on role
                 perm_cursor = conn.cursor(buffered=True)
-                perm_cursor.execute("""
+                perm_cursor.execute(
+                    """
                     SELECT p.description FROM Permission p
                     JOIN Role_Permission rp ON p.id_permission = rp.id_permission
                     JOIN Role r ON r.id_role = rp.id_role
                     WHERE r.role = %s
-                """, (row["role"],))
+                """,
+                    (row["role"],),
+                )
                 role_permissions = [p[0] for p in perm_cursor.fetchall()]
                 perm_cursor.close()
 
@@ -92,7 +95,7 @@ class AuthRepository:
                     "address_zip": row["address_zip"] or "",
                     "assigned_sensors": sensors,
                     "permissions": role_permissions,
-                    "superior_dni": row["superior_dni"]
+                    "superior_dni": row["superior_dni"],
                 }
             cursor.close()
             return result
@@ -129,12 +132,15 @@ class AuthRepository:
 
             # Get permissions based on role
             perm_cursor = conn.cursor(buffered=True)
-            perm_cursor.execute("""
+            perm_cursor.execute(
+                """
                 SELECT p.description FROM Permission p
                 JOIN Role_Permission rp ON p.id_permission = rp.id_permission
                 JOIN Role r ON r.id_role = rp.id_role
                 WHERE r.role = %s
-            """, (row["role"],))
+            """,
+                (row["role"],),
+            )
             role_permissions = [p[0] for p in perm_cursor.fetchall()]
             perm_cursor.close()
 
@@ -149,7 +155,7 @@ class AuthRepository:
                 "address_zip": row["address_zip"] or "",
                 "assigned_sensors": sensors,
                 "permissions": role_permissions,
-                "superior_dni": row["superior_dni"]
+                "superior_dni": row["superior_dni"],
             }
             cursor.close()
             return result
@@ -184,7 +190,7 @@ class AuthRepository:
                     kwargs.get("phone"),
                     kwargs.get("address_street"),
                     kwargs.get("address_city"),
-                    kwargs.get("address_zip")
+                    kwargs.get("address_zip"),
                 ),
             )
 
@@ -195,7 +201,7 @@ class AuthRepository:
                     "INSERT INTO User_Sensor (dni, id_sensor) VALUES (%s, %s)",
                     (dni, sensor_id),
                 )
-            
+
             # Hierarchy
             superior_dni = kwargs.get("superior_dni")
             if superior_dni:
@@ -241,20 +247,23 @@ class AuthRepository:
                 cursor.execute(
                     "UPDATE User SET phone=%s WHERE dni=%s", (kwargs["phone"], dni)
                 )
-            
+
             if "address_street" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET address_street=%s WHERE dni=%s", (kwargs["address_street"], dni)
+                    "UPDATE User SET address_street=%s WHERE dni=%s",
+                    (kwargs["address_street"], dni),
                 )
-            
+
             if "address_city" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET address_city=%s WHERE dni=%s", (kwargs["address_city"], dni)
+                    "UPDATE User SET address_city=%s WHERE dni=%s",
+                    (kwargs["address_city"], dni),
                 )
-            
+
             if "address_zip" in kwargs:
                 cursor.execute(
-                    "UPDATE User SET address_zip=%s WHERE dni=%s", (kwargs["address_zip"], dni)
+                    "UPDATE User SET address_zip=%s WHERE dni=%s",
+                    (kwargs["address_zip"], dni),
                 )
 
             if "role" in kwargs:
@@ -275,9 +284,11 @@ class AuthRepository:
                         "INSERT INTO User_Sensor (dni, id_sensor) VALUES (%s, %s)",
                         (dni, sensor_id),
                     )
-            
+
             if "superior_dni" in kwargs:
-                cursor.execute("DELETE FROM User_Hierarchy WHERE subordinate_dni = %s", (dni,))
+                cursor.execute(
+                    "DELETE FROM User_Hierarchy WHERE subordinate_dni = %s", (dni,)
+                )
                 if kwargs["superior_dni"]:
                     cursor.execute(
                         "INSERT INTO User_Hierarchy (superior_dni, subordinate_dni) VALUES (%s, %s)",
@@ -307,16 +318,19 @@ class AuthRepository:
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)
-            
+
             # 1. Limpiar jerarquía (donde sea superior o subordinado)
-            cursor.execute("DELETE FROM User_Hierarchy WHERE superior_dni = %s OR subordinate_dni = %s", (dni, dni))
-            
+            cursor.execute(
+                "DELETE FROM User_Hierarchy WHERE superior_dni = %s OR subordinate_dni = %s",
+                (dni, dni),
+            )
+
             # 2. Limpiar sensores asignados
             cursor.execute("DELETE FROM User_Sensor WHERE dni = %s", (dni,))
-            
+
             # 3. Limpiar participación en chats
             cursor.execute("DELETE FROM User_Chat WHERE dni = %s", (dni,))
-            
+
             # 4. Limpiar mensajes (opcional, podrías querer mantenerlos con un ID 'Usuario Borrado')
             # Por ahora los borramos para permitir el borrado físico del usuario
             cursor.execute("DELETE FROM Message WHERE dni = %s", (dni,))
@@ -328,10 +342,10 @@ class AuthRepository:
             if row:
                 username = row[0]
                 cursor.execute("DELETE FROM Request WHERE username = %s", (username,))
-            
+
             # 6. Finalmente borrar el usuario
             cursor.execute("DELETE FROM User WHERE dni = %s", (dni,))
-            
+
             conn.commit()
             cursor.close()
         except mysql.connector.Error as err:

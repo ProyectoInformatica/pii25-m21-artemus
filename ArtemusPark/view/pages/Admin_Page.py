@@ -598,14 +598,20 @@ class AdminPage(ft.Container):
         supervisors = []
         all_users = self.auth_repo.get_all_users()
         for u_name, u_info in all_users.items():
-            if u_info["role"] in ["admin", "maintenance"] and u_info["dni"] != user_data.get("dni"):
-                supervisors.append(ft.dropdown.Option(key=u_info["dni"], text=f"{u_info['full_name']} ({u_name})"))
+            if u_info["role"] in ["admin", "maintenance"] and u_info[
+                "dni"
+            ] != user_data.get("dni"):
+                supervisors.append(
+                    ft.dropdown.Option(
+                        key=u_info["dni"], text=f"{u_info['full_name']} ({u_name})"
+                    )
+                )
 
         dd_supervisor = ft.Dropdown(
             label="Supervisor (Jerarquía)",
             options=supervisors,
             value=user_data.get("superior_dni"),
-            visible=user_data.get("role") == "maintenance"
+            visible=user_data.get("role") == "maintenance",
         )
 
         def on_role_change(e):
@@ -705,7 +711,9 @@ class AdminPage(ft.Container):
                         size=14,
                     ),
                     ft.Container(
-                        content=ft.Column(sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO),
+                        content=ft.Column(
+                            sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO
+                        ),
                         height=300,
                         border=ft.border.all(1, ft.Colors.GREY_300),
                         padding=5,
@@ -851,23 +859,24 @@ class AdminPage(ft.Container):
     def _realtime_energy_loop(self):
         import random
         import math
+
         while self.simulation_running:
             # Curva de consumo realista basada en la hora (más consumo de día, menos de noche)
             current_hour = datetime.now().hour
-            
+
             # Función seno para simular curva diaria: pico a las 14h, valle a las 02h
             # math.sin((hour - 8) * (2 * math.pi / 24)) da un valor entre -1 y 1
             base_curve = 1200 + 400 * math.sin((current_hour - 8) * (2 * math.pi / 24))
             fluctuation = random.uniform(-50.0, 50.0)
             current_w = base_curve + fluctuation
-            
+
             self.txt_energy_value.value = f"{current_w:.1f} W"
             self.txt_energy_detail.value = f"Hora actual: {current_hour:02d}h | Actualizado: {datetime.now().strftime('%H:%M:%S')}"
-            
+
             # Actualizar SOLO el punto de la hora actual en la gráfica
             if 0 <= current_hour < len(self.energy_data_points):
                 self.energy_data_points[current_hour].y = current_w
-            
+
             try:
                 self.txt_energy_value.update()
                 self.txt_energy_detail.update()

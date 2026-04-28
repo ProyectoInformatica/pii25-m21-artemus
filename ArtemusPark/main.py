@@ -39,7 +39,9 @@ from ArtemusPark.view.pages.Chat_Page import ChatPage
 from ArtemusPark.view.pages.Profile_Page import ProfilePage
 
 
-def generate_sensor_snapshot(timestamp: float, all_users: list, sensor_config: dict = None):
+def generate_sensor_snapshot(
+    timestamp: float, all_users: list, sensor_config: dict = None
+):
     """Generates and saves a data snapshot for all configured sensors."""
     if sensor_config is None:
         sensor_config = load_sensor_config()

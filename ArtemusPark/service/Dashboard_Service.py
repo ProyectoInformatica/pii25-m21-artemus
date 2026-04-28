@@ -332,10 +332,16 @@ class DashboardService:
                 sensor_data = [
                     d
                     for d in type_data
-                    if (isinstance(d, dict) and (d.get("sensor_id") == s_id or d.get("sensor_id") == db_id))
+                    if (
+                        isinstance(d, dict)
+                        and (d.get("sensor_id") == s_id or d.get("sensor_id") == db_id)
+                    )
                     or (
                         not isinstance(d, dict)
-                        and (getattr(d, "sensor_id", None) == s_id or getattr(d, "sensor_id", None) == db_id)
+                        and (
+                            getattr(d, "sensor_id", None) == s_id
+                            or getattr(d, "sensor_id", None) == db_id
+                        )
                     )
                 ]
 
@@ -384,7 +390,9 @@ class DashboardService:
                         val = (
                             last_item.get("value") or last_item.get("co2_level")
                             if isinstance(last_item, dict)
-                            else getattr(last_item, "value", getattr(last_item, "co2_level", 0))
+                            else getattr(
+                                last_item, "value", getattr(last_item, "co2_level", 0)
+                            )
                         )
                         last_value = f"AQI {val }"
                     elif sensor_type == "door":
