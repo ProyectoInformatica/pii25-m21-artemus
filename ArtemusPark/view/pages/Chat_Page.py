@@ -1,5 +1,4 @@
 import flet as ft
-from datetime import datetime
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.repository.Chat_Repository import ChatRepository
 from ArtemusPark.repository.Auth_Repository import AuthRepository

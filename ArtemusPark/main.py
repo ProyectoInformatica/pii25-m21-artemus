@@ -16,6 +16,7 @@ from ArtemusPark.repository.Light_Repository import save_light_event
 
 
 from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
+from ArtemusPark.bbdd.db_connection import load_sensor_config
 
 
 from ArtemusPark.model.Temperature_Model import TemperatureModel
@@ -38,10 +39,12 @@ from ArtemusPark.view.pages.Chat_Page import ChatPage
 from ArtemusPark.view.pages.Profile_Page import ProfilePage
 
 
-def generate_sensor_snapshot(timestamp: float, all_users: list):
+def generate_sensor_snapshot(timestamp: float, all_users: list, sensor_config: dict = None):
     """Generates and saves a data snapshot for all configured sensors."""
+    if sensor_config is None:
+        sensor_config = load_sensor_config()
 
-    for sensor in SENSOR_CONFIG.get("temperature", []):
+    for sensor in sensor_config.get("temperature", []):
         temp_val = int(random.uniform(18, 32))
         temp_status = "HOT" if temp_val > 30 else "MILD"
         save_temperature_measurement(
@@ -54,7 +57,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    for sensor in SENSOR_CONFIG.get("humidity", []):
+    for sensor in sensor_config.get("humidity", []):
         hum_val = int(random.uniform(30, 65))
         save_humidity_measurement(
             HumidityModel(
@@ -66,7 +69,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    for sensor in SENSOR_CONFIG.get("wind", []):
+    for sensor in sensor_config.get("wind", []):
         wind_speed = int(random.uniform(0, 25))
         wind_state = "WARNING" if wind_speed > 20 else "SAFE"
         save_wind_measurement(
@@ -79,7 +82,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    for sensor in SENSOR_CONFIG.get("smoke", []):
+    for sensor in sensor_config.get("air_quality", []):
         smoke_val = int(random.uniform(0, 50))
         smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
         save_smoke_measurement(
@@ -92,7 +95,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    for sensor in SENSOR_CONFIG.get("door", []):
+    for sensor in sensor_config.get("door", []):
         if random.random() < 0.45:
             is_open = True
             direction = "IN" if random.random() < 0.6 else "OUT"
@@ -108,7 +111,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
                 )
             )
 
-    for sensor in SENSOR_CONFIG.get("light", []):
+    for sensor in sensor_config.get("lighting", []):
         if random.random() < 0.8:
             is_on = random.choice([True, False])
             watts = round(random.uniform(100, 250), 2) if is_on else 0.5
@@ -157,7 +160,9 @@ async def main(page: ft.Page):
         while True:
             now = time.time()
             try:
-                generate_sensor_snapshot(now, all_users)
+                # Reload config from DB each loop to catch new sensors
+                current_sensor_config = load_sensor_config()
+                generate_sensor_snapshot(now, all_users, current_sensor_config)
 
                 # Check for critical alerts every 20 seconds max to avoid spam
                 if now - last_alert_time > 20:

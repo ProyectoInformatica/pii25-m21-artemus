@@ -1,9 +1,5 @@
-import threading
-import time
 import mysql.connector
 from mysql.connector.pooling import MySQLConnectionPool
-from datetime import datetime
-from typing import Dict, Optional
 
 # =====================================================================
 # SYSTEM CONFIGURATION
@@ -12,7 +8,7 @@ DB_CONFIG = {
     "host": "localhost",
     "database": "artemus",
     "user": "root",
-    "password": "1234",
+    "password": "",
     "port": 3306,
 }
 

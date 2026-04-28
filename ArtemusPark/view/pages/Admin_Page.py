@@ -3,20 +3,14 @@ import time
 import threading
 import base64
 import os
+import random
+
 from datetime import datetime
-
-from flet.core.types import MainAxisAlignment
-
 from ArtemusPark.config.Colors import AppColors
-from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
 from ArtemusPark.service.Dashboard_Service import DashboardService
-from ArtemusPark.repository import (
-    Light_Repository,
-    Temperature_Repository,
-    Door_Repository,
-)
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
+from ArtemusPark.bbdd.db_connection import load_sensor_config
 
 
 class AdminPage(ft.Container):
@@ -32,6 +26,7 @@ class AdminPage(ft.Container):
         self.simulation_running = False
         self.current_username = current_username
         self.permissions = permissions or []
+        self.sensor_config = load_sensor_config()
 
         self.file_picker = ft.FilePicker(on_result=self._on_file_result)
         self.save_file_picker = ft.FilePicker(on_result=self._on_export_result)
@@ -68,9 +63,10 @@ class AdminPage(ft.Container):
         )
 
         # --- CHART COMPONENTS ---
-        self.energy_data_points = [ft.LineChartDataPoint(i, 50) for i in range(20)]
-        now_str = datetime.now().strftime("%H:%M:%S")
-        self.time_labels = [now_str for _ in range(20)]
+        # Inicializamos 24 puntos para las 24 horas del día
+        self.energy_data_points = [
+            ft.LineChartDataPoint(i, 800 + random.uniform(-100, 100)) for i in range(24)
+        ]
 
         can_emergency = "VIEW_SECURITY_LOGS" in self.permissions or user_role == "admin"
         self.btn_catastrophe = ft.ElevatedButton(
@@ -119,14 +115,28 @@ class AdminPage(ft.Container):
             border=ft.border.all(1, ft.Colors.TRANSPARENT),
             left_axis=ft.ChartAxis(
                 labels=[
-                    ft.ChartAxisLabel(value=50, label=ft.Text("50kW", size=10)),
-                    ft.ChartAxisLabel(value=200, label=ft.Text("200kW", size=10)),
-                    ft.ChartAxisLabel(value=400, label=ft.Text("400kW", size=10)),
-                    ft.ChartAxisLabel(value=600, label=ft.Text("600kW", size=10)),
+                    ft.ChartAxisLabel(value=0, label=ft.Text("0W", size=10)),
+                    ft.ChartAxisLabel(value=500, label=ft.Text("500W", size=10)),
+                    ft.ChartAxisLabel(value=1000, label=ft.Text("1000W", size=10)),
+                    ft.ChartAxisLabel(value=1500, label=ft.Text("1500W", size=10)),
+                    ft.ChartAxisLabel(value=2000, label=ft.Text("2000W", size=10)),
                 ],
                 labels_size=40,
             ),
-            bottom_axis=ft.ChartAxis(labels=[], labels_size=20),
+            bottom_axis=ft.ChartAxis(
+                labels=[
+                    ft.ChartAxisLabel(value=0, label=ft.Text("00h", size=10)),
+                    ft.ChartAxisLabel(value=6, label=ft.Text("06h", size=10)),
+                    ft.ChartAxisLabel(value=12, label=ft.Text("12h", size=10)),
+                    ft.ChartAxisLabel(value=18, label=ft.Text("18h", size=10)),
+                    ft.ChartAxisLabel(value=23, label=ft.Text("23h", size=10)),
+                ],
+                labels_size=30,
+            ),
+            min_y=0,
+            max_y=2000,
+            min_x=0,
+            max_x=23,
             tooltip_bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.BLUE_GREY),
             expand=True,
         )
@@ -584,6 +594,26 @@ class AdminPage(ft.Container):
         tf_city = ft.TextField(label="Ciudad", value=user_data.get("address_city", ""))
         tf_zip = ft.TextField(label="C.P.", value=user_data.get("address_zip", ""))
 
+        # --- SUPERVISOR SELECTION (Hierarchy) ---
+        supervisors = []
+        all_users = self.auth_repo.get_all_users()
+        for u_name, u_info in all_users.items():
+            if u_info["role"] in ["admin", "maintenance"] and u_info["dni"] != user_data.get("dni"):
+                supervisors.append(ft.dropdown.Option(key=u_info["dni"], text=f"{u_info['full_name']} ({u_name})"))
+
+        dd_supervisor = ft.Dropdown(
+            label="Supervisor (Jerarquía)",
+            options=supervisors,
+            value=user_data.get("superior_dni"),
+            visible=user_data.get("role") == "maintenance"
+        )
+
+        def on_role_change(e):
+            dd_supervisor.visible = dd_role.value == "maintenance"
+            dd_supervisor.update()
+
+        dd_role.on_change = on_role_change
+
         def handle_next(e):
             if not is_edit and not all([tf_user.value, tf_pass.value, tf_dni.value]):
                 self.page.open(
@@ -603,9 +633,9 @@ class AdminPage(ft.Container):
                 "address_street": tf_street.value,
                 "address_city": tf_city.value,
                 "address_zip": tf_zip.value,
+                "superior_dni": dd_supervisor.value if dd_supervisor.visible else None,
                 "is_edit": is_edit,
                 "original_username": username,
-                "current_perms": user_data.get("permissions", []),
                 "assigned_sensors": user_data.get("assigned_sensors", []),
             }
             self.page.close(dialog)
@@ -618,6 +648,7 @@ class AdminPage(ft.Container):
                     tf_user,
                     tf_pass,
                     dd_role,
+                    dd_supervisor,
                     tf_full_name,
                     tf_dni,
                     tf_phone,
@@ -637,30 +668,28 @@ class AdminPage(ft.Container):
         self.page.open(dialog)
 
     def _open_technical_dialog(self, user_payload):
-        all_perms = self.auth_repo.get_all_permissions()
-        current_perms = set(user_payload.get("current_perms", []))
-        perm_checks = [
-            ft.Checkbox(label=p, value=(p in current_perms), data=p) for p in all_perms
-        ]
-
         sensor_checks = []
         if user_payload["role"] == "maintenance":
             assigned = user_payload.get("assigned_sensors", [])
-            for s_type, s_list in SENSOR_CONFIG.items():
+            for s_type, s_list in self.sensor_config.items():
                 sensor_checks.append(
                     ft.Text(f"{s_type.capitalize()}:", weight="bold", size=12)
                 )
                 for s in s_list:
                     sensor_checks.append(
                         ft.Checkbox(
-                            label=f"{s['name']} ({s['id']})",
-                            value=(s["id"] in assigned),
-                            data=s["id"],
+                            label=f"{s['name']}",
+                            value=(s["db_id"] in assigned),
+                            data=s["db_id"],
                         )
                     )
 
+        # If it's not maintenance, we might not need this dialog at all or just show a message
+        if user_payload["role"] != "maintenance":
+            self._save_final(user_payload)
+            return
+
         def save_all(e):
-            user_payload["permissions"] = [c.data for c in perm_checks if c.value]
             user_payload["assigned_sensors"] = [
                 c.data for c in sensor_checks if isinstance(c, ft.Checkbox) and c.value
             ]
@@ -668,33 +697,21 @@ class AdminPage(ft.Container):
             self.page.close(dialog)
 
         dialog = ft.AlertDialog(
-            title=ft.Text("Configuración de Permisos y Sensores"),
+            title=ft.Text("Configuración de Sensores (Solo Mantenimiento)"),
             content=ft.Column(
                 [
-                    ft.Text("Permisos Individuales:", weight="bold"),
-                    ft.Container(
-                        content=ft.Column(perm_checks, spacing=0),
-                        height=200,
-                        scroll=ft.ScrollMode.AUTO,
-                        border=ft.border.all(1, ft.Colors.GREY_300),
-                        padding=5,
-                    ),
-                    ft.Divider(),
                     ft.Text(
-                        "Sensores Asignados:",
-                        weight="bold",
-                        visible=user_payload["role"] == "maintenance",
+                        "Seleccione los sensores que este técnico podrá gestionar:",
+                        size=14,
                     ),
                     ft.Container(
-                        content=ft.Column(sensor_checks, spacing=0),
-                        height=150,
-                        scroll=ft.ScrollMode.AUTO,
-                        visible=user_payload["role"] == "maintenance",
+                        content=ft.Column(sensor_checks, spacing=0, scroll=ft.ScrollMode.AUTO),
+                        height=300,
                         border=ft.border.all(1, ft.Colors.GREY_300),
                         padding=5,
                     ),
                 ],
-                height=450,
+                height=400,
                 width=400,
             ),
             actions=[
@@ -721,7 +738,7 @@ class AdminPage(ft.Container):
                 "address_city": payload["address_city"],
                 "address_zip": payload["address_zip"],
                 "assigned_sensors": payload.get("assigned_sensors", []),
-                "permissions": payload.get("permissions", []),
+                "superior_dni": payload.get("superior_dni"),
             }
             if payload["password"]:
                 update_data["password"] = payload["password"]
@@ -733,7 +750,8 @@ class AdminPage(ft.Container):
                     payload["username"],
                     payload["password"],
                     payload["role"],
-                    permissions=payload["permissions"],
+                    assigned_sensors=payload.get("assigned_sensors", []),
+                    superior_dni=payload.get("superior_dni"),
                     **{
                         k: v
                         for k, v in payload.items()
@@ -747,6 +765,7 @@ class AdminPage(ft.Container):
                             "permissions",
                             "current_perms",
                             "assigned_sensors",
+                            "superior_dni",
                         ]
                     },
                 )
@@ -830,13 +849,32 @@ class AdminPage(ft.Container):
         )
 
     def _realtime_energy_loop(self):
+        import random
+        import math
         while self.simulation_running:
-            self.txt_energy_value.value = f"{50 + (time.time() % 100):.1f} kW"
+            # Curva de consumo realista basada en la hora (más consumo de día, menos de noche)
+            current_hour = datetime.now().hour
+            
+            # Función seno para simular curva diaria: pico a las 14h, valle a las 02h
+            # math.sin((hour - 8) * (2 * math.pi / 24)) da un valor entre -1 y 1
+            base_curve = 1200 + 400 * math.sin((current_hour - 8) * (2 * math.pi / 24))
+            fluctuation = random.uniform(-50.0, 50.0)
+            current_w = base_curve + fluctuation
+            
+            self.txt_energy_value.value = f"{current_w:.1f} W"
+            self.txt_energy_detail.value = f"Hora actual: {current_hour:02d}h | Actualizado: {datetime.now().strftime('%H:%M:%S')}"
+            
+            # Actualizar SOLO el punto de la hora actual en la gráfica
+            if 0 <= current_hour < len(self.energy_data_points):
+                self.energy_data_points[current_hour].y = current_w
+            
             try:
                 self.txt_energy_value.update()
+                self.txt_energy_detail.update()
+                self.chart.update()
             except:
                 pass
-            time.sleep(1)
+            time.sleep(5)
 
     def _build_section_container(self, title, content_control, visible=True):
         return ft.Container(

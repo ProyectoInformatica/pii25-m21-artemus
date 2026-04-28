@@ -1,6 +1,4 @@
-import time
 import flet as ft
-from datetime import datetime, timedelta
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.service.Dashboard_Service import DashboardService
 
