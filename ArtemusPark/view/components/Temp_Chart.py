@@ -56,9 +56,9 @@ class TempChart(ft.Container):
                             "Resumen (temperatura)",
                             size=14,
                             weight=ft.FontWeight.BOLD,
-                            color="#6b7280",
+                            color="#000000",
                         ),
-                        ft.Text("Actualmente", size=12, color="#9ca3af"),
+                        ft.Text("Actualmente", size=12, color="#000000"),
                     ],
                 ),
                 ft.Container(height=20),
@@ -75,7 +75,7 @@ class TempChart(ft.Container):
         for p in chart_data:
             new_points.append(
                 ft.LineChartDataPoint(
-                    x=p["x"], y=p["y"], tooltip=f"{p ['y']}°C\n{p .get ('tooltip','')}"
+                    x=p["x"], y=p["y"], tooltip=f"{p ['y']:.2f}°C\n{p .get ('tooltip','')}"
                 )
             )
 

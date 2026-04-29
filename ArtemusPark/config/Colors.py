@@ -11,9 +11,9 @@ class AppColors:
     TRANSPARENT = "transparent"
 
     TEXT_MAIN = "#111827"
-    TEXT_MUTED = "#6b7280"
+    TEXT_MUTED = "#000000"
     TEXT_WHITE = "#f9fafb"
-    TEXT_LIGHT_GREY = "#d1d5db"
+    TEXT_LIGHT_GREY = "#000000"
 
     ACCENT = "#2563eb"
     ACCENT_SOFT = "#dbeafe"

@@ -38,12 +38,42 @@ class DatabaseManager:
                 raise error
 
     @classmethod
-    def ensure_basic_data(cls):
-        """Ensures Roles, Zones, Types and Admin exist. Forces admin update to ensure login."""
-
+    def fix_autoincrement(cls):
+        """Adjusts AUTO_INCREMENT values to match the actual maximum ID in each table."""
         conn = cls.get_connection()
         try:
-            # Use buffered=True to avoid 'Unread result found' errors
+            cursor = conn.cursor()
+            table_ids = {
+                "Measurement": "id_measurement",
+                "Ticket": "id_ticket",
+                "Chat": "id_chat",
+                "Message": "id_message",
+                "Sensor": "id_sensor",
+                "Role": "id_role",
+                "Permission": "id_permission"
+            }
+            for table, id_col in table_ids.items():
+                try:
+                    cursor.execute(f"SELECT MAX({id_col}) FROM {table}")
+                    max_id_row = cursor.fetchone()
+                    max_id = max_id_row[0] if max_id_row and max_id_row[0] is not None else 0
+                    new_ai = max_id + 1
+                    cursor.execute(f"ALTER TABLE {table} AUTO_INCREMENT = {new_ai}")
+                except mysql.connector.Error:
+                    continue
+            conn.commit()
+            cursor.close()
+        except Exception as e:
+            print(f"Error sincronizando IDs: {e}")
+        finally:
+            conn.close()
+
+    @classmethod
+    def ensure_basic_data(cls):
+        """Ensures Roles, Zones, Types and Admin exist. Forces admin update to ensure login."""
+        cls.fix_autoincrement()
+        conn = cls.get_connection()
+        try:
             cursor = conn.cursor(buffered=True)
 
             # 1. Roles
@@ -53,138 +83,42 @@ class DatabaseManager:
             )
 
             # 2. Zones
-            cursor.execute(
-                "INSERT IGNORE INTO Zone (id_zone, name) VALUES (1, 'Main Zone')"
-            )
+            cursor.execute("INSERT IGNORE INTO Zone (id_zone, name) VALUES (1, 'Main Zone')")
 
             # 3. Types
             types = [
-                (1, "Temperature"),
-                (2, "Humidity"),
-                (3, "Wind"),
-                (4, "Air_Quality"),
-                (5, "Lighting"),
-                (6, "Door"),
+                (1, "Temperature"), (2, "Humidity"), (3, "Wind"),
+                (4, "Air_Quality"), (5, "Lighting"), (6, "Door"),
             ]
-            cursor.executemany(
-                "INSERT IGNORE INTO Type (id_type, description) VALUES (%s, %s)", types
-            )
+            cursor.executemany("INSERT IGNORE INTO Type (id_type, description) VALUES (%s, %s)", types)
 
             # 3.1 Permissions
             permissions = [
-                (1, "VIEW_DASHBOARD"),
-                (2, "VIEW_HISTORY"),
-                (3, "VIEW_REQUESTS"),
-                (4, "MANAGE_REQUESTS"),
-                (5, "VIEW_MAINTENANCE"),
-                (6, "MANAGE_SENSORS"),
-                (7, "ACCESS_ADMIN_PANEL"),
-                (8, "MANAGE_USERS"),
-                (9, "ACTIVATE_EMERGENCY"),
+                (1, "VIEW_DASHBOARD"), (2, "VIEW_HISTORY"), (3, "VIEW_REQUESTS"),
+                (4, "MANAGE_REQUESTS"), (5, "VIEW_MAINTENANCE"), (6, "MANAGE_SENSORS"),
+                (7, "ACCESS_ADMIN_PANEL"), (8, "MANAGE_USERS"), (9, "ACTIVATE_EMERGENCY"),
             ]
-            cursor.executemany(
-                "INSERT IGNORE INTO Permission (id_permission, description) VALUES (%s, %s)",
-                permissions,
-            )
+            cursor.executemany("INSERT IGNORE INTO Permission (id_permission, description) VALUES (%s, %s)", permissions)
 
             # 3.2 Role_Permission mapping
             role_perms = []
-            # Admin (Role 1) gets all (1-9)
-            for p_id in range(1, 10):
-                role_perms.append((1, p_id))
-            # Maintenance (Role 2) gets 1-6
-            for p_id in range(1, 7):
-                role_perms.append((2, p_id))
-            # User (Role 3) gets only 1
+            for p_id in range(1, 10): role_perms.append((1, p_id))
+            for p_id in range(1, 7): role_perms.append((2, p_id))
             role_perms.append((3, 1))
-
-            cursor.executemany(
-                "INSERT IGNORE INTO Role_Permission (id_role, id_permission) VALUES (%s, %s)",
-                role_perms,
-            )
+            cursor.executemany("INSERT IGNORE INTO Role_Permission (id_role, id_permission) VALUES (%s, %s)", role_perms)
 
             # 3.3. Messaging Infrastructure
-            # Chat table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Chat (
-                    id_chat INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(100),
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
+            cursor.execute("CREATE TABLE IF NOT EXISTS Chat (id_chat INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), created_at DATETIME DEFAULT CURRENT_TIMESTAMP)")
+            cursor.execute("CREATE TABLE IF NOT EXISTS User_Chat (dni VARCHAR(20), id_chat INT, joined_at DATETIME DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (dni, id_chat), FOREIGN KEY (dni) REFERENCES User(dni) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (id_chat) REFERENCES Chat(id_chat) ON DELETE CASCADE)")
+            cursor.execute("CREATE TABLE IF NOT EXISTS Message (id_message INT AUTO_INCREMENT PRIMARY KEY, id_chat INT NOT NULL, sender_dni VARCHAR(20) NOT NULL, content TEXT NOT NULL, sent_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (id_chat) REFERENCES Chat(id_chat) ON DELETE CASCADE, FOREIGN KEY (sender_dni) REFERENCES User(dni) ON UPDATE CASCADE ON DELETE CASCADE)")
 
-            # Verify if 'name' column exists in Chat, if not add it.
-            cursor.execute("SHOW COLUMNS FROM Chat LIKE 'name'")
-            if not cursor.fetchone():
-                cursor.execute(
-                    "ALTER TABLE Chat ADD COLUMN name VARCHAR(100) AFTER id_chat"
-                )
-
-            # Verify if 'encrypted_content' exists and remove it if it does (it should not be here)
-            cursor.execute("SHOW COLUMNS FROM Chat LIKE 'encrypted_content'")
-            if cursor.fetchone():
-                cursor.execute("ALTER TABLE Chat DROP COLUMN encrypted_content")
-
-            # User_Chat table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS User_Chat (
-                    dni VARCHAR(20),
-                    id_chat INT,
-                    joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (dni, id_chat),
-                    FOREIGN KEY (dni) REFERENCES User(dni) ON UPDATE CASCADE ON DELETE CASCADE,
-                    FOREIGN KEY (id_chat) REFERENCES Chat(id_chat) ON DELETE CASCADE
-                )
-            """)
-
-            # Message table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Message (
-                    id_message INT AUTO_INCREMENT PRIMARY KEY,
-                    id_chat INT NOT NULL,
-                    sender_dni VARCHAR(20) NOT NULL,
-                    content TEXT NOT NULL,
-                    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (id_chat) REFERENCES Chat(id_chat) ON DELETE CASCADE,
-                    FOREIGN KEY (sender_dni) REFERENCES User(dni) ON UPDATE CASCADE ON DELETE CASCADE
-                )
-            """)
-
-            # Create Global Chat if it doesn't exist
             cursor.execute("SELECT id_chat FROM Chat WHERE name = 'Global'")
             if not cursor.fetchone():
                 cursor.execute("INSERT INTO Chat (name) VALUES ('Global')")
-                global_chat_id = cursor.lastrowid
-                # Add all existing users to Global Chat
-                cursor.execute("SELECT dni FROM User")
-                users = cursor.fetchall()
-                for (user_dni,) in users:
-                    cursor.execute(
-                        "INSERT IGNORE INTO User_Chat (dni, id_chat) VALUES (%s, %s)",
-                        (user_dni, global_chat_id),
-                    )
 
-            # 4. Default Admin (admin123) - Using REPLACE to force password update
-            # Hash of 'admin123': a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3
-            admin_sql = """
-                REPLACE INTO User 
-                (dni, id_role, username, full_name, password_hash, active, address_street, address_city, address_zip) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """
-            cursor.execute(
-                admin_sql,
-                (
-                    "12345678X",
-                    1,
-                    "admin_soto",
-                    "Adrian Soto",
-                    "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-                    True,
-                    "Central Ave 45",
-                    "Madrid",
-                    "28001",
-                ),
-            )
+            # 4. Default Admin
+            admin_sql = "REPLACE INTO User (dni, id_role, username, full_name, password_hash, active, address_street, address_city, address_zip) VALUES (%s, %s, %s, %s, SHA2(%s, 256), %s, %s, %s, %s)"
+            cursor.execute(admin_sql, ("12345678X", 1, "admin_soto", "Adrian Soto", "admin123", True, "Central Ave 45", "Madrid", "28001"))
 
             conn.commit()
             cursor.close()
@@ -204,90 +138,56 @@ class DatabaseManager:
         conn = cls.get_connection()
         try:
             cursor = conn.cursor(buffered=True)
-            cursor.execute(
-                "SELECT id_type FROM Type WHERE description = %s", (type_name,)
-            )
+            cursor.execute("SELECT id_type FROM Type WHERE description = %s", (type_name,))
             res = cursor.fetchone()
             if res:
                 cls.type_cache[type_name] = res[0]
-                cursor.close()
                 return res[0]
-            cursor.close()
             return 1
         finally:
             conn.close()
 
-
-# =====================================================================
-# PUBLIC FUNCTIONS
-# =====================================================================
 def get_connection():
     return DatabaseManager.get_connection()
-
 
 def get_tipo_id(name: str):
     return DatabaseManager.get_type_id(name)
 
-
 def get_sensor_id(sensor_name: str, type_name: str) -> int:
-    """Gets sensor ID from Sensor table."""
     if sensor_name in DatabaseManager.sensor_cache:
         return DatabaseManager.sensor_cache[sensor_name]
-
     conn = get_connection()
     try:
         cursor = conn.cursor(buffered=True)
         cursor.execute("SELECT id_sensor FROM Sensor WHERE name = %s", (sensor_name,))
         res = cursor.fetchone()
-
         if res:
             sensor_id = res[0]
         else:
             type_id = DatabaseManager.get_type_id(type_name)
-            cursor.execute(
-                "INSERT INTO Sensor (id_zone, id_type, id_role, name) VALUES (%s, %s, %s, %s)",
-                (1, type_id, 1, sensor_name),
-            )
+            cursor.execute("INSERT INTO Sensor (id_zone, id_type, id_role, name) VALUES (%s, %s, %s, %s)", (1, type_id, 1, sensor_name))
             conn.commit()
             sensor_id = cursor.lastrowid
-
         DatabaseManager.sensor_cache[sensor_name] = sensor_id
-        cursor.close()
         return sensor_id
     finally:
         conn.close()
 
-
 def load_sensor_config():
-    """Loads sensor configuration from the database to replace static SENSOR_CONFIG."""
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True, buffered=True)
-        query = """
-            SELECT s.name, s.id_sensor, t.description as type
-            FROM Sensor s
-            JOIN Type t ON s.id_type = t.id_type
-            WHERE s.active = TRUE
-        """
+        query = "SELECT s.name, s.id_sensor, t.description as type FROM Sensor s JOIN Type t ON s.id_type = t.id_type WHERE s.active = TRUE"
         cursor.execute(query)
         rows = cursor.fetchall()
-        cursor.close()
-
         config = {}
         for row in rows:
             s_type = row["type"].lower()
-            if s_type not in config:
-                config[s_type] = []
-            config[s_type].append(
-                {"id": row["name"], "db_id": row["id_sensor"], "name": row["name"]}
-            )
-
-        # Fallback if DB is empty but we need something to work with
+            if s_type not in config: config[s_type] = []
+            config[s_type].append({"id": row["name"], "db_id": row["id_sensor"], "name": row["name"]})
         if not config:
             from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
-
             return SENSOR_CONFIG
-
         return config
     finally:
         conn.close()

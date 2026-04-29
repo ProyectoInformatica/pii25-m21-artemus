@@ -82,23 +82,36 @@ class AdminPage(ft.Container):
             on_click=self._toggle_catastrophe,
         )
 
+        can_export = user_role == "admin" or "EXPORT_DATA_REPORTS" in self.permissions
+        
         self.btn_export = ft.ElevatedButton(
-            "Exportar Reporte de Sensores (PDF)",
+            "Exportar PDF",
             icon=ft.Icons.PICTURE_AS_PDF,
             on_click=self._start_export_flow,
-            visible="EXPORT_DATA_REPORTS" in self.permissions,
+            visible=can_export,
             bgcolor=ft.Colors.ORANGE_800,
             color=ft.Colors.WHITE,
+            width=400,
+        )
+
+        self.btn_export_csv = ft.ElevatedButton(
+            "Reporte CSV",
+            icon=ft.Icons.FILE_DOWNLOAD,
+            on_click=self._start_export_csv_flow,
+            visible=can_export,
+            bgcolor=ft.Colors.GREEN_800,
+            color=ft.Colors.WHITE,
+            width=400,
         )
 
         self.txt_energy_value = ft.Text(
             "Iniciando...",
             size=40,
             weight=ft.FontWeight.BOLD,
-            color=ft.Colors.BLUE_GREY_800,
+            color=ft.Colors.BLACK,
         )
         self.txt_energy_detail = ft.Text(
-            "Sincronizando...", size=12, color=ft.Colors.GREY
+            "Sincronizando...", size=12, color=ft.Colors.BLACK
         )
 
         self.chart = ft.LineChart(
@@ -174,6 +187,8 @@ class AdminPage(ft.Container):
                     self.btn_catastrophe,
                     ft.Container(height=10),
                     self.btn_export,
+                    ft.Container(height=5),
+                    self.btn_export_csv,
                 ],
             ),
         )
@@ -260,9 +275,6 @@ class AdminPage(ft.Container):
             return
 
         try:
-            if self.save_file_picker not in self.page.overlay:
-                self.page.overlay.append(self.save_file_picker)
-
             self.page.open(
                 ft.SnackBar(
                     content=ft.Text(
@@ -273,10 +285,38 @@ class AdminPage(ft.Container):
             )
             self.page.update()
             self.save_file_picker.save_file(
-                dialog_title="Guardar reporte de sensores",
+                dialog_title="Guardar reporte de sensores (PDF)",
                 file_name="Reporte_Artemus.pdf",
                 file_type=ft.FilePickerFileType.CUSTOM,
                 allowed_extensions=["pdf"],
+            )
+        except Exception as ex:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text(f"No se pudo abrir el selector de archivo: {ex}"),
+                    bgcolor=ft.Colors.RED_700,
+                )
+            )
+
+    def _start_export_csv_flow(self, e):
+        if not self.page:
+            return
+
+        try:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text(
+                        "Abriendo selector de ubicación para exportar CSV..."
+                    ),
+                    bgcolor=ft.Colors.GREEN_700,
+                )
+            )
+            self.page.update()
+            self.save_file_picker.save_file(
+                dialog_title="Guardar reporte de sensores (CSV)",
+                file_name="Reporte_Artemus.csv",
+                file_type=ft.FilePickerFileType.CUSTOM,
+                allowed_extensions=["csv"],
             )
         except Exception as ex:
             self.page.open(
@@ -299,9 +339,19 @@ class AdminPage(ft.Container):
             return
 
         try:
-            report_rows = self.service.get_sensors_health_status()
-            output_path = e.path if e.path.lower().endswith(".pdf") else f"{e.path}.pdf"
-            self._export_sensor_report_pdf(output_path, report_rows)
+            output_path = e.path
+            
+            if output_path.lower().endswith(".csv"):
+                # Para CSV usamos el historial completo de medidas
+                report_rows = self.service.get_all_history_logs()
+                self._export_sensor_report_csv(output_path, report_rows)
+            else:
+                # Para PDF usamos el estado de salud actual de los sensores
+                report_rows = self.service.get_sensors_health_status()
+                if not output_path.lower().endswith(".pdf"):
+                    output_path += ".pdf"
+                self._export_sensor_report_pdf(output_path, report_rows)
+
             self.page.open(
                 ft.SnackBar(
                     content=ft.Text(f"Reporte exportado con éxito en: {output_path}"),
@@ -320,6 +370,22 @@ class AdminPage(ft.Container):
         pdf_bytes = self._build_simple_pdf(report_rows, output_path)
         with open(output_path, "wb") as pdf_file:
             pdf_file.write(pdf_bytes)
+
+    def _export_sensor_report_csv(self, output_path, report_rows):
+        import csv
+        with open(output_path, mode="w", newline="", encoding="utf-8") as csv_file:
+            writer = csv.writer(csv_file)
+            # Cabecera para el historial completo
+            writer.writerow(["Fecha y Hora", "Tipo de Sensor", "Ubicacion", "Valor Medido", "Estado"])
+            
+            for row in report_rows:
+                writer.writerow([
+                    row.get("time_str", "-"),
+                    row.get("type", "-"),
+                    row.get("location", "-"),
+                    row.get("detail", "-"),
+                    row.get("status", "-")
+                ])
 
     def _build_simple_pdf(self, report_rows, output_path=None):
         report_title = "Reporte de Sensores Artemus"
@@ -753,6 +819,7 @@ class AdminPage(ft.Container):
 
             if payload["is_edit"]:
                 self.auth_repo.update_user(dni, **update_data)
+                success_msg = f"Usuario {payload['username']} actualizado con éxito"
             else:
                 self.auth_repo.add_user(
                     payload["username"],
@@ -777,29 +844,45 @@ class AdminPage(ft.Container):
                         ]
                     },
                 )
+                success_msg = f"Usuario {payload['username']} creado con éxito"
 
             self._load_users()
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text("Usuario y permisos actualizados"),
+                    content=ft.Text(success_msg),
                     bgcolor=ft.Colors.GREEN_700,
                 )
             )
         except Exception as ex:
             self.page.open(
                 ft.SnackBar(
-                    content=ft.Text(f"Error al guardar: {ex}"),
+                    content=ft.Text(f"Error al procesar usuario: {ex}"),
                     bgcolor=ft.Colors.RED_700,
                 )
             )
 
     def _delete_user(self, username):
         def confirm(e):
-            udata = self.auth_repo.get_user_by_username(username)
-            if udata:
-                self.auth_repo.delete_user(udata["dni"])
-            self.page.close(dialog)
-            self._load_users()
+            try:
+                udata = self.auth_repo.get_user_by_username(username)
+                if udata:
+                    self.auth_repo.delete_user(udata["dni"])
+                    self.page.open(
+                        ft.SnackBar(
+                            content=ft.Text(f"Usuario {username} eliminado con éxito"),
+                            bgcolor=ft.Colors.GREEN_700,
+                        )
+                    )
+                self.page.close(dialog)
+                self._load_users()
+            except Exception as ex:
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text(f"Error al eliminar usuario: {ex}"),
+                        bgcolor=ft.Colors.RED_700,
+                    )
+                )
+                self.page.close(dialog)
 
         dialog = ft.AlertDialog(
             title=ft.Text("Eliminar"),
@@ -851,7 +934,7 @@ class AdminPage(ft.Container):
         return self._build_section_container(
             "Perfil",
             ft.Row(
-                [self.admin_avatar, ft.Text(admin_full_name, weight="bold")],
+                [self.admin_avatar, ft.Text(admin_full_name, weight="bold", color=ft.Colors.BLACK)],
                 alignment=ft.MainAxisAlignment.START,
             ),
         )
@@ -870,7 +953,7 @@ class AdminPage(ft.Container):
             fluctuation = random.uniform(-50.0, 50.0)
             current_w = base_curve + fluctuation
 
-            self.txt_energy_value.value = f"{current_w:.1f} W"
+            self.txt_energy_value.value = f"{current_w:.2f} W"
             self.txt_energy_detail.value = f"Hora actual: {current_hour:02d}h | Actualizado: {datetime.now().strftime('%H:%M:%S')}"
 
             # Actualizar SOLO el punto de la hora actual en la gráfica

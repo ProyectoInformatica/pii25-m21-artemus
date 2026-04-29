@@ -34,8 +34,8 @@ class ProfilePage(ft.Container):
 
         self.user_avatar = ft.CircleAvatar(
             radius=50,
-            content=ft.Text(self.username[0].upper(), size=30),
-            bgcolor=ft.Colors.BLUE_GREY_700,
+            content=ft.Text(self.username[0].upper(), size=30, color="black"),
+            bgcolor=ft.Colors.BLUE_GREY_100,
         )
 
         self.file_picker = ft.FilePicker(on_result=self._on_file_result)
