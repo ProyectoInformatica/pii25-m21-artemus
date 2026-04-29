@@ -75,7 +75,9 @@ class TempChart(ft.Container):
         for p in chart_data:
             new_points.append(
                 ft.LineChartDataPoint(
-                    x=p["x"], y=p["y"], tooltip=f"{p ['y']:.2f}°C\n{p .get ('tooltip','')}"
+                    x=p["x"],
+                    y=p["y"],
+                    tooltip=f"{p ['y']:.2f}°C\n{p .get ('tooltip','')}",
                 )
             )
 

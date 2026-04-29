@@ -185,7 +185,8 @@ class HistoryPage(ft.Container):
                         size=16,
                         color=ft.Colors.BLACK,
                         text_align=ft.TextAlign.CENTER,
-                        ),                    padding=50,
+                    ),
+                    padding=50,
                 )
             ]
         else:

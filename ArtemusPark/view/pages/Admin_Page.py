@@ -83,7 +83,7 @@ class AdminPage(ft.Container):
         )
 
         can_export = user_role == "admin" or "EXPORT_DATA_REPORTS" in self.permissions
-        
+
         self.btn_export = ft.ElevatedButton(
             "Exportar PDF",
             icon=ft.Icons.PICTURE_AS_PDF,
@@ -340,7 +340,7 @@ class AdminPage(ft.Container):
 
         try:
             output_path = e.path
-            
+
             if output_path.lower().endswith(".csv"):
                 # Para CSV usamos el historial completo de medidas
                 report_rows = self.service.get_all_history_logs()
@@ -373,19 +373,30 @@ class AdminPage(ft.Container):
 
     def _export_sensor_report_csv(self, output_path, report_rows):
         import csv
+
         with open(output_path, mode="w", newline="", encoding="utf-8") as csv_file:
             writer = csv.writer(csv_file)
             # Cabecera para el historial completo
-            writer.writerow(["Fecha y Hora", "Tipo de Sensor", "Ubicacion", "Valor Medido", "Estado"])
-            
+            writer.writerow(
+                [
+                    "Fecha y Hora",
+                    "Tipo de Sensor",
+                    "Ubicacion",
+                    "Valor Medido",
+                    "Estado",
+                ]
+            )
+
             for row in report_rows:
-                writer.writerow([
-                    row.get("time_str", "-"),
-                    row.get("type", "-"),
-                    row.get("location", "-"),
-                    row.get("detail", "-"),
-                    row.get("status", "-")
-                ])
+                writer.writerow(
+                    [
+                        row.get("time_str", "-"),
+                        row.get("type", "-"),
+                        row.get("location", "-"),
+                        row.get("detail", "-"),
+                        row.get("status", "-"),
+                    ]
+                )
 
     def _build_simple_pdf(self, report_rows, output_path=None):
         report_title = "Reporte de Sensores Artemus"
@@ -934,7 +945,10 @@ class AdminPage(ft.Container):
         return self._build_section_container(
             "Perfil",
             ft.Row(
-                [self.admin_avatar, ft.Text(admin_full_name, weight="bold", color=ft.Colors.BLACK)],
+                [
+                    self.admin_avatar,
+                    ft.Text(admin_full_name, weight="bold", color=ft.Colors.BLACK),
+                ],
                 alignment=ft.MainAxisAlignment.START,
             ),
         )
