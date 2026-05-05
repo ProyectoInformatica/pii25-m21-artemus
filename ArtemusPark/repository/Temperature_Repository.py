@@ -33,7 +33,7 @@ def save_temperature_measurement(measurement: TemperatureModel) -> None:
         conn.close()
 
 
-def    load_all_temperature_measurements() -> List[Dict[str, Any]]:
+def load_all_temperature_measurements() -> List[Dict[str, Any]]:
     """Loads all temperature measurements from the database."""
     conn = get_connection()
     try:
