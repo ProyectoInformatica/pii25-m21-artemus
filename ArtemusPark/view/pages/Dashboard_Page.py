@@ -145,6 +145,18 @@ class DashboardPage(ft.Container):
             data = self.service.get_latest_sensor_data()
             if data:
                 self.card_capacity.update_occupancy(data.get("occupancy", 0))
+                if not self.service.is_catastrophe_mode():
+                    alert = self._get_sensor_alert(data)
+                    if alert:
+                        self.card_alerts.show_alert(
+                            "Incidencia activa", alert, is_critical=True
+                        )
+                    else:
+                        self.card_alerts.show_alert(
+                            "Sistema Normal",
+                            "No hay incidencias activas.",
+                            is_critical=False,
+                        )
             avg_data = self.service.get_average_sensor_data()
             if avg_data:
 
@@ -200,6 +212,15 @@ class DashboardPage(ft.Container):
             self.update()
         except:
             pass
+
+    def _get_sensor_alert(self, data):
+        if data.get("temperature", 0) > 30:
+            return f"Temperatura elevada: {data['temperature']}ºC"
+        if data.get("wind", 0) > 20:
+            return f"Vientos fuertes: {data['wind']} km/h"
+        if data.get("air_quality", 0) > 30:
+            return f"Calidad del aire deficiente: {data['air_quality']} AQI"
+        return None
 
     def _build_window_bar(self):
         self.txt_welcome = ft.Text(

@@ -30,19 +30,33 @@ class TempChart(ft.Container):
                 left=ft.border.BorderSide(1, "transparent"),
             ),
             left_axis=ft.ChartAxis(
-                labels=[ft.ChartAxisLabel(value=20, label=ft.Text("20°", size=10))],
-                labels_size=30,
+                labels=[
+                    ft.ChartAxisLabel(value=10, label=ft.Text("10°C", size=10)),
+                    ft.ChartAxisLabel(value=20, label=ft.Text("20°C", size=10)),
+                    ft.ChartAxisLabel(value=30, label=ft.Text("30°C", size=10)),
+                    ft.ChartAxisLabel(value=40, label=ft.Text("40°C", size=10)),
+                ],
+                labels_size=42,
             ),
             bottom_axis=ft.ChartAxis(
                 labels=[
-                    ft.ChartAxisLabel(value=0, label=ft.Text("Inicio", size=10)),
-                    ft.ChartAxisLabel(value=5, label=ft.Text("Actual", size=10)),
+                    ft.ChartAxisLabel(value=0, label=ft.Text("00h", size=10)),
+                    ft.ChartAxisLabel(value=3, label=ft.Text("03h", size=10)),
+                    ft.ChartAxisLabel(value=6, label=ft.Text("06h", size=10)),
+                    ft.ChartAxisLabel(value=9, label=ft.Text("09h", size=10)),
+                    ft.ChartAxisLabel(value=12, label=ft.Text("12h", size=10)),
+                    ft.ChartAxisLabel(value=15, label=ft.Text("15h", size=10)),
+                    ft.ChartAxisLabel(value=18, label=ft.Text("18h", size=10)),
+                    ft.ChartAxisLabel(value=21, label=ft.Text("21h", size=10)),
+                    ft.ChartAxisLabel(value=24, label=ft.Text("24h", size=10)),
                 ],
                 labels_size=40,
             ),
             tooltip_bgcolor="#111827",
-            min_y=15,
-            max_y=35,
+            min_x=0,
+            max_x=24,
+            min_y=10,
+            max_y=45,
             expand=True,
         )
 
@@ -82,6 +96,12 @@ class TempChart(ft.Container):
             )
 
         self.main_line.data_points = new_points
+        y_values = [point.y for point in new_points]
+        if y_values:
+            min_temp = min(y_values)
+            max_temp = max(y_values)
+            self.chart.min_y = min(0, int(min_temp // 5) * 5)
+            self.chart.max_y = max(45, int((max_temp + 4) // 5) * 5)
         if self.chart.page:
             try:
                 self.chart.update()

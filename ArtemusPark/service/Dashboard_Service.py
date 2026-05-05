@@ -79,9 +79,9 @@ class DashboardService:
     def get_temp_chart_data(self) -> List[Dict[str, Any]]:
         """Prepara datos para el gráfico de temperatura."""
         temps = Temperature_Repository.load_all_temperature_measurements()
-        recent = temps[-10:] if temps else []
+        recent = temps[-60:] if temps else []
         chart_data = []
-        for i, item in enumerate(recent):
+        for item in recent:
             ts = (
                 item.get("timestamp", 0)
                 if isinstance(item, dict)
@@ -93,10 +93,13 @@ class DashboardService:
                 else getattr(item, "value", 0)
             )
             try:
-                time_label = datetime.fromtimestamp(ts).strftime("%H:%M:%S")
+                time_value = datetime.fromtimestamp(ts)
+                hour_value = time_value.hour + (time_value.minute / 60)
+                time_label = time_value.strftime("%H:%M:%S")
             except:
+                hour_value = 0
                 time_label = ""
-            chart_data.append({"x": i, "y": float(val), "tooltip": time_label})
+            chart_data.append({"x": hour_value, "y": float(val), "tooltip": time_label})
         return chart_data
 
     def get_recent_events(self) -> List[Dict[str, Any]]:

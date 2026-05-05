@@ -13,6 +13,7 @@ from ArtemusPark.repository.Wind_Repository import save_wind_measurement
 from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement
 from ArtemusPark.repository.Door_Repository import save_door_event
 from ArtemusPark.repository.Light_Repository import save_light_event
+from ArtemusPark.repository.Requests_Repository import RequestsRepository
 
 
 from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
@@ -156,6 +157,7 @@ async def main(page: ft.Page):
         from ArtemusPark.repository.Chat_Repository import ChatRepository
 
         chat_repo = ChatRepository()
+        requests_repo = RequestsRepository()
         system_dni = "12345678X"  # DNI del administrador por defecto
         last_alert_time = 0
 
@@ -171,18 +173,27 @@ async def main(page: ft.Page):
                     data = service.get_latest_sensor_data()
                     if data:
                         alert_msg = None
+                        incident_type = None
                         if data.get("temperature", 0) > 30:
                             alert_msg = f"⚠️ ALERTA CRÍTICA: Temperatura elevada ({data['temperature']}ºC) en sector principal."
+                            incident_type = "INCIDENT_TEMPERATURE"
                         elif data.get("wind", 0) > 20:
                             alert_msg = f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados."
+                            incident_type = "INCIDENT_WIND"
                         elif data.get("air_quality", 0) > 30:
                             alert_msg = f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (AQI: {data['air_quality']})."
+                            incident_type = "INCIDENT_AIR_QUALITY"
 
                         if alert_msg:
                             try:
                                 # El chat 1 es el chat Global
                                 chat_repo.send_message(1, system_dni, alert_msg)
                                 page.pubsub.send_all("new_chat_message")
+                                created_incident = requests_repo.create_system_incident(
+                                    system_dni, alert_msg, incident_type
+                                )
+                                if created_incident:
+                                    page.pubsub.send_all({"topic": "requests_updated"})
                                 last_alert_time = now
                             except Exception as chat_err:
                                 print(f"Error enviando alerta: {chat_err}")
