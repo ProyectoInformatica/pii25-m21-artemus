@@ -17,44 +17,54 @@ from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement
 
 app = Flask(__name__)
 
-handler = RotatingFileHandler('artemus_api.log', maxBytes=100000, backupCount=3)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler = RotatingFileHandler("artemus_api.log", maxBytes=100000, backupCount=3)
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
 
-DB_PATH = 'ArtemusPark/bbdd/artemus.db'
+DB_PATH = "ArtemusPark/bbdd/artemus.db"
 
 
-@app.route('/', methods=['GET'])
+@app.route("/", methods=["GET"])
 def index():
-    return jsonify({
-        "project": "Artemus Park IoT System",
-        "version": "1.1.0",
-        "status": "running",
-        "endpoints": ["/status", "/ping", "/api/sensor", "/api/debug/latest", "/api/debug/inject"]
-    }), 200
+    return (
+        jsonify(
+            {
+                "project": "Artemus Park IoT System",
+                "version": "1.1.0",
+                "status": "running",
+                "endpoints": [
+                    "/status",
+                    "/ping",
+                    "/api/sensor",
+                    "/api/debug/latest",
+                    "/api/debug/inject",
+                ],
+            }
+        ),
+        200,
+    )
 
 
-@app.route('/status', methods=['GET'])
+@app.route("/status", methods=["GET"])
 def health_check():
-    return jsonify({
-        "status": "healthy",
-        "uptime": time.time(),
-        "database": "connected"
-    }), 200
+    return (
+        jsonify({"status": "healthy", "uptime": time.time(), "database": "connected"}),
+        200,
+    )
 
 
-@app.route('/ping', methods=['GET'])
+@app.route("/ping", methods=["GET"])
 def ping_check():
     return jsonify({"msg": "pong"}), 200
 
 
-@app.route('/api/sensor', methods=['GET'])
+@app.route("/api/sensor", methods=["GET"])
 def receive_sensor_data():
-    sensor_type = request.args.get('type')
-    raw_value = request.args.get('value', type=float)
-    sensor_id = request.args.get('sensor_id')
+    sensor_type = request.args.get("type")
+    raw_value = request.args.get("value", type=float)
+    sensor_id = request.args.get("sensor_id")
 
     if raw_value is None or not sensor_id or not sensor_type:
         app.logger.warning(f"Invalid request: {request.args}")
@@ -64,18 +74,29 @@ def receive_sensor_data():
     current_time = time.time()
 
     try:
-        if sensor_type == 'temperature':
-            data = TemperatureModel(value=value, status="OK", sensor_id=sensor_id, timestamp=current_time)
+        if sensor_type == "temperature":
+            data = TemperatureModel(
+                value=value, status="OK", sensor_id=sensor_id, timestamp=current_time
+            )
             save_temperature_measurement(data)
-        elif sensor_type == 'humidity':
-            data = HumidityModel(value=value, status="OK", sensor_id=sensor_id, timestamp=current_time)
+        elif sensor_type == "humidity":
+            data = HumidityModel(
+                value=value, status="OK", sensor_id=sensor_id, timestamp=current_time
+            )
             save_humidity_measurement(data)
-        elif sensor_type == 'light':
-            data = LightModel(value=value, status="OK", is_on=(value < 1000), sensor_id=sensor_id,
-                              timestamp=current_time)
+        elif sensor_type == "light":
+            data = LightModel(
+                value=value,
+                status="OK",
+                is_on=(value < 1000),
+                sensor_id=sensor_id,
+                timestamp=current_time,
+            )
             save_light_event(data)
-        elif sensor_type == 'smoke':
-            data = SmokeModel(value=value, status="OK", sensor_id=sensor_id, timestamp=current_time)
+        elif sensor_type == "smoke":
+            data = SmokeModel(
+                value=value, status="OK", sensor_id=sensor_id, timestamp=current_time
+            )
             save_smoke_measurement(data)
         else:
             return jsonify({"error": "Invalid sensor type"}), 400
@@ -87,14 +108,19 @@ def receive_sensor_data():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-@app.route('/api/debug/latest', methods=['GET'])
+@app.route("/api/debug/latest", methods=["GET"])
 def get_latest_data():
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
         results = {}
-        tables = ['temperature_measurements', 'humidity_measurements', 'light_events', 'smoke_measurements']
+        tables = [
+            "temperature_measurements",
+            "humidity_measurements",
+            "light_events",
+            "smoke_measurements",
+        ]
 
         for table in tables:
             cursor.execute(f"SELECT * FROM {table} ORDER BY timestamp DESC LIMIT 3")
@@ -106,21 +132,26 @@ def get_latest_data():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/debug/inject', methods=['GET'])
+@app.route("/api/debug/inject", methods=["GET"])
 def inject_fake_data():
-    stype = request.args.get('type', 'temperature')
-    sid = request.args.get('id', 'DEBUG_01')
+    stype = request.args.get("type", "temperature")
+    sid = request.args.get("id", "DEBUG_01")
     val = random.randint(15, 35)
 
     url = f"/api/sensor?type={stype}&value={val}&sensor_id={sid}"
     with app.test_client() as client:
         response = client.get(url)
-        return jsonify({
-            "action": "injection",
-            "target_url": url,
-            "response": response.get_json()
-        }), 200
+        return (
+            jsonify(
+                {
+                    "action": "injection",
+                    "target_url": url,
+                    "response": response.get_json(),
+                }
+            ),
+            200,
+        )
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
