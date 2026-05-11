@@ -3,7 +3,7 @@ from ArtemusPark.config.Colors import AppColors
 
 
 class MapCard(ft.Container):
-    def __init__(self, on_sensor_click=None):
+    def __init__(self, on_sensor_click=None, permissions=None):
         super().__init__()
         self.border_radius = 12
         self.bgcolor = ft.Colors.WHITE
@@ -11,6 +11,7 @@ class MapCard(ft.Container):
         self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.alignment = ft.alignment.center
         self.on_sensor_click = on_sensor_click
+        self.permissions = permissions or []
 
         self.map_size = 400
 
@@ -120,7 +121,11 @@ class MapCard(ft.Container):
                     marker.bgcolor = self.original_colors.get(key, ft.Colors.BLUE)
             else:
                 marker.bgcolor = ft.Colors.GREY
-            marker.update()
+            if marker.page:
+                try:
+                    marker.update()
+                except Exception:
+                    pass
 
     def update_light_marker_status(self, is_on: bool, consumption: float):
         """Actualiza el marcador de luces y el texto de consumo."""
@@ -132,7 +137,11 @@ class MapCard(ft.Container):
             )
             marker.bgcolor = ft.Colors.ORANGE_500 if is_on else ft.Colors.GREY_500
             marker.tooltip = "Encendido" if is_on else "Apagado"
-            marker.update()
+            if marker.page:
+                try:
+                    marker.update()
+                except Exception:
+                    pass
 
     def update_sensor_data(self, data: dict):
         """Actualiza tooltips y estados de los marcadores"""
@@ -159,5 +168,10 @@ class MapCard(ft.Container):
 
     def _update_marker(self, key, text):
         if key in self.markers:
-            self.markers[key].tooltip = text
-            self.markers[key].update()
+            marker = self.markers[key]
+            marker.tooltip = text
+            if marker.page:
+                try:
+                    marker.update()
+                except Exception:
+                    pass

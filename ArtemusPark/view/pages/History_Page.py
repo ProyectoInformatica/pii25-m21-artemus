@@ -1,6 +1,4 @@
-import time
 import flet as ft
-from datetime import datetime, timedelta
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.service.Dashboard_Service import DashboardService
 
@@ -185,7 +183,7 @@ class HistoryPage(ft.Container):
                         "No hay datos disponibles para mostrar en este rango.",
                         weight=ft.FontWeight.BOLD,
                         size=16,
-                        color=ft.Colors.BLACK54,
+                        color=ft.Colors.BLACK,
                         text_align=ft.TextAlign.CENTER,
                     ),
                     padding=50,

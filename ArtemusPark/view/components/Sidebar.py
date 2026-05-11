@@ -4,6 +4,7 @@ from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.service.Dashboard_Service import DashboardService
+from ArtemusPark.repository.Chat_Repository import ChatRepository
 
 
 class Sidebar(ft.Container):
@@ -18,8 +19,13 @@ class Sidebar(ft.Container):
         self.username = username
         self.permissions = permissions or []
         self.auth_repo = AuthRepository()
+        self.chat_repo = ChatRepository()
         self.badge_controls = {}
         self.has_pending_requests = False
+
+        user_data = self.auth_repo.get_user_by_username(self.username)
+        self.user_dni = user_data.get("dni", "")
+
         if "MANAGE_REQUESTS" in self.permissions or self.user_role == "admin":
             self.has_pending_requests = self._check_pending_requests()
 
@@ -46,6 +52,7 @@ class Sidebar(ft.Container):
         if DashboardService().is_catastrophe_mode():
             self.bgcolor = ft.Colors.RED_900
             self.update()
+        self._refresh_unread_badge()
 
     def _load_user_avatar(self):
         """Loads the user's profile picture from the repository."""
@@ -78,13 +85,24 @@ class Sidebar(ft.Container):
                 topic == "profile_updated" and message.get("username") == self.username
             ):
                 self._load_user_avatar()
-                self.user_avatar.update()
+                if self.user_avatar.page:
+                    self.user_avatar.update()
         elif message == "catastrophe_mode":
             self.bgcolor = ft.Colors.RED_900
             self.update()
         elif message == "normal_mode":
             self.bgcolor = AppColors.BG_DARK
             self.update()
+        elif message == "new_chat_message":
+            self._refresh_unread_badge()
+
+    def _refresh_unread_badge(self):
+        unread_count = self.chat_repo.get_total_unread_count(self.user_dni)
+        badge = self.badge_controls.get("chat")
+        if badge:
+            badge.visible = unread_count > 0
+            if badge.page:
+                badge.update()
 
     def _build_content(self):
         """Construye el contenido vertical de la barra lateral."""
@@ -99,6 +117,7 @@ class Sidebar(ft.Container):
             ),
             ft.Divider(height=30, color="transparent"),
             self._make_button("Dashboard", "📊", "dashboard", active=True),
+            self._make_button("Mensajería", "💬", "chat"),
         ]
 
         if "VIEW_HISTORY" in self.permissions or self.user_role == "admin":
@@ -121,8 +140,9 @@ class Sidebar(ft.Container):
         if "VIEW_MAINTENANCE" in self.permissions or self.user_role == "admin":
             controls_list.append(self._make_button("Mantenimiento", "🛠", "maintenance"))
 
-        if "ACCESS_ADMIN_PANEL" in self.permissions or self.user_role == "admin":
-            controls_list.append(self._make_button("Administración", "⚙️", "admin"))
+        # Botón de Administración / Perfil
+        admin_label = "Administración" if self.user_role == "admin" else "Mi Perfil"
+        controls_list.append(self._make_button(admin_label, "⚙️", "admin"))
 
         controls_list.append(ft.Container(expand=True))
 
@@ -195,14 +215,16 @@ class Sidebar(ft.Container):
             ft.Text(icon, size=16),
             ft.Text(text, size=14, color=text_color),
         ]
-        if key == "requests" and self.user_role == "admin":
+
+        # Unread badge for chat or generic show_badge
+        if key == "chat" or key == "requests":
             badge = ft.Container(
                 width=8,
                 height=8,
                 bgcolor=ft.Colors.RED,
                 border_radius=4,
                 margin=ft.margin.only(left=6),
-                visible=show_badge,
+                visible=show_badge if key == "requests" else False,
             )
             self.badge_controls[key] = badge
             row_controls.append(badge)
@@ -227,8 +249,11 @@ class Sidebar(ft.Container):
     def _handle_click(self, e):
         """Maneja el evento de clic en un botón de navegación."""
         clicked_key = e.control.data
-        if e.control.bgcolor == "#111827":
-            return
+        if (
+            e.control.bgcolor == "#111827" and clicked_key != "admin"
+        ):  # Allow clicking admin to refresh profile
+            pass
+
         self.on_nav_change(clicked_key)
 
         self._apply_active_state(clicked_key)

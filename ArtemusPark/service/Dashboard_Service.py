@@ -4,6 +4,7 @@ import flet as ft
 from typing import Dict, Any, List
 from datetime import datetime, timedelta
 from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
+from ArtemusPark.bbdd.db_connection import load_sensor_config
 
 from ArtemusPark.model.Door_Model import DoorModel
 from ArtemusPark.repository import (
@@ -22,6 +23,9 @@ class DashboardService:
 
     _catastrophe_active = False
 
+    def __init__(self):
+        self.sensor_config = load_sensor_config()
+
     def set_catastrophe_mode(self, active: bool):
         """Activa o desactiva la alarma globalmente"""
         DashboardService._catastrophe_active = active
@@ -35,7 +39,7 @@ class DashboardService:
         temps = Temperature_Repository.load_all_temperature_measurements()
         hums = Humidity_Repository.load_all_humidity_measurements()
         winds = Wind_Repository.load_all_wind_measurements()
-        smokes = Smoke_Repository.load_all_smoke_measurements()
+        air_qualities = Smoke_Repository.load_all_smoke_measurements()
         lights = Light_Repository.load_all_light_events()
 
         real_occupancy = self._calculate_occupancy()
@@ -44,7 +48,7 @@ class DashboardService:
             "temperature": self._get_last_value(temps, "value", 0),
             "humidity": self._get_last_value(hums, "value", 0),
             "wind": self._get_last_value(winds, "speed", 0),
-            "air_quality": self._get_last_value(smokes, "value", 0),
+            "air_quality": self._get_last_value(air_qualities, "value", 0),
             "occupancy": real_occupancy,
             "light_is_on": self._get_last_value(lights, "is_on", False),
             "light_consumption": self._get_last_value(lights, "value", 0),
@@ -75,9 +79,9 @@ class DashboardService:
     def get_temp_chart_data(self) -> List[Dict[str, Any]]:
         """Prepara datos para el gráfico de temperatura."""
         temps = Temperature_Repository.load_all_temperature_measurements()
-        recent = temps[-10:] if temps else []
+        recent = temps[-60:] if temps else []
         chart_data = []
-        for i, item in enumerate(recent):
+        for item in recent:
             ts = (
                 item.get("timestamp", 0)
                 if isinstance(item, dict)
@@ -89,10 +93,13 @@ class DashboardService:
                 else getattr(item, "value", 0)
             )
             try:
-                time_label = datetime.fromtimestamp(ts).strftime("%H:%M:%S")
+                time_value = datetime.fromtimestamp(ts)
+                hour_value = time_value.hour + (time_value.minute / 60)
+                time_label = time_value.strftime("%H:%M:%S")
             except:
+                hour_value = 0
                 time_label = ""
-            chart_data.append({"x": i, "y": float(val), "tooltip": time_label})
+            chart_data.append({"x": hour_value, "y": float(val), "tooltip": time_label})
         return chart_data
 
     def get_recent_events(self) -> List[Dict[str, Any]]:
@@ -104,7 +111,7 @@ class DashboardService:
         def get_sensor_name(s_type, s_id):
             if not s_id:
                 return "Desconocido"
-            for s in SENSOR_CONFIG.get(s_type, []):
+            for s in self.sensor_config.get(s_type, []):
                 if s["id"] == s_id:
                     return s["name"]
             return s_id
@@ -294,6 +301,7 @@ class DashboardService:
 
     def get_sensors_health_status(self) -> List[Dict[str, Any]]:
         """Verifica si los sensores configurados están enviando datos recientemente."""
+        self.sensor_config = load_sensor_config()
         now = time.time()
         threshold = 15
         health_report = []
@@ -302,34 +310,41 @@ class DashboardService:
             "temperature": Temperature_Repository.load_all_temperature_measurements(),
             "humidity": Humidity_Repository.load_all_humidity_measurements(),
             "wind": Wind_Repository.load_all_wind_measurements(),
-            "smoke": Smoke_Repository.load_all_smoke_measurements(),
+            "air_quality": Smoke_Repository.load_all_smoke_measurements(),
             "door": Door_Repository.load_all_door_events(),
-            "light": Light_Repository.load_all_light_events(),
+            "lighting": Light_Repository.load_all_light_events(),
         }
 
         icon_map = {
             "temperature": ft.Icons.THERMOSTAT,
             "humidity": ft.Icons.WATER_DROP,
             "wind": ft.Icons.AIR,
-            "smoke": ft.Icons.CLOUD,
+            "air_quality": ft.Icons.CLOUD,
             "door": ft.Icons.SENSOR_DOOR,
-            "light": ft.Icons.LIGHTBULB,
+            "lighting": ft.Icons.LIGHTBULB,
         }
 
-        for sensor_type, sensors in SENSOR_CONFIG.items():
+        for sensor_type, sensors in self.sensor_config.items():
             type_data = all_data.get(sensor_type, [])
 
             for sensor_config in sensors:
                 s_id = sensor_config["id"]
                 s_name = sensor_config["name"]
+                db_id = sensor_config.get("db_id")
 
                 sensor_data = [
                     d
                     for d in type_data
-                    if (isinstance(d, dict) and d.get("sensor_id") == s_id)
+                    if (
+                        isinstance(d, dict)
+                        and (d.get("sensor_id") == s_id or d.get("sensor_id") == db_id)
+                    )
                     or (
                         not isinstance(d, dict)
-                        and getattr(d, "sensor_id", None) == s_id
+                        and (
+                            getattr(d, "sensor_id", None) == s_id
+                            or getattr(d, "sensor_id", None) == db_id
+                        )
                     )
                 ]
 
@@ -371,14 +386,16 @@ class DashboardService:
                         val = (
                             last_item.get("speed")
                             if isinstance(last_item, dict)
-                            else last_item.speed
+                            else getattr(last_item, "speed", 0)
                         )
                         last_value = f"{val } km/h"
-                    elif sensor_type == "smoke":
+                    elif sensor_type == "air_quality":
                         val = (
-                            last_item.get("value")
+                            last_item.get("value") or last_item.get("co2_level")
                             if isinstance(last_item, dict)
-                            else last_item.value
+                            else getattr(
+                                last_item, "value", getattr(last_item, "co2_level", 0)
+                            )
                         )
                         last_value = f"AQI {val }"
                     elif sensor_type == "door":
@@ -388,7 +405,7 @@ class DashboardService:
                             else last_item.is_open
                         )
                         last_value = "Abierta" if is_open else "Cerrada"
-                    elif sensor_type == "light":
+                    elif sensor_type == "lighting":
                         is_on = (
                             last_item.get("is_on")
                             if isinstance(last_item, dict)
@@ -399,6 +416,7 @@ class DashboardService:
                 health_report.append(
                     {
                         "id": s_id,
+                        "db_id": db_id,
                         "name": s_name,
                         "type": sensor_type,
                         "status": "En Línea" if is_online else "Sin Señal",

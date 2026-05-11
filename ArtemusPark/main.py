@@ -13,9 +13,11 @@ from ArtemusPark.repository.Wind_Repository import save_wind_measurement
 from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement
 from ArtemusPark.repository.Door_Repository import save_door_event
 from ArtemusPark.repository.Light_Repository import save_light_event
+from ArtemusPark.repository.Requests_Repository import RequestsRepository
 
 
 from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
+from ArtemusPark.bbdd.db_connection import load_sensor_config
 
 
 from ArtemusPark.model.Temperature_Model import TemperatureModel
@@ -34,12 +36,18 @@ from ArtemusPark.view.pages.History_Page import HistoryPage
 from ArtemusPark.view.pages.Maintenance_Page import MaintenancePage
 from ArtemusPark.view.pages.Requests_Page import RequestsPage
 from ArtemusPark.view.pages.Admin_Page import AdminPage
+from ArtemusPark.view.pages.Chat_Page import ChatPage
+from ArtemusPark.view.pages.Profile_Page import ProfilePage
 
 
-def generate_sensor_snapshot(timestamp: float, all_users: list):
+def generate_sensor_snapshot(
+    timestamp: float, all_users: list, sensor_config: dict = None
+):
     """Generates and saves a data snapshot for all configured sensors."""
+    if sensor_config is None:
+        sensor_config = load_sensor_config()
 
-    for sensor in SENSOR_CONFIG.get("temperature", []):
+    for sensor in sensor_config.get("temperature", []):
         temp_val = int(random.uniform(18, 32))
         temp_status = "HOT" if temp_val > 30 else "MILD"
         save_temperature_measurement(
@@ -52,7 +60,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    for sensor in SENSOR_CONFIG.get("humidity", []):
+    for sensor in sensor_config.get("humidity", []):
         hum_val = int(random.uniform(30, 65))
         save_humidity_measurement(
             HumidityModel(
@@ -64,7 +72,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    for sensor in SENSOR_CONFIG.get("wind", []):
+    for sensor in sensor_config.get("wind", []):
         wind_speed = int(random.uniform(0, 25))
         wind_state = "WARNING" if wind_speed > 20 else "SAFE"
         save_wind_measurement(
@@ -77,7 +85,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    for sensor in SENSOR_CONFIG.get("smoke", []):
+    for sensor in sensor_config.get("air_quality", []):
         smoke_val = int(random.uniform(0, 50))
         smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
         save_smoke_measurement(
@@ -90,7 +98,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
             )
         )
 
-    for sensor in SENSOR_CONFIG.get("door", []):
+    for sensor in sensor_config.get("door", []):
         if random.random() < 0.45:
             is_open = True
             direction = "IN" if random.random() < 0.6 else "OUT"
@@ -106,7 +114,7 @@ def generate_sensor_snapshot(timestamp: float, all_users: list):
                 )
             )
 
-    for sensor in SENSOR_CONFIG.get("light", []):
+    for sensor in sensor_config.get("lighting", []):
         if random.random() < 0.8:
             is_on = random.choice([True, False])
             watts = round(random.uniform(100, 250), 2) if is_on else 0.5
@@ -146,10 +154,50 @@ async def main(page: ft.Page):
 
     async def sensor_simulation_loop():
         """Periodically generates random sensor data."""
+        from ArtemusPark.repository.Chat_Repository import ChatRepository
+
+        chat_repo = ChatRepository()
+        requests_repo = RequestsRepository()
+        system_dni = "12345678X"  # DNI del administrador por defecto
+        last_alert_time = 0
+
         while True:
             now = time.time()
             try:
-                generate_sensor_snapshot(now, all_users)
+                # Reload config from DB each loop to catch new sensors
+                current_sensor_config = load_sensor_config()
+                generate_sensor_snapshot(now, all_users, current_sensor_config)
+
+                # Check for critical alerts every 20 seconds max to avoid spam
+                if now - last_alert_time > 20:
+                    data = service.get_latest_sensor_data()
+                    if data:
+                        alert_msg = None
+                        incident_type = None
+                        if data.get("temperature", 0) > 30:
+                            alert_msg = f"⚠️ ALERTA CRÍTICA: Temperatura elevada ({data['temperature']}ºC) en sector principal."
+                            incident_type = "INCIDENT_TEMPERATURE"
+                        elif data.get("wind", 0) > 20:
+                            alert_msg = f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados."
+                            incident_type = "INCIDENT_WIND"
+                        elif data.get("air_quality", 0) > 30:
+                            alert_msg = f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (AQI: {data['air_quality']})."
+                            incident_type = "INCIDENT_AIR_QUALITY"
+
+                        if alert_msg:
+                            try:
+                                # El chat 1 es el chat Global
+                                chat_repo.send_message(1, system_dni, alert_msg)
+                                page.pubsub.send_all("new_chat_message")
+                                created_incident = requests_repo.create_system_incident(
+                                    system_dni, alert_msg, incident_type
+                                )
+                                if created_incident:
+                                    page.pubsub.send_all({"topic": "requests_updated"})
+                                last_alert_time = now
+                            except Exception as chat_err:
+                                print(f"Error enviando alerta: {chat_err}")
+
             except Exception as e:
                 print(f"Error in sensor simulation: {e}")
 
@@ -189,18 +237,14 @@ async def main(page: ft.Page):
             if user_data and user_data.get("full_name"):
                 display_name = user_data["full_name"]
 
-        if page_name == "admin" and current_role != "admin":
-
-            page.snack_bar = ft.SnackBar(ft.Text("Access Denied"))
-            page.snack_bar.open = True
-            page.update()
-            return
-
         content_area.content = None
 
         if page_name == "dashboard":
             content_area.content = DashboardPage(
-                user_name=display_name, user_role=current_role, on_navigate=change_view
+                user_name=display_name,
+                user_role=current_role,
+                on_navigate=change_view,
+                permissions=session.get("permissions", []),
             )
 
         elif page_name == "history":
@@ -217,8 +261,20 @@ async def main(page: ft.Page):
             )
 
         elif page_name == "admin":
-            content_area.content = AdminPage(
-                user_role=current_role, current_username=current_username
+            if current_role == "admin":
+                content_area.content = AdminPage(
+                    user_role=current_role,
+                    current_username=current_username,
+                    permissions=session.get("permissions", []),
+                )
+            else:
+                content_area.content = ProfilePage(username=current_username)
+
+        elif page_name == "chat":
+            content_area.content = ChatPage(
+                current_username=current_username,
+                current_user_role=current_role,
+                permissions=session.get("permissions", []),
             )
 
         content_area.update()

@@ -34,6 +34,42 @@ class RequestsRepository:
         finally:
             conn.close()
 
+    def create_system_incident(self, user_dni, message, incident_type):
+        """Creates a pending automatic incident if one of the same type is not already open."""
+        conn = get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT id_ticket
+                FROM Ticket
+                WHERE user_dni = %s
+                  AND type = %s
+                  AND status = 'PENDING'
+                LIMIT 1
+                """,
+                (user_dni, incident_type),
+            )
+            if cursor.fetchone():
+                cursor.close()
+                return False
+
+            cursor.execute(
+                """
+                INSERT INTO Ticket (user_dni, type, description, status)
+                VALUES (%s, %s, %s, 'PENDING')
+                """,
+                (user_dni, incident_type, message),
+            )
+            conn.commit()
+            cursor.close()
+            return True
+        except mysql.connector.Error:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
     def get_all_requests(self):
         """Returns all maintenance tickets."""
         conn = get_connection()
