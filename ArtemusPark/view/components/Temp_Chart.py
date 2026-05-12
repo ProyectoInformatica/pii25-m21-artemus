@@ -1,6 +1,7 @@
 import flet as ft
 from datetime import datetime, timedelta
 
+
 class TempChart(ft.Container):
     def __init__(self):
         super().__init__()
@@ -41,7 +42,7 @@ class TempChart(ft.Container):
                 labels_size=42,
             ),
             bottom_axis=ft.ChartAxis(
-                labels=[], # Dynamic labels
+                labels=[],  # Dynamic labels
                 labels_size=40,
             ),
             tooltip_bgcolor="#111827",
@@ -78,14 +79,13 @@ class TempChart(ft.Container):
         now = datetime.now()
         day_ago = now - timedelta(hours=24)
         labels = []
-        
+
         # Generar etiquetas cada 3 horas
         for i in range(0, 25, 3):
             label_time = day_ago + timedelta(hours=i)
             labels.append(
                 ft.ChartAxisLabel(
-                    value=i,
-                    label=ft.Text(label_time.strftime("%H:%M"), size=10)
+                    value=i, label=ft.Text(label_time.strftime("%H:%M"), size=10)
                 )
             )
         self.chart.bottom_axis.labels = labels
@@ -113,7 +113,7 @@ class TempChart(ft.Container):
             max_temp = max(y_values)
             self.chart.min_y = max(0, int(min_temp // 5) * 5 - 5)
             self.chart.max_y = int((max_temp + 5) // 5) * 5 + 5
-        
+
         if self.chart.page:
             try:
                 self.chart.update()
