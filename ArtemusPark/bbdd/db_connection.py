@@ -8,7 +8,7 @@ DB_CONFIG = {
     "host": "localhost",
     "database": "artemus",
     "user": "root",
-    "password": "1234",
+    "password": "",
     "port": 3306,
 }
 

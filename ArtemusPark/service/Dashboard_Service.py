@@ -77,29 +77,56 @@ class DashboardService:
         return max(0, count)
 
     def get_temp_chart_data(self) -> List[Dict[str, Any]]:
-        """Prepara datos para el gráfico de temperatura."""
+        """Prepara datos promediados por hora para el gráfico de temperatura (últimas 24 horas)."""
         temps = Temperature_Repository.load_all_temperature_measurements()
-        recent = temps[-60:] if temps else []
-        chart_data = []
-        for item in recent:
+        if not temps:
+            return []
+
+        now = datetime.now()
+        day_ago = now - timedelta(hours=24)
+        
+        # Agrupar valores por hora (0-23)
+        hourly_bins = {} # int_hour -> list of values
+        
+        for item in temps:
             ts = (
                 item.get("timestamp", 0)
                 if isinstance(item, dict)
                 else getattr(item, "timestamp", 0)
             )
-            val = (
-                item.get("value", 0)
-                if isinstance(item, dict)
-                else getattr(item, "value", 0)
-            )
-            try:
-                time_value = datetime.fromtimestamp(ts)
-                hour_value = time_value.hour + (time_value.minute / 60)
-                time_label = time_value.strftime("%H:%M:%S")
-            except:
-                hour_value = 0
-                time_label = ""
-            chart_data.append({"x": hour_value, "y": float(val), "tooltip": time_label})
+            dt = datetime.fromtimestamp(ts)
+            
+            if dt > day_ago:
+                # Calcular a cuántas horas de distancia está del inicio del periodo (day_ago)
+                delta = dt - day_ago
+                hour_index = int(delta.total_seconds() // 3600)
+                
+                if 0 <= hour_index < 24:
+                    if hour_index not in hourly_bins:
+                        hourly_bins[hour_index] = []
+                    
+                    val = (
+                        item.get("value", 0)
+                        if isinstance(item, dict)
+                        else getattr(item, "value", 0)
+                    )
+                    hourly_bins[hour_index].append(float(val))
+
+        chart_data = []
+        for h in range(24):
+            if h in hourly_bins:
+                values = hourly_bins[h]
+                avg_val = sum(values) / len(values)
+                # La etiqueta muestra la hora de inicio del bloque promediado
+                time_label = (day_ago + timedelta(hours=h)).strftime("%H:00")
+                chart_data.append({
+                    "x": float(h), 
+                    "y": round(avg_val, 2), 
+                    "tooltip": f"Media: {round(avg_val, 1)}°C\nHora: {time_label}"
+                })
+        
+        # No es estrictamente necesario si iteramos el rango 24, pero asegura orden
+        chart_data.sort(key=lambda p: p["x"])
         return chart_data
 
     def get_recent_events(self) -> List[Dict[str, Any]]:

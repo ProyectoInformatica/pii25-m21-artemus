@@ -49,9 +49,6 @@ class Sidebar(ft.Container):
 
     def did_mount(self):
         self.page.pubsub.subscribe(self._on_message)
-        if DashboardService().is_catastrophe_mode():
-            self.bgcolor = ft.Colors.RED_900
-            self.update()
         self._refresh_unread_badge()
 
     def _load_user_avatar(self):
@@ -87,12 +84,6 @@ class Sidebar(ft.Container):
                 self._load_user_avatar()
                 if self.user_avatar.page:
                     self.user_avatar.update()
-        elif message == "catastrophe_mode":
-            self.bgcolor = ft.Colors.RED_900
-            self.update()
-        elif message == "normal_mode":
-            self.bgcolor = AppColors.BG_DARK
-            self.update()
         elif message == "new_chat_message":
             self._refresh_unread_badge()
 

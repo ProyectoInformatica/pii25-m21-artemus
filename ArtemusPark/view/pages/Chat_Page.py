@@ -29,9 +29,9 @@ class ChatPage(ft.Container):
         self.is_group_selected = False
 
         # UI Components
-        self.chat_list_column = ft.Column(scroll=ft.ScrollMode.AUTO, expand=True)
+        self.chat_list_column = ft.Column(scroll=ft.ScrollMode.ALWAYS, expand=True)
         self.messages_column = ft.Column(
-            scroll=ft.ScrollMode.AUTO, expand=True, spacing=10
+            expand=True, spacing=10, scroll=ft.ScrollMode.ALWAYS, auto_scroll=False
         )
 
         self.search_input = ft.TextField(
@@ -86,6 +86,15 @@ class ChatPage(ft.Container):
             [self.btn_edit_name, self.btn_manage_members, self.btn_delete_chat]
         )
 
+        self.btn_scroll_bottom = ft.FloatingActionButton(
+            icon=ft.Icons.KEYBOARD_ARROW_DOWN,
+            on_click=lambda _: self.messages_column.scroll_to(offset=-1, duration=500),
+            visible=False,
+            mini=True,
+            bgcolor=AppColors.ACCENT,
+            opacity=0.8,
+        )
+
         self.content = self._build_ui()
 
     def did_mount(self):
@@ -95,7 +104,8 @@ class ChatPage(ft.Container):
     def _on_message_received(self, message):
         if message == "new_chat_message":
             if self.selected_chat_id:
-                self._load_messages(self.selected_chat_id)
+                # Al recibir mensaje de otro, no forzamos scroll si está leyendo arriba
+                self._load_messages(self.selected_chat_id, scroll_to_bottom=False)
             self._refresh_chats()
 
     def _refresh_chats(self):
@@ -159,6 +169,7 @@ class ChatPage(ft.Container):
         self.selected_chat_id = chat_id
         self.chat_header_text.value = chat_name
         self.is_group_selected = is_group
+        self.btn_scroll_bottom.visible = True
 
         # PERMISSIONS SYSTEM
         can_manage_all = "MANAGE_CHATS" in self.permissions
@@ -186,15 +197,15 @@ class ChatPage(ft.Container):
         query = self.search_input.value.lower()
         if not self.selected_chat_id:
             return
-        self._display_messages(query)
+        self._display_messages(query, scroll_to_bottom=False)
 
-    def _load_messages(self, chat_id):
+    def _load_messages(self, chat_id, scroll_to_bottom=True):
         if not self.page:
             return
         self.messages = self.chat_repo.get_messages_in_chat(chat_id, self.user_dni)
-        self._display_messages()
+        self._display_messages(scroll_to_bottom=scroll_to_bottom)
 
-    def _display_messages(self, filter_query=""):
+    def _display_messages(self, filter_query="", scroll_to_bottom=True):
         self.messages_column.controls.clear()
         for msg in self.messages:
             if filter_query and filter_query not in msg["content"].lower():
@@ -267,6 +278,8 @@ class ChatPage(ft.Container):
             )
         try:
             self.update()
+            if scroll_to_bottom:
+                self.messages_column.scroll_to(offset=-1, duration=300)
         except:
             pass
 
@@ -284,6 +297,7 @@ class ChatPage(ft.Container):
 
         self.chat_repo.send_message(self.selected_chat_id, self.user_dni, text)
         self.message_input.value = ""
+        self._load_messages(self.selected_chat_id, scroll_to_bottom=True)
 
         if text.lower().startswith("@bot-artemus"):
             self._process_bot_command(text)
@@ -464,8 +478,16 @@ class ChatPage(ft.Container):
                             ft.Divider(),
                             ft.Container(
                                 expand=True,
-                                content=self.messages_column,
-                                padding=ft.padding.only(bottom=10),
+                                content=ft.Stack(
+                                    [
+                                        ft.Container(
+                                            content=self.messages_column,
+                                            padding=ft.padding.only(bottom=10),
+                                            expand=True,
+                                        ),
+                                    ],
+                                    expand=True,
+                                ),
                             ),
                             ft.Row(
                                 [
