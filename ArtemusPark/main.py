@@ -324,6 +324,7 @@ async def main(page: ft.Page):
 
         # Desencriptar llave privada para la sesión actual
         from ArtemusPark.service.Crypto_Service import CryptoService
+
         private_key = CryptoService.decrypt_private_key(priv_enc, password)
 
         permissions = auth_repo.get_user_permissions(username)

@@ -73,7 +73,7 @@ class ChatRepository:
                     msg["content"] = msg["aes_content"]
                 else:
                     msg["content"] = msg["raw_content"]
-            
+
             return messages
         finally:
             conn.close()
