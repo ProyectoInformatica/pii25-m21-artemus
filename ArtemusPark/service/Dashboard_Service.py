@@ -84,10 +84,10 @@ class DashboardService:
 
         now = datetime.now()
         day_ago = now - timedelta(hours=24)
-        
+
         # Agrupar valores por hora (0-23)
-        hourly_bins = {} # int_hour -> list of values
-        
+        hourly_bins = {}  # int_hour -> list of values
+
         for item in temps:
             ts = (
                 item.get("timestamp", 0)
@@ -95,16 +95,16 @@ class DashboardService:
                 else getattr(item, "timestamp", 0)
             )
             dt = datetime.fromtimestamp(ts)
-            
+
             if dt > day_ago:
                 # Calcular a cuántas horas de distancia está del inicio del periodo (day_ago)
                 delta = dt - day_ago
                 hour_index = int(delta.total_seconds() // 3600)
-                
+
                 if 0 <= hour_index < 24:
                     if hour_index not in hourly_bins:
                         hourly_bins[hour_index] = []
-                    
+
                     val = (
                         item.get("value", 0)
                         if isinstance(item, dict)
@@ -119,12 +119,14 @@ class DashboardService:
                 avg_val = sum(values) / len(values)
                 # La etiqueta muestra la hora de inicio del bloque promediado
                 time_label = (day_ago + timedelta(hours=h)).strftime("%H:00")
-                chart_data.append({
-                    "x": float(h), 
-                    "y": round(avg_val, 2), 
-                    "tooltip": f"Media: {round(avg_val, 1)}°C\nHora: {time_label}"
-                })
-        
+                chart_data.append(
+                    {
+                        "x": float(h),
+                        "y": round(avg_val, 2),
+                        "tooltip": f"Media: {round(avg_val, 1)}°C\nHora: {time_label}",
+                    }
+                )
+
         # No es estrictamente necesario si iteramos el rango 24, pero asegura orden
         chart_data.sort(key=lambda p: p["x"])
         return chart_data
