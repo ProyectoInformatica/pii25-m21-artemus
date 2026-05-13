@@ -1,12 +1,16 @@
 import flet as ft
+import json
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.repository.Chat_Repository import ChatRepository
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.service.Dashboard_Service import DashboardService
+from ArtemusPark.service.Crypto_Service import CryptoService
 
 
 class ChatPage(ft.Container):
-    def __init__(self, current_username, current_user_role, permissions=None):
+    def __init__(
+        self, current_username, current_user_role, permissions=None, private_key=None
+    ):
         super().__init__()
         self.expand = True
         self.bgcolor = AppColors.BG_MAIN
@@ -15,6 +19,7 @@ class ChatPage(ft.Container):
         self.username = current_username
         self.role = current_user_role
         self.permissions = permissions or []
+        self.private_key = private_key
 
         self.chat_repo = ChatRepository()
         self.auth_repo = AuthRepository()
@@ -208,7 +213,26 @@ class ChatPage(ft.Container):
     def _display_messages(self, filter_query="", scroll_to_bottom=True):
         self.messages_column.controls.clear()
         for msg in self.messages:
-            if filter_query and filter_query not in msg["content"].lower():
+            content = msg["content"]
+            is_encrypted_rsa = False
+
+            # Intentar parsear como JSON para ver si es RSA
+            try:
+                data = json.loads(content)
+                if isinstance(data, dict) and data.get("type") == "rsa":
+                    payload = data.get("payload", {})
+                    encrypted_val = payload.get(self.user_dni)
+                    if encrypted_val and self.private_key:
+                        content = CryptoService.decrypt_with_private_key(
+                            encrypted_val, self.private_key
+                        )
+                        is_encrypted_rsa = True
+                    else:
+                        content = "[Mensaje cifrado para otro destinatario]"
+            except:
+                pass
+
+            if filter_query and filter_query not in content.lower():
                 continue
 
             is_me = msg["username"] == self.username
@@ -216,7 +240,7 @@ class ChatPage(ft.Container):
                 ft.MainAxisAlignment.END if is_me else ft.MainAxisAlignment.START
             )
 
-            is_alert = "⚠️ ALERTA" in msg["content"]
+            is_alert = "⚠️ ALERTA" in content
             bg_color = (
                 ft.Colors.RED_100
                 if is_alert
@@ -230,23 +254,37 @@ class ChatPage(ft.Container):
                 if is_me:
                     sender_name = f"{sender_name} (Tú)"
 
+            # Indicator for E2EE
+            lock_icon = (
+                ft.Icon(ft.Icons.LOCK_OUTLINE, size=10, color=AppColors.TEXT_MUTED)
+                if is_encrypted_rsa
+                else ft.Container()
+            )
+
             self.messages_column.controls.append(
                 ft.Row(
                     [
                         ft.Container(
                             content=ft.Column(
                                 [
-                                    ft.Text(
-                                        sender_name,
-                                        size=10,
-                                        weight=ft.FontWeight.BOLD,
-                                        color=(
-                                            ft.Colors.RED_700
-                                            if is_alert
-                                            else AppColors.ACCENT
-                                        ),
+                                    ft.Row(
+                                        [
+                                            ft.Text(
+                                                sender_name,
+                                                size=10,
+                                                weight=ft.FontWeight.BOLD,
+                                                color=(
+                                                    ft.Colors.RED_700
+                                                    if is_alert
+                                                    else AppColors.ACCENT
+                                                ),
+                                            ),
+                                            lock_icon,
+                                        ],
+                                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                        tight=True,
                                     ),
-                                    ft.Text(msg["content"], color=ft.Colors.BLACK),
+                                    ft.Text(content, color=ft.Colors.BLACK),
                                     ft.Text(
                                         msg["sent_at"].strftime("%H:%M"),
                                         size=9,

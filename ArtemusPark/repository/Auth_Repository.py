@@ -1,6 +1,7 @@
 import json
 import mysql.connector
 from ArtemusPark.bbdd.db_connection import get_connection, get_sensor_id
+from ArtemusPark.service.Crypto_Service import CryptoService
 
 
 class AuthRepository:
@@ -76,7 +77,7 @@ class AuthRepository:
             cursor.execute("""
                 SELECT u.username, u.full_name, u.password_hash, u.dni,
                        u.phone, u.address_street, u.address_city, u.address_zip, 
-                       r.role, u.active, h.superior_dni
+                       r.role, u.active, h.superior_dni, u.public_key
                 FROM User u
                 JOIN Role r ON u.id_role = r.id_role
                 LEFT JOIN User_Hierarchy h ON u.dni = h.subordinate_dni
@@ -122,6 +123,7 @@ class AuthRepository:
                     "assigned_sensors": sensors,
                     "permissions": role_permissions,
                     "superior_dni": row["superior_dni"],
+                    "public_key": row["public_key"],
                 }
             cursor.close()
             return result
@@ -182,11 +184,34 @@ class AuthRepository:
                 "assigned_sensors": sensors,
                 "permissions": role_permissions,
                 "superior_dni": row["superior_dni"],
+                "public_key": row.get("public_key"),
+                "private_key_encrypted": row.get("private_key"),
             }
             cursor.close()
             return result
         finally:
             conn.close()
+
+    def ensure_keys_exist(self, username, password):
+        """Generates RSA keys for a user if they don't have them yet."""
+        user = self.get_user_by_username(username)
+        if user and not user.get("public_key"):
+            priv, pub = CryptoService.generate_rsa_keys()
+            pub_pem = CryptoService.export_public_key(pub)
+            priv_enc = CryptoService.export_private_key_encrypted(priv, password)
+
+            conn = get_connection()
+            try:
+                cursor = conn.cursor(buffered=True)
+                cursor.execute(
+                    "UPDATE User SET public_key = %s, private_key = %s WHERE username = %s",
+                    (pub_pem, priv_enc, username),
+                )
+                conn.commit()
+                return pub_pem, priv_enc
+            finally:
+                conn.close()
+        return user.get("public_key"), user.get("private_key_encrypted")
 
     def add_user(self, username, password, role, permissions=None, **kwargs):
         """Inserts a user with role and optional supervisor."""
@@ -199,11 +224,16 @@ class AuthRepository:
 
             dni = kwargs.get("dni")
 
+            # --- RSA KEY GENERATION ---
+            priv, pub = CryptoService.generate_rsa_keys()
+            pub_pem = CryptoService.export_public_key(pub)
+            priv_enc = CryptoService.export_private_key_encrypted(priv, password)
+
             query = """
                 INSERT INTO User
                     (dni, id_role, username, full_name, password_hash, phone, 
-                     address_street, address_city, address_zip, active)
-                VALUES (%s, %s, %s, %s, SHA2(%s, 256), %s, %s, %s, %s, TRUE)
+                     address_street, address_city, address_zip, public_key, private_key, active)
+                VALUES (%s, %s, %s, %s, SHA2(%s, 256), %s, %s, %s, %s, %s, %s, TRUE)
             """
             cursor.execute(
                 query,
@@ -217,6 +247,8 @@ class AuthRepository:
                     kwargs.get("address_street"),
                     kwargs.get("address_city"),
                     kwargs.get("address_zip"),
+                    pub_pem,
+                    priv_enc,
                 ),
             )
 

@@ -1,4 +1,6 @@
+import json
 from ArtemusPark.bbdd.db_connection import get_connection
+from ArtemusPark.service.Crypto_Service import CryptoService
 
 
 class ChatRepository:
@@ -46,10 +48,11 @@ class ChatRepository:
             )
             conn.commit()
 
-            # Using AES_DECRYPT to read the message content
+            # First attempt: Try to get raw content (some might be RSA JSON)
             query = """
                     SELECT m.id_message,
-                           CAST(AES_DECRYPT(UNHEX(m.content), 'artemus_master_key') AS CHAR) as content,
+                           m.content as raw_content,
+                           CAST(AES_DECRYPT(UNHEX(m.content), 'artemus_master_key') AS CHAR) as aes_content,
                            m.sent_at,
                            u.dni as sender_dni,
                            u.username,
@@ -65,19 +68,12 @@ class ChatRepository:
             cursor.execute(query, (id_chat,))
             messages = cursor.fetchall()
 
-            # Fallback if decryption fails (for older unencrypted messages)
-            if messages:
-                for msg in messages:
-                    if msg["content"] is None:
-                        # Fetch the raw unencrypted content
-                        cursor.execute(
-                            "SELECT content FROM Message WHERE id_message = %s",
-                            (msg["id_message"],),
-                        )
-                        raw = cursor.fetchone()
-                        msg["content"] = (
-                            raw["content"] if raw else "Error al desencriptar"
-                        )
+            for msg in messages:
+                if msg["aes_content"]:
+                    msg["content"] = msg["aes_content"]
+                else:
+                    msg["content"] = msg["raw_content"]
+            
             return messages
         finally:
             conn.close()
@@ -124,16 +120,46 @@ class ChatRepository:
             conn.close()
 
     def send_message(self, id_chat, sender_dni, content):
-        """Inserts a new AES encrypted message into the database."""
+        """Inserts a message. Uses RSA for private chats (if keys exist), AES for others."""
         conn = get_connection()
         try:
-            cursor = conn.cursor(buffered=True)
-            # Using AES_ENCRYPT to save the message securely
-            query = """
+            cursor = conn.cursor(dictionary=True, buffered=True)
+
+            # Get participants and their public keys
+            cursor.execute(
+                "SELECT u.dni, u.public_key FROM User u JOIN User_Chat uc ON u.dni = uc.dni WHERE uc.id_chat = %s",
+                (id_chat,),
+            )
+            participants = cursor.fetchall()
+
+            # Check if everyone in the chat has a public key
+            all_have_keys = all(p["public_key"] for p in participants)
+
+            if id_chat != 1 and len(participants) <= 5 and all_have_keys:
+                # RSA Strategy: Encrypt for each participant
+                payload = {}
+                for p in participants:
+                    try:
+                        encrypted = CryptoService.encrypt_with_public_key(
+                            content, p["public_key"]
+                        )
+                        payload[p["dni"]] = encrypted
+                    except:
+                        continue
+
+                envelope = {"type": "rsa", "payload": payload}
+                final_content = json.dumps(envelope)
+                query = "INSERT INTO Message (id_chat, sender_dni, content) VALUES (%s, %s, %s)"
+                cursor.execute(query, (id_chat, sender_dni, final_content))
+            else:
+                # AES Strategy (Legacy / Fallback): Use the master key
+                # This ensures we don't lose communication if someone hasn't migrated yet
+                query = """
                     INSERT INTO Message (id_chat, sender_dni, content)
-                    VALUES (%s, %s, HEX(AES_ENCRYPT(%s, 'artemus_master_key'))) \
-                    """
-            cursor.execute(query, (id_chat, sender_dni, content))
+                    VALUES (%s, %s, HEX(AES_ENCRYPT(%s, 'artemus_master_key'))) 
+                """
+                cursor.execute(query, (id_chat, sender_dni, content))
+
             conn.commit()
             return cursor.lastrowid
         finally:

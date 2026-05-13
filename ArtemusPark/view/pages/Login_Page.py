@@ -358,7 +358,7 @@ class LoginPage(ft.Container):
         else:
             role = self.auth_repo.authenticate(username, password)
             if role:
-                self.on_login_success(username, role)
+                self.on_login_success(username, role, password)
             else:
                 self._show_error("Credenciales incorrectas")
 

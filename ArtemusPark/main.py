@@ -275,6 +275,7 @@ async def main(page: ft.Page):
                 current_username=current_username,
                 current_user_role=current_role,
                 permissions=session.get("permissions", []),
+                private_key=session.get("private_key"),
             )
 
         content_area.update()
@@ -314,13 +315,22 @@ async def main(page: ft.Page):
             page.add(LoginPage(on_login_success=login_success))
             page.update()
 
-    def login_success(username, role):
+    def login_success(username, role, password):
         """Handles successful login and configures the main interface."""
         print(f"Login exitoso: {username} ({role})")
+
+        # Asegurar que tiene llaves RSA (migración para usuarios viejos)
+        pub_key, priv_enc = auth_repo.ensure_keys_exist(username, password)
+
+        # Desencriptar llave privada para la sesión actual
+        from ArtemusPark.service.Crypto_Service import CryptoService
+        private_key = CryptoService.decrypt_private_key(priv_enc, password)
+
         permissions = auth_repo.get_user_permissions(username)
         session["role"] = role
         session["username"] = username
         session["permissions"] = permissions
+        session["private_key"] = private_key  # Llave viva en memoria durante la sesión
 
         # Limpiamos antes de añadir la nueva interfaz
         page.controls.clear()
