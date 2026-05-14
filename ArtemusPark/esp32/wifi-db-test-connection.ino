@@ -1,82 +1,49 @@
 #include <WiFi.h>
-#include <HTTPClient.h>
-#include <DHT.h>
+#define USING_HOST_NAME false
+#include <MySQL_Generic.h>
 
-#define DHT_PIN 4
-#define DHT_TYPE DHT11
-#define LDR_PIN 34
-#define MQ_PIN 35
-#define FAN_PIN 18
-#define MOTOR_PIN 19
-#define LEDS_PIN 12
+// ── WiFi ──────────────────────────────────────
+char ssid[] = "igomez-fedora";
+char pass[] = "cacadevaca";
 
-const char* ssid = "Israel's Ultra 24";
-const char* password = "cacadevaca";
-const char* serverName = "http://10.165.41.204:5000/api/sensor";
+// ── MySQL ─────────────────────────────────────
+IPAddress server_addr(172, 27, 81, 221);
+uint16_t  server_port = 3306;
+char db_user[]     = "esp32user";
+char db_password[] = "tu_password";
 
-DHT dht(DHT_PIN, DHT_TYPE);
-
-void sendSensorData(String type, float value, String sensorId) {
-    if (WiFi.status() == WL_CONNECTED) {
-        HTTPClient http;
-        String serverPath = String(serverName) + "?type=" + type + "&value=" + String(value) + "&sensor_id=" + sensorId;
-        http.begin(serverPath.c_str());
-        http.GET();
-        http.end();
-    }
-}
+// client ya está declarado dentro de MySQL_Generic.h, no lo declares tú
+MySQL_Connection conn((Client *)&client);
 
 void setup() {
     Serial.begin(115200);
-    dht.begin();
+    delay(2000);
 
-    pinMode(FAN_PIN, OUTPUT);
-    pinMode(MOTOR_PIN, OUTPUT);
-    pinMode(LEDS_PIN, OUTPUT);
-
-    digitalWrite(FAN_PIN, LOW);
-    digitalWrite(MOTOR_PIN, LOW);
-    digitalWrite(LEDS_PIN, LOW);
-
-    WiFi.begin(ssid, password);
+    Serial.print("Conectando a WiFi");
+    WiFi.begin(ssid, pass);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
+        Serial.print(".");
     }
+    Serial.println("\n✔ WiFi conectado — IP: " + WiFi.localIP().toString());
+
+    Serial.println("Conectando a MySQL...");
+    while (conn.connectNonBlocking(server_addr, server_port, db_user, db_password) != RESULT_OK) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println("\n✔ MySQL conectado!");
+
+    // En esta librería se llama MySQL_Query, no MySQL_Cursor
+    MySQL_Query query(&conn);
+    if (query.execute("INSERT INTO artemus.Measurement (id_sensor, status, elec_consumption, timestamp) VALUES (33, 1, 0, NOW())")) {
+        Serial.println("✔ INSERT ejecutado correctamente");
+    } else {
+        Serial.println("✘ Error en el INSERT");
+    }
+
+
+    conn.close();
 }
 
-void loop() {
-    float humidity = dht.readHumidity();
-    float temperature = dht.readTemperature();
-    int ldrValue = analogRead(LDR_PIN);
-    int mqValue = analogRead(MQ_PIN);
-
-    if (!isnan(temperature)) {
-        sendSensorData("temperature", temperature, "TempSens1");
-    }
-    if (!isnan(humidity)) {
-        sendSensorData("humidity", humidity, "HumiditySens1");
-    }
-
-    sendSensorData("light", (float)ldrValue, "LightSens1");
-    sendSensorData("smoke", (float)mqValue, "SmokeSens1");
-
-    if (temperature > 25.0) {
-        digitalWrite(FAN_PIN, HIGH);
-    } else {
-        digitalWrite(FAN_PIN, LOW);
-    }
-
-    if (ldrValue < 1000) {
-        digitalWrite(LEDS_PIN, HIGH);
-    } else {
-        digitalWrite(LEDS_PIN, LOW);
-    }
-
-    if (mqValue > 2000) {
-        digitalWrite(MOTOR_PIN, HIGH);
-    } else {
-        digitalWrite(MOTOR_PIN, LOW);
-    }
-
-    delay(10000);
-}
+void loop() {}
