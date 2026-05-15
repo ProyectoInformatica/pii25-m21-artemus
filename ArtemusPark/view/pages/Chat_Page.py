@@ -240,23 +240,51 @@ class ChatPage(ft.Container):
                 ft.MainAxisAlignment.END if is_me else ft.MainAxisAlignment.START
             )
 
-            is_alert = "⚠️ ALERTA" in content
-            bg_color = (
-                ft.Colors.RED_100
-                if is_alert
-                else (AppColors.ACCENT_SOFT if is_me else "white")
-            )
+            is_bot = msg.get("sender_dni") == "12345678X"
+            is_alert = "ALERTA" in content
 
-            if msg.get("sender_dni") == "12345678X":
+            if is_bot:
+                bg_color = ft.Colors.GREEN_100
+            elif is_alert:
+                bg_color = ft.Colors.RED_100
+            else:
+                bg_color = AppColors.CHAT_OWNER_BG if is_me else AppColors.CHAT_INTERLOCUTOR_BG
+
+            if is_bot:
                 sender_name = "Bot-Artemus"
             else:
                 sender_name = msg["full_name"] or msg["username"]
                 if is_me:
                     sender_name = f"{sender_name} (Tú)"
 
-            # Indicator for E2EE
+            if is_bot:
+                msg_text_color = ft.Colors.GREEN_900
+                msg_time_color = ft.Colors.GREEN_700
+                sender_color = ft.Colors.GREEN_700
+            elif is_alert:
+                msg_text_color = AppColors.CHAT_INTERLOCUTOR_TEXT
+                msg_time_color = AppColors.CHAT_INTERLOCUTOR_TIME
+                sender_color = ft.Colors.RED_700
+            elif is_me:
+                msg_text_color = AppColors.CHAT_OWNER_TEXT
+                msg_time_color = AppColors.CHAT_OWNER_TIME
+                sender_color = AppColors.ACCENT
+            else:
+                msg_text_color = AppColors.CHAT_INTERLOCUTOR_TEXT
+                msg_time_color = AppColors.CHAT_INTERLOCUTOR_TIME
+                sender_color = AppColors.CHAT_INTERLOCUTOR_NAME
+
+            if is_bot:
+                bubble_border = ft.border.all(2, ft.Colors.GREEN_700)
+            elif is_alert:
+                bubble_border = ft.border.all(2, ft.Colors.RED_700)
+            else:
+                bubble_border = None
+
+            bubble_width = 320 if (is_alert or is_bot) else 300
+
             lock_icon = (
-                ft.Icon(ft.Icons.LOCK_OUTLINE, size=10, color=AppColors.TEXT_MUTED)
+                ft.Icon(ft.Icons.LOCK_OUTLINE, size=10, color=msg_time_color)
                 if is_encrypted_rsa
                 else ft.Container()
             )
@@ -273,22 +301,18 @@ class ChatPage(ft.Container):
                                                 sender_name,
                                                 size=10,
                                                 weight=ft.FontWeight.BOLD,
-                                                color=(
-                                                    ft.Colors.RED_700
-                                                    if is_alert
-                                                    else AppColors.ACCENT
-                                                ),
+                                                color=sender_color,
                                             ),
                                             lock_icon,
                                         ],
                                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                                         tight=True,
                                     ),
-                                    ft.Text(content, color=ft.Colors.BLACK),
+                                    ft.Text(content, color=msg_text_color, width=280),
                                     ft.Text(
                                         msg["sent_at"].strftime("%H:%M"),
                                         size=9,
-                                        color=AppColors.TEXT_MUTED,
+                                        color=msg_time_color,
                                         text_align=ft.TextAlign.RIGHT,
                                     ),
                                 ],
@@ -299,19 +323,16 @@ class ChatPage(ft.Container):
                             border_radius=ft.border_radius.only(
                                 top_left=15,
                                 top_right=15,
-                                bottom_left=0 if is_me else 15,
-                                bottom_right=15 if is_me else 0,
+                                bottom_left=15 if is_me else 0,
+                                bottom_right=0 if is_me else 15,
                             ),
                             bgcolor=bg_color,
-                            border=(
-                                ft.border.all(2, ft.Colors.RED_700)
-                                if is_alert
-                                else None
-                            ),
-                            width=320 if is_alert else 300,
+                            border=bubble_border,
+                            width=bubble_width,
                         )
                     ],
                     alignment=alignment,
+                    tight=True,
                 )
             )
         try:
@@ -375,6 +396,7 @@ class ChatPage(ft.Container):
             f"• Ocupación: {data['occupancy']}"
         )
         self.chat_repo.send_message(self.selected_chat_id, self.user_dni, msg)
+        self._load_messages(self.selected_chat_id, scroll_to_bottom=True)
         self.page.pubsub.send_all("new_chat_message")
 
     def _handle_manage_members(self, e):
