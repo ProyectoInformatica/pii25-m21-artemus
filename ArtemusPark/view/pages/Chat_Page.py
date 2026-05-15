@@ -237,15 +237,15 @@ class ChatPage(ft.Container):
 
             is_me = msg["username"] == self.username
             alignment = (
-                ft.MainAxisAlignment.END if is_me else ft.MainAxisAlignment.START
+                ft.MainAxisAlignment.END
+                if is_me
+                else ft.MainAxisAlignment.START
             )
 
             is_bot = msg.get("sender_dni") == "12345678X"
             is_alert = "ALERTA" in content
 
-            if is_bot:
-                bg_color = ft.Colors.GREEN_100
-            elif is_alert:
+            if is_alert:
                 bg_color = ft.Colors.RED_100
             else:
                 bg_color = AppColors.CHAT_OWNER_BG if is_me else AppColors.CHAT_INTERLOCUTOR_BG
@@ -257,11 +257,7 @@ class ChatPage(ft.Container):
                 if is_me:
                     sender_name = f"{sender_name} (Tú)"
 
-            if is_bot:
-                msg_text_color = ft.Colors.GREEN_900
-                msg_time_color = ft.Colors.GREEN_700
-                sender_color = ft.Colors.GREEN_700
-            elif is_alert:
+            if is_alert:
                 msg_text_color = AppColors.CHAT_INTERLOCUTOR_TEXT
                 msg_time_color = AppColors.CHAT_INTERLOCUTOR_TIME
                 sender_color = ft.Colors.RED_700
@@ -274,9 +270,7 @@ class ChatPage(ft.Container):
                 msg_time_color = AppColors.CHAT_INTERLOCUTOR_TIME
                 sender_color = AppColors.CHAT_INTERLOCUTOR_NAME
 
-            if is_bot:
-                bubble_border = ft.border.all(2, ft.Colors.GREEN_700)
-            elif is_alert:
+            if is_alert:
                 bubble_border = ft.border.all(2, ft.Colors.RED_700)
             else:
                 bubble_border = None
@@ -307,7 +301,7 @@ class ChatPage(ft.Container):
                                         ],
                                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                                         tight=True,
-                                    ),
+                                    ) if not is_me else ft.Container(),
                                     ft.Text(content, color=msg_text_color, width=280),
                                     ft.Text(
                                         msg["sent_at"].strftime("%H:%M"),
@@ -332,7 +326,6 @@ class ChatPage(ft.Container):
                         )
                     ],
                     alignment=alignment,
-                    tight=True,
                 )
             )
         try:
@@ -390,7 +383,7 @@ class ChatPage(ft.Container):
             return
         data = self.dashboard_service.get_latest_sensor_data()
         msg = (
-            f"📍 **Reporte de Sensores compartido por {self.username}**:\n"
+            f"📍 Reporte de Sensores compartido por {self.username}:\n"
             f"• Temperatura: {data['temperature']}°C\n"
             f"• Viento: {data['wind']} km/h\n"
             f"• Ocupación: {data['occupancy']}"
