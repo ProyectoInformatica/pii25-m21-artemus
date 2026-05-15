@@ -67,9 +67,9 @@ class DashboardPage(ft.Container):
             return
 
         type_map = {
-            "lights": "light",
+            "lights": "lighting",
             "capacity": "door",
-            "smoke": "smoke",
+            "smoke": "air_quality",
             "temperature": "temperature",
             "humidity": "humidity",
             "wind": "wind",

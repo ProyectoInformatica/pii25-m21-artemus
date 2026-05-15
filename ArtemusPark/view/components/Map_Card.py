@@ -108,7 +108,8 @@ class MapCard(ft.Container):
                 self.page.open(
                     ft.SnackBar(
                         content=ft.Text(
-                            f"Sensor sin conexión — no hay datos disponibles para '{key}'"
+                            f"Sensor sin conexión — no hay datos disponibles para '{key}'",
+                            color=AppColors.TEXT_WHITE,
                         ),
                         bgcolor=ft.Colors.GREY_700,
                     )
@@ -123,6 +124,8 @@ class MapCard(ft.Container):
         status: {map_key: bool} — True si al menos un sensor del tipo está online.
         """
         for key, is_online in status.items():
+            if self.sensor_online.get(key) == is_online:
+                continue  # sin cambio, evitar update innecesario que causa flickeo
             self.sensor_online[key] = is_online
             if key not in self.markers:
                 continue
