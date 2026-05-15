@@ -3,8 +3,8 @@ import time
 import flet as ft
 from typing import Dict, Any, List
 from datetime import datetime, timedelta
-from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
 from ArtemusPark.database.db_connection import load_sensor_config
+from ArtemusPark.config.Thresholds_Config import SENSOR_ONLINE_WINDOW_SECONDS
 
 from ArtemusPark.model.Door_Model import DoorModel
 from ArtemusPark.repository import (
@@ -332,7 +332,7 @@ class DashboardService:
         """Verifica si los sensores configurados están enviando datos recientemente."""
         self.sensor_config = load_sensor_config()
         now = time.time()
-        threshold = 15
+        threshold = SENSOR_ONLINE_WINDOW_SECONDS
         health_report = []
 
         all_data = {

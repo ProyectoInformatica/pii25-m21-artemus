@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from ArtemusPark.config.Wind_Config import RISK_THRESHOLD_KMH
+from ArtemusPark.config.Thresholds_Config import WIND_RISK_THRESHOLD_KMH as RISK_THRESHOLD_KMH
 from ArtemusPark.model.Wind_Model import WindModel
 
 

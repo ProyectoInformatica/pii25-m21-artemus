@@ -10,6 +10,7 @@ from ArtemusPark.view.components.Alert_Card import AlertCard
 from ArtemusPark.view.components.Map_Card import MapCard
 from ArtemusPark.service.Dashboard_Service import DashboardService
 from ArtemusPark.config.Park_Config import OPEN_HOUR, CLOSE_HOUR
+from ArtemusPark.config.Thresholds_Config import TEMP_THRESHOLD, MQ_THRESHOLD
 
 
 class DashboardPage(ft.Container):
@@ -214,12 +215,12 @@ class DashboardPage(ft.Container):
             pass
 
     def _get_sensor_alert(self, data):
-        if data.get("temperature", 0) > 30:
+        if data.get("temperature", 0) > TEMP_THRESHOLD:
             return f"Temperatura elevada: {data['temperature']}ºC"
         if data.get("wind", 0) > 20:
             return f"Vientos fuertes: {data['wind']} km/h"
-        if data.get("air_quality", 0) > 30:
-            return f"Calidad del aire deficiente: {data['air_quality']} AQI"
+        if data.get("air_quality", 0) > MQ_THRESHOLD:
+            return f"Calidad del aire deficiente: CO₂ {data['air_quality']}"
         return None
 
     def _build_window_bar(self):

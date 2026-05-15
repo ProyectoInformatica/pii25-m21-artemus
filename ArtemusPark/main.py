@@ -4,6 +4,7 @@ import multiprocessing
 import flet as ft
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
+from ArtemusPark.config.Thresholds_Config import TEMP_THRESHOLD, MQ_THRESHOLD
 
 
 from ArtemusPark.view.pages.Login_Page import LoginPage
@@ -56,14 +57,14 @@ async def main(page: ft.Page):
                     if data:
                         alert_msg = None
                         incident_type = None
-                        if data.get("temperature", 0) > 30:
+                        if data.get("temperature", 0) > TEMP_THRESHOLD:
                             alert_msg = f"⚠️ ALERTA CRÍTICA: Temperatura elevada ({data['temperature']}ºC) en sector principal."
                             incident_type = "INCIDENT_TEMPERATURE"
                         elif data.get("wind", 0) > 20:
                             alert_msg = f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados."
                             incident_type = "INCIDENT_WIND"
-                        elif data.get("air_quality", 0) > 30:
-                            alert_msg = f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (AQI: {data['air_quality']})."
+                        elif data.get("air_quality", 0) > MQ_THRESHOLD:
+                            alert_msg = f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (CO₂: {data['air_quality']})."
                             incident_type = "INCIDENT_AIR_QUALITY"
 
                         if alert_msg:
