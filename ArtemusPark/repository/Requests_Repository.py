@@ -1,5 +1,5 @@
 import mysql.connector
-from ArtemusPark.bbdd.db_connection import get_connection
+from ArtemusPark.database.db_connection import get_connection
 
 
 class RequestsRepository:

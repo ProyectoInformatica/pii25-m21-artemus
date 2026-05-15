@@ -10,7 +10,7 @@ from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.service.Dashboard_Service import DashboardService
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
-from ArtemusPark.bbdd.db_connection import load_sensor_config
+from ArtemusPark.database.db_connection import load_sensor_config
 
 
 class AdminPage(ft.Container):

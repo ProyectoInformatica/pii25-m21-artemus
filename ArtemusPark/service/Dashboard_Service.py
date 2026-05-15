@@ -4,7 +4,7 @@ import flet as ft
 from typing import Dict, Any, List
 from datetime import datetime, timedelta
 from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
-from ArtemusPark.bbdd.db_connection import load_sensor_config
+from ArtemusPark.database.db_connection import load_sensor_config
 
 from ArtemusPark.model.Door_Model import DoorModel
 from ArtemusPark.repository import (

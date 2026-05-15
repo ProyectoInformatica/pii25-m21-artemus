@@ -1,6 +1,6 @@
 import json
 import mysql.connector
-from ArtemusPark.bbdd.db_connection import get_connection, get_sensor_id
+from ArtemusPark.database.db_connection import get_connection, get_sensor_id
 from ArtemusPark.service.Crypto_Service import CryptoService
 
 

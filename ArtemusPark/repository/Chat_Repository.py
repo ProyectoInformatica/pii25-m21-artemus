@@ -1,5 +1,5 @@
 import json
-from ArtemusPark.bbdd.db_connection import get_connection
+from ArtemusPark.database.db_connection import get_connection
 from ArtemusPark.service.Crypto_Service import CryptoService
 
 

@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List, Dict, Any
 
 from ArtemusPark.model.Door_Model import DoorModel
-from ArtemusPark.bbdd.db_connection import get_connection, get_sensor_id
+from ArtemusPark.database.db_connection import get_connection, get_sensor_id
 
 TIPO_NOMBRE = "Door"
 
