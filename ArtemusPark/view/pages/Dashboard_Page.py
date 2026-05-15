@@ -180,6 +180,7 @@ class DashboardPage(ft.Container):
                 self.card_map.update_sensor_data(data)
             chart_data = self.service.get_temp_chart_data()
             self.chart_component.update_data(chart_data)
+            self._refresh_map_online_status()
             if "VIEW_SECURITY_LOGS" in self.permissions or self.user_role == "admin":
                 new_events = self.service.get_recent_events()
                 self.panel_events.update_events(new_events)
@@ -213,6 +214,23 @@ class DashboardPage(ft.Container):
             self.update()
         except:
             pass
+
+    def _refresh_map_online_status(self):
+        """Calcula qué tipos de sensor tienen datos online y actualiza el mapa."""
+        type_to_map_key = {
+            "temperature": "temperature",
+            "humidity": "humidity",
+            "wind": "wind",
+            "air_quality": "smoke",
+            "lighting": "lights",
+            "door": "capacity",
+        }
+        map_online = {k: False for k in type_to_map_key.values()}
+        for sensor in self.service.get_sensors_health_status():
+            map_key = type_to_map_key.get(sensor["type"])
+            if map_key and sensor["is_online"]:
+                map_online[map_key] = True
+        self.card_map.set_types_online_status(map_online)
 
     def _get_sensor_alert(self, data):
         if data.get("temperature", 0) > TEMP_THRESHOLD:

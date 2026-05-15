@@ -40,6 +40,7 @@ class MapCard(ft.Container):
 
         self.markers = {}
         self.original_colors = {}
+        self.sensor_online = {}  # key → bool
         self.content = self._build_map()
 
     def _build_map(self):
@@ -101,8 +102,43 @@ class MapCard(ft.Container):
 
     def _on_marker_click(self, e):
         """Maneja el clic en un marcador y llama al callback principal"""
+        key = e.control.data
+        if not self.sensor_online.get(key, True):
+            if self.page:
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text(
+                            f"Sensor sin conexión — no hay datos disponibles para '{key}'"
+                        ),
+                        bgcolor=ft.Colors.GREY_700,
+                    )
+                )
+            return
         if self.on_sensor_click:
-            self.on_sensor_click(e.control.data)
+            self.on_sensor_click(key)
+
+    def set_types_online_status(self, status: dict):
+        """Actualiza el estado online/offline de cada tipo de sensor en el mapa.
+
+        status: {map_key: bool} — True si al menos un sensor del tipo está online.
+        """
+        for key, is_online in status.items():
+            self.sensor_online[key] = is_online
+            if key not in self.markers:
+                continue
+            marker = self.markers[key]
+            if is_online:
+                if key != "lights":
+                    marker.bgcolor = self.original_colors.get(key, ft.Colors.BLUE)
+                marker.opacity = 1.0
+            else:
+                marker.bgcolor = ft.Colors.GREY_400
+                marker.opacity = 0.4
+            if marker.page:
+                try:
+                    marker.update()
+                except Exception:
+                    pass
 
     def update_marker_status_by_type(self, sensor_type, has_data):
         """Pone el marcador en gris si no hay datos, o restaura su color si hay datos."""
