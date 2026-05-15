@@ -1,31 +1,9 @@
 import asyncio
 import time
-import random
 import multiprocessing
 import flet as ft
 from ArtemusPark.repository.Auth_Repository import AuthRepository
-from ArtemusPark.repository.Temperature_Repository import (
-    save_temperature_measurement,
-    load_all_temperature_measurements,
-)
-from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
-from ArtemusPark.repository.Wind_Repository import save_wind_measurement
-from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement
-from ArtemusPark.repository.Door_Repository import save_door_event
-from ArtemusPark.repository.Light_Repository import save_light_event
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
-
-
-from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
-from ArtemusPark.bbdd.db_connection import load_sensor_config
-
-
-from ArtemusPark.model.Temperature_Model import TemperatureModel
-from ArtemusPark.model.Humidity_Model import HumidityModel
-from ArtemusPark.model.Wind_Model import WindModel
-from ArtemusPark.model.Smoke_Model import SmokeModel
-from ArtemusPark.model.Door_Model import DoorModel
-from ArtemusPark.model.Light_Model import LightModel
 
 
 from ArtemusPark.view.pages.Login_Page import LoginPage
@@ -38,96 +16,6 @@ from ArtemusPark.view.pages.Requests_Page import RequestsPage
 from ArtemusPark.view.pages.Admin_Page import AdminPage
 from ArtemusPark.view.pages.Chat_Page import ChatPage
 from ArtemusPark.view.pages.Profile_Page import ProfilePage
-
-
-def generate_sensor_snapshot(
-    timestamp: float, all_users: list, sensor_config: dict = None
-):
-    """Generates and saves a data snapshot for all configured sensors."""
-    if sensor_config is None:
-        sensor_config = load_sensor_config()
-
-    for sensor in sensor_config.get("temperature", []):
-        temp_val = int(random.uniform(18, 32))
-        temp_status = "HOT" if temp_val > 30 else "MILD"
-        save_temperature_measurement(
-            TemperatureModel(
-                value=temp_val,
-                status=temp_status,
-                timestamp=timestamp,
-                sensor_id=sensor["id"],
-                name=sensor["name"],
-            )
-        )
-
-    for sensor in sensor_config.get("humidity", []):
-        hum_val = int(random.uniform(30, 65))
-        save_humidity_measurement(
-            HumidityModel(
-                value=hum_val,
-                status="NORMAL",
-                timestamp=timestamp,
-                sensor_id=sensor["id"],
-                name=sensor["name"],
-            )
-        )
-
-    for sensor in sensor_config.get("wind", []):
-        wind_speed = int(random.uniform(0, 25))
-        wind_state = "WARNING" if wind_speed > 20 else "SAFE"
-        save_wind_measurement(
-            WindModel(
-                speed=wind_speed,
-                state=wind_state,
-                sensor_id=sensor["id"],
-                name=sensor["name"],
-                timestamp=timestamp,
-            )
-        )
-
-    for sensor in sensor_config.get("air_quality", []):
-        smoke_val = int(random.uniform(0, 50))
-        smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
-        save_smoke_measurement(
-            SmokeModel(
-                value=smoke_val,
-                status=smoke_status,
-                timestamp=timestamp,
-                sensor_id=sensor["id"],
-                name=sensor["name"],
-            )
-        )
-
-    for sensor in sensor_config.get("door", []):
-        if random.random() < 0.45:
-            is_open = True
-            direction = "IN" if random.random() < 0.6 else "OUT"
-            sim_user = random.choice(all_users) if all_users else "unknown"
-            save_door_event(
-                DoorModel(
-                    is_open=is_open,
-                    sensor_id=sensor["id"],
-                    name=sensor["name"],
-                    direction=direction,
-                    username=sim_user,
-                    timestamp=timestamp,
-                )
-            )
-
-    for sensor in sensor_config.get("lighting", []):
-        if random.random() < 0.8:
-            is_on = random.choice([True, False])
-            watts = round(random.uniform(100, 250), 2) if is_on else 0.5
-            save_light_event(
-                LightModel(
-                    value=watts,
-                    status="OK",
-                    is_on=is_on,
-                    timestamp=timestamp,
-                    sensor_id=sensor["id"],
-                    name=sensor["name"],
-                )
-            )
 
 
 async def main(page: ft.Page):
@@ -150,25 +38,19 @@ async def main(page: ft.Page):
     service = DashboardService()
 
     auth_repo = AuthRepository()
-    all_users = list(auth_repo.get_all_users().keys())
 
-    async def sensor_simulation_loop():
-        """Periodically generates random sensor data."""
+    async def monitor_loop():
+        """Monitors real sensor data and sends critical alerts via chat."""
         from ArtemusPark.repository.Chat_Repository import ChatRepository
 
         chat_repo = ChatRepository()
         requests_repo = RequestsRepository()
-        system_dni = "12345678X"  # DNI del administrador por defecto
+        system_dni = "12345678X"
         last_alert_time = 0
 
         while True:
             now = time.time()
             try:
-                # Reload config from DB each loop to catch new sensors
-                current_sensor_config = load_sensor_config()
-                generate_sensor_snapshot(now, all_users, current_sensor_config)
-
-                # Check for critical alerts every 20 seconds max to avoid spam
                 if now - last_alert_time > 20:
                     data = service.get_latest_sensor_data()
                     if data:
@@ -186,7 +68,6 @@ async def main(page: ft.Page):
 
                         if alert_msg:
                             try:
-                                # El chat 1 es el chat Global
                                 chat_repo.send_message(1, system_dni, alert_msg)
                                 page.pubsub.send_all("new_chat_message")
                                 created_incident = requests_repo.create_system_incident(
@@ -197,9 +78,8 @@ async def main(page: ft.Page):
                                 last_alert_time = now
                             except Exception as chat_err:
                                 print(f"Error enviando alerta: {chat_err}")
-
             except Exception as e:
-                print(f"Error in sensor simulation: {e}")
+                print(f"Error in monitor loop: {e}")
 
             try:
                 page.pubsub.send_all("refresh_dashboard")
@@ -208,23 +88,7 @@ async def main(page: ft.Page):
 
             await asyncio.sleep(3)
 
-    def seed_historical_data_if_needed(days=30):
-        """Seeds historical data if the database is empty or outdated."""
-        now = time.time()
-        temps = load_all_temperature_measurements()
-        if temps:
-            min_ts = min(
-                item.get("timestamp", now) for item in temps if isinstance(item, dict)
-            )
-            if min_ts <= now - (days * 86400):
-                return
-
-        for day in range(days, 0, -1):
-            ts = now - (day * 86400) + random.uniform(0, 86000)
-            generate_sensor_snapshot(ts, all_users)
-
-    page.run_task(sensor_simulation_loop)
-    seed_historical_data_if_needed()
+    page.run_task(monitor_loop)
 
     def change_view(page_name, data=None):
         """Changes the current view in the main content area."""
