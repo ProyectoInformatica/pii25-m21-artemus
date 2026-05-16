@@ -4,9 +4,11 @@ import threading
 import base64
 import os
 import random
+import math
 
 from datetime import datetime
 from ArtemusPark.config.Colors import AppColors
+from ArtemusPark.config.Park_Config import OPEN_HOUR, CLOSE_HOUR
 from ArtemusPark.service.Dashboard_Service import DashboardService
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
@@ -63,9 +65,8 @@ class AdminPage(ft.Container):
         )
 
         # --- CHART COMPONENTS ---
-        # Inicializamos 24 puntos para las 24 horas del día
         self.energy_data_points = [
-            ft.LineChartDataPoint(i, 800 + random.uniform(-100, 100)) for i in range(24)
+            ft.LineChartDataPoint(i, round(self._base_energy_for_hour(i), 2)) for i in range(24)
         ]
 
         can_emergency = "VIEW_SECURITY_LOGS" in self.permissions or user_role == "admin"
@@ -83,7 +84,7 @@ class AdminPage(ft.Container):
         )
 
         can_export = user_role == "admin" or "EXPORT_DATA_REPORTS" in self.permissions
-
+    
         self.btn_export = ft.ElevatedButton(
             "Exportar PDF",
             icon=ft.Icons.PICTURE_AS_PDF,
@@ -953,24 +954,37 @@ class AdminPage(ft.Container):
             ),
         )
 
+    def _base_energy_for_hour(self, hour: int) -> float:
+        """Curva de consumo energético realista para un parque por hora del día."""
+        if OPEN_HOUR <= hour < CLOSE_HOUR:
+            # Horas de apertura: carga operativa con pico al mediodía
+            peak = (OPEN_HOUR + CLOSE_HOUR) / 2
+            spread = (CLOSE_HOUR - OPEN_HOUR) / 3.5
+            operational = 1000 * math.exp(-((hour - peak) ** 2) / (2 * spread**2))
+            return 600 + operational  # base 600W (admin, sensores, HVAC) + carga operativa
+        elif hour >= CLOSE_HOUR:
+            # Tarde/noche: alumbrado artificial, caída exponencial
+            hours_after_close = hour - CLOSE_HOUR
+            return max(180, 700 * math.exp(-hours_after_close / 4))
+        else:
+            # Madrugada antes de apertura: mínima carga (seguridad, sensores)
+            return 180 + 60 * math.sin(hour * math.pi / OPEN_HOUR)
+
     def _realtime_energy_loop(self):
-        import random
-        import math
-
         while self.simulation_running:
-            # Curva de consumo realista basada en la hora (más consumo de día, menos de noche)
             current_hour = datetime.now().hour
+            base = self._base_energy_for_hour(current_hour)
+            fluctuation = random.uniform(-30.0, 30.0)
+            current_w = round(base + fluctuation, 2)
 
-            # Función seno para simular curva diaria: pico a las 14h, valle a las 02h
-            # math.sin((hour - 8) * (2 * math.pi / 24)) da un valor entre -1 y 1
-            base_curve = 1200 + 400 * math.sin((current_hour - 8) * (2 * math.pi / 24))
-            fluctuation = random.uniform(-50.0, 50.0)
-            current_w = base_curve + fluctuation
-
+            park_status = (
+                "Parque abierto" if OPEN_HOUR <= current_hour < CLOSE_HOUR else "Parque cerrado"
+            )
             self.txt_energy_value.value = f"{current_w:.2f} W"
-            self.txt_energy_detail.value = f"Hora actual: {current_hour:02d}h | Actualizado: {datetime.now().strftime('%H:%M:%S')}"
+            self.txt_energy_detail.value = (
+                f"{park_status} | {current_hour:02d}h | Act.: {datetime.now().strftime('%H:%M:%S')}"
+            )
 
-            # Actualizar SOLO el punto de la hora actual en la gráfica
             if 0 <= current_hour < len(self.energy_data_points):
                 self.energy_data_points[current_hour].y = current_w
 
