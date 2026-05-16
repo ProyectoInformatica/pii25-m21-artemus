@@ -66,7 +66,8 @@ class AdminPage(ft.Container):
 
         # --- CHART COMPONENTS ---
         self.energy_data_points = [
-            ft.LineChartDataPoint(i, round(self._base_energy_for_hour(i), 2)) for i in range(24)
+            ft.LineChartDataPoint(i, round(self._base_energy_for_hour(i), 2))
+            for i in range(24)
         ]
 
         can_emergency = "VIEW_SECURITY_LOGS" in self.permissions or user_role == "admin"
@@ -84,7 +85,7 @@ class AdminPage(ft.Container):
         )
 
         can_export = user_role == "admin" or "EXPORT_DATA_REPORTS" in self.permissions
-    
+
         self.btn_export = ft.ElevatedButton(
             "Exportar PDF",
             icon=ft.Icons.PICTURE_AS_PDF,
@@ -961,7 +962,9 @@ class AdminPage(ft.Container):
             peak = (OPEN_HOUR + CLOSE_HOUR) / 2
             spread = (CLOSE_HOUR - OPEN_HOUR) / 3.5
             operational = 1000 * math.exp(-((hour - peak) ** 2) / (2 * spread**2))
-            return 600 + operational  # base 600W (admin, sensores, HVAC) + carga operativa
+            return (
+                600 + operational
+            )  # base 600W (admin, sensores, HVAC) + carga operativa
         elif hour >= CLOSE_HOUR:
             # Tarde/noche: alumbrado artificial, caída exponencial
             hours_after_close = hour - CLOSE_HOUR
@@ -978,12 +981,12 @@ class AdminPage(ft.Container):
             current_w = round(base + fluctuation, 2)
 
             park_status = (
-                "Parque abierto" if OPEN_HOUR <= current_hour < CLOSE_HOUR else "Parque cerrado"
+                "Parque abierto"
+                if OPEN_HOUR <= current_hour < CLOSE_HOUR
+                else "Parque cerrado"
             )
             self.txt_energy_value.value = f"{current_w:.2f} W"
-            self.txt_energy_detail.value = (
-                f"{park_status} | {current_hour:02d}h | Act.: {datetime.now().strftime('%H:%M:%S')}"
-            )
+            self.txt_energy_detail.value = f"{park_status} | {current_hour:02d}h | Act.: {datetime.now().strftime('%H:%M:%S')}"
 
             if 0 <= current_hour < len(self.energy_data_points):
                 self.energy_data_points[current_hour].y = current_w
