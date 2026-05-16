@@ -1,5 +1,7 @@
 import flet as ft
 import base64
+import io
+from PIL import Image
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 
@@ -66,12 +68,27 @@ class ProfilePage(ft.Container):
                 )
                 self.user_avatar.bgcolor = ft.Colors.TRANSPARENT
 
+            if self.page:
+                try:
+                    self.user_avatar.update()
+                except Exception:
+                    pass
             self.update()
+
+    def _compress_image(self, raw_bytes: bytes, max_side: int = 400) -> bytes:
+        """Redimensiona y comprime la imagen a JPEG ≤ max_side px por lado."""
+        img = Image.open(io.BytesIO(raw_bytes)).convert("RGB")
+        img.thumbnail((max_side, max_side), Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=85, optimize=True)
+        return buf.getvalue()
 
     def _on_file_result(self, e: ft.FilePickerResultEvent):
         if e.files:
             with open(e.files[0].path, "rb") as f:
-                img_bytes = f.read()
+                raw_bytes = f.read()
+
+            img_bytes = self._compress_image(raw_bytes)
 
             user_data = self.auth_repo.get_user_by_username(self.username)
             self.auth_repo.update_user(user_data["dni"], profile_picture=img_bytes)

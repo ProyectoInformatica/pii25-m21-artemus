@@ -289,6 +289,7 @@ class AuthRepository:
         try:
             cursor = conn.cursor(buffered=True)
 
+
             if "password" in kwargs and kwargs["password"]:
                 cursor.execute(
                     "UPDATE User SET password_hash=SHA2(%s, 256) WHERE dni=%s",
@@ -353,8 +354,20 @@ class AuthRepository:
                         (kwargs["superior_dni"], dni),
                     )
 
+            if "profile_picture" in kwargs:
+                cursor.execute(
+                    "UPDATE User SET profile_picture=%s WHERE dni=%s",
+                    (kwargs["profile_picture"], dni),
+                )
+
             conn.commit()
             cursor.close()
+        except Exception:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            raise
         finally:
             conn.close()
 
