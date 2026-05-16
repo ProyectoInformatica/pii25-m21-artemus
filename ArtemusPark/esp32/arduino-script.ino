@@ -35,6 +35,9 @@
 #define ID_SENSOR_LIGHT   32   // light_01 · id_tipo 5
 #define ID_SENSOR_AIR     28   // smoke_01 · id_tipo 6
 
+#define ID_ZONE           1
+#define ID_ROLE           3
+
 
 // ── Credenciales WiFi ─────────────────────────────
 char ssid[] = "igomez-fedora";
@@ -56,9 +59,42 @@ MySQL_Query      q(&conn);    // globales para evitar fragmentación de heap
 MySQL_Query      q2(&conn);   // globales para evitar fragmentación de heap
 
 
+// ── Registrar sensores en la BD al iniciar ────────
+void registrarSensores() {
+    Serial.println("\n── Registrando sensores en BD ──");
+    char query[300];
+
+    struct {
+        int         id;
+        int         id_type;
+        const char *name;
+    } sensores[] = {
+        { ID_SENSOR_TEMP,  1, "Temp_1"  },
+        { ID_SENSOR_HUM,   2, "Hum_1"   },
+        { ID_SENSOR_LIGHT, 5, "Light_1" },
+        { ID_SENSOR_AIR,   6, "Air_1"   },
+    };
+
+    for (int i = 0; i < 4; i++) {
+        sprintf(query,
+            "INSERT IGNORE INTO artemus.Sensor "
+            "(id_sensor, id_zone, id_type, id_role, name, description, active, installed_at) "
+            "VALUES (%d, %d, %d, %d, '%s', NULL, 1, NOW())",
+            sensores[i].id, ID_ZONE, sensores[i].id_type, ID_ROLE, sensores[i].name);
+
+        if (q.execute(query)) {
+            Serial.printf("  ✔ Sensor '%s' (id=%d) registrado\n",
+                          sensores[i].name, sensores[i].id);
+        } else {
+            Serial.printf("  ✘ Error al registrar sensor '%s'\n", sensores[i].name);
+        }
+    }
+}
+
+
 // ── Función auxiliar: insertar Measurement + tabla específica ──
 void insertarMedicion(int id_sensor, const char *tabla,
-                      const char *campo, float valor, bool esFloat, bool ok) {
+                      const char *campo, float valor, bool esFloat, bool ok, int is_on = -1) {
     char query[300];
 
     // 1. Insertar en Measurement con estado según si el sensor funciona
@@ -94,7 +130,17 @@ void insertarMedicion(int id_sensor, const char *tabla,
     Serial.printf("  → id_measurement: %d\n", lastId);
 
     // 3. Insertar en tabla específica con el ID real
-    if (esFloat) {
+    if (is_on >= 0) {
+        if (esFloat) {
+            sprintf(query,
+                "INSERT INTO artemus.%s (id_measurement, is_on, %s) VALUES (%d, %d, %.2f)",
+                tabla, campo, lastId, is_on, valor);
+        } else {
+            sprintf(query,
+                "INSERT INTO artemus.%s (id_measurement, is_on, %s) VALUES (%d, %d, %d)",
+                tabla, campo, lastId, is_on, (int)valor);
+        }
+    } else if (esFloat) {
         sprintf(query,
             "INSERT INTO artemus.%s (id_measurement, %s) VALUES (%d, %.2f)",
             tabla, campo, lastId, valor);
@@ -145,6 +191,9 @@ void setup() {
         Serial.print(".");
     }
     Serial.println("\n✔ MySQL conectado!");
+
+    // Registrar sensores físicos en la BD
+    registrarSensores();
 }
 
 
@@ -153,6 +202,26 @@ void loop() {
 // ═══════════════════════════════════════════════
 
     Serial.printf("[MEM] Heap libre: %d bytes\n", ESP.getFreeHeap());
+
+        // Reconectar WiFi si se perdió
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("WiFi perdido, reconectando...");
+        WiFi.disconnect();
+        WiFi.begin(ssid, pass);
+        int intentos = 0;
+        while (WiFi.status() != WL_CONNECTED && intentos < 20) {
+            delay(500);
+            Serial.print(".");
+            intentos++;
+        }
+        if (WiFi.status() == WL_CONNECTED) {
+            Serial.println("\n✔ WiFi reconectado — IP: " + WiFi.localIP().toString());
+        } else {
+            Serial.println("\n✘ No se pudo reconectar al WiFi, reintentando en el próximo ciclo");
+            delay(LOOP_TIME);
+            return;
+        }
+    }
 
     // Reconectar si se perdió la conexión
     if (!conn.connected()) {
@@ -168,10 +237,13 @@ void loop() {
     int   ldrValue    = analogRead(LDR_PIN);
     int   mqValue     = analogRead(MQ_PIN);
 
-    bool tempOk = !isnan(temperature);
-    bool humOk  = !isnan(humidity);
-    bool ldrOk  = (ldrValue >= 0 && ldrValue <= 4095);
-    bool mqOk   = (mqValue  >= 0 && mqValue  <= 4095);
+    bool tempOk  = !isnan(temperature);
+    bool humOk   = !isnan(humidity);
+    bool ldrOk   = (ldrValue >= 0 && ldrValue <= 4095);
+    bool mqOk    = (mqValue  >= 0 && mqValue  <= 4095);
+    bool fanOn   = temperature > TEMP_THRESHOLD;
+    bool ledsOn  = ldrValue    < LDR_THRESHOLD;
+    bool motorOn = mqValue     > MQ_THRESHOLD;
 
     Serial.printf("Temp: %s  Hum: %s  Luz: %d  CO2: %d\n",
                   tempOk ? String(temperature).c_str() : "ERROR",
@@ -181,13 +253,17 @@ void loop() {
     // ── 2. Insertar mediciones en BD ──────────────
     insertarMedicion(ID_SENSOR_TEMP,  "Temperature", "temperature",       temperature, true,  tempOk);
     insertarMedicion(ID_SENSOR_HUM,   "Humidity",    "relative_humidity", humidity,    true,  humOk);
-    insertarMedicion(ID_SENSOR_LIGHT, "Lighting",    "value",             ldrValue,    false, ldrOk);
+    insertarMedicion(ID_SENSOR_LIGHT, "Lighting",    "value",             ldrValue,    false, ldrOk, ledsOn ? 1 : 0);
     insertarMedicion(ID_SENSOR_AIR,   "Air_Quality", "co2_level",         mqValue,     false, mqOk);
 
     // ── 3. Control de actuadores ──────────────────
-    digitalWrite(FAN_PIN,   temperature > TEMP_THRESHOLD ? HIGH : LOW);
-    digitalWrite(LEDS_PIN,  ldrValue    < LDR_THRESHOLD  ? HIGH : LOW);
-    digitalWrite(MOTOR_PIN, mqValue     > MQ_THRESHOLD   ? HIGH : LOW);
+
+    digitalWrite(FAN_PIN,   fanOn   ? HIGH : LOW);
+    digitalWrite(LEDS_PIN,  ledsOn  ? HIGH : LOW);
+    digitalWrite(MOTOR_PIN, motorOn ? HIGH : LOW);
+
+    Serial.printf("Actuadores — Ventilador: %s  LEDs: %s  Extractor: %s\n",
+                  fanOn ? "ON" : "OFF", ledsOn ? "ON" : "OFF", motorOn ? "ON" : "OFF");
 
     delay(LOOP_TIME);
 }
