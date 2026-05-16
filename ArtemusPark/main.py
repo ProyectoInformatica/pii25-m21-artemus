@@ -4,7 +4,14 @@ import multiprocessing
 import flet as ft
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
-from ArtemusPark.config.Thresholds_Config import TEMP_THRESHOLD, MQ_THRESHOLD
+from ArtemusPark.config.Thresholds_Config import (
+    TEMP_THRESHOLD,
+    MQ_THRESHOLD,
+    WIND_WARNING_THRESHOLD_KMH,
+    HUMIDITY_LOW_THRESHOLD,
+    HUMIDITY_HIGH_THRESHOLD,
+    MAX_OCCUPANCY,
+)
 
 
 from ArtemusPark.view.pages.Login_Page import LoginPage
@@ -47,36 +54,71 @@ async def main(page: ft.Page):
         chat_repo = ChatRepository()
         requests_repo = RequestsRepository()
         system_dni = "12345678X"
-        last_alert_time = 0
+        last_alert_times = {
+            "temperature": 0,
+            "wind": 0,
+            "air_quality": 0,
+            "humidity_low": 0,
+            "humidity_high": 0,
+            "occupancy": 0,
+        }
+        ALERT_COOLDOWN = 20
 
         while True:
             now = time.time()
             try:
-                if now - last_alert_time > 20:
-                    data = service.get_latest_sensor_data()
-                    if data:
-                        alert_msg = None
-                        incident_type = None
-                        if data.get("temperature", 0) > TEMP_THRESHOLD:
-                            alert_msg = f"⚠️ ALERTA CRÍTICA: Temperatura elevada ({data['temperature']}ºC) en sector principal."
-                            incident_type = "INCIDENT_TEMPERATURE"
-                        elif data.get("wind", 0) > 20:
-                            alert_msg = f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados."
-                            incident_type = "INCIDENT_WIND"
-                        elif data.get("air_quality", 0) > MQ_THRESHOLD:
-                            alert_msg = f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (CO₂: {data['air_quality']})."
-                            incident_type = "INCIDENT_AIR_QUALITY"
-
-                        if alert_msg:
+                data = service.get_latest_sensor_data()
+                if data:
+                    alert_checks = [
+                        (
+                            "temperature",
+                            data.get("temperature", 0) > TEMP_THRESHOLD,
+                            f"⚠️ ALERTA CRÍTICA: Temperatura elevada ({data['temperature']}ºC) en sector principal.",
+                            "INCIDENT_TEMPERATURE",
+                        ),
+                        (
+                            "wind",
+                            data.get("wind", 0) > WIND_WARNING_THRESHOLD_KMH,
+                            f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados.",
+                            "INCIDENT_WIND",
+                        ),
+                        (
+                            "air_quality",
+                            data.get("air_quality", 0) > MQ_THRESHOLD,
+                            f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (CO₂: {data['air_quality']}).",
+                            "INCIDENT_AIR_QUALITY",
+                        ),
+                        (
+                            "humidity_low",
+                            0 < data.get("humidity", 0) < HUMIDITY_LOW_THRESHOLD,
+                            f"⚠️ ALERTA CRÍTICA: Humedad muy baja ({data['humidity']}%) — riesgo de incendio o sequía.",
+                            "INCIDENT_HUMIDITY_LOW",
+                        ),
+                        (
+                            "humidity_high",
+                            data.get("humidity", 0) > HUMIDITY_HIGH_THRESHOLD,
+                            f"⚠️ ALERTA CRÍTICA: Humedad muy alta ({data['humidity']}%) — riesgo sanitario.",
+                            "INCIDENT_HUMIDITY_HIGH",
+                        ),
+                        (
+                            "occupancy",
+                            data.get("occupancy", 0) > MAX_OCCUPANCY,
+                            f"⚠️ ALERTA CRÍTICA: Aforo superado ({data['occupancy']} personas). Límite: {MAX_OCCUPANCY}.",
+                            "INCIDENT_OCCUPANCY",
+                        ),
+                    ]
+                    for key, condition, alert_msg, incident_type in alert_checks:
+                        if condition and now - last_alert_times[key] > ALERT_COOLDOWN:
                             try:
                                 chat_repo.send_message(1, system_dni, alert_msg)
                                 page.pubsub.send_all("new_chat_message")
+                                page.pubsub.send_all({"topic": "bot_alert"})
                                 created_incident = requests_repo.create_system_incident(
                                     system_dni, alert_msg, incident_type
                                 )
                                 if created_incident:
                                     page.pubsub.send_all({"topic": "requests_updated"})
-                                last_alert_time = now
+                                last_alert_times[key] = now
                             except Exception as chat_err:
                                 print(f"Error enviando alerta: {chat_err}")
             except Exception as e:
