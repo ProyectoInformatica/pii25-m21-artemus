@@ -79,16 +79,23 @@ class ChatPage(ft.Container):
             on_click=self._handle_manage_members,
             visible=False,
         )
+        self.btn_leave_chat = ft.IconButton(
+            ft.Icons.LOGOUT,
+            tooltip="Salirse del grupo",
+            icon_color=ft.Colors.ORANGE_700,
+            on_click=self._handle_leave_chat,
+            visible=False,
+        )
         self.btn_delete_chat = ft.IconButton(
             ft.Icons.DELETE_OUTLINE,
-            tooltip="Borrar chat",
+            tooltip="Eliminar chat para todos",
             icon_color="red",
             on_click=self._handle_delete_chat,
             visible=False,
         )
 
         self.chat_actions = ft.Row(
-            [self.btn_edit_name, self.btn_manage_members, self.btn_delete_chat]
+            [self.btn_edit_name, self.btn_manage_members, self.btn_leave_chat, self.btn_delete_chat]
         )
 
         self.btn_scroll_bottom = ft.FloatingActionButton(
@@ -181,16 +188,20 @@ class ChatPage(ft.Container):
         is_global = chat_id == 1
 
         if is_global:
-            # En el Chat Global, solo si tiene permiso de gestionar chats
             self.btn_edit_name.visible = can_manage_all
             self.btn_manage_members.visible = can_manage_all
+            self.btn_leave_chat.visible = False
+            self.btn_delete_chat.visible = can_manage_all
+        elif is_group:
+            self.btn_edit_name.visible = True
+            self.btn_manage_members.visible = True
+            self.btn_leave_chat.visible = True
             self.btn_delete_chat.visible = can_manage_all
         else:
-            # En otros chats:
-            # Editar nombre y gestionar miembros solo si es grupo
-            self.btn_edit_name.visible = is_group
-            self.btn_manage_members.visible = is_group
-            # Borrar chat: si es el creador o tiene permiso global (aquí simplificamos a si puede gestionar chats o es su chat)
+            # Chat privado 1 a 1
+            self.btn_edit_name.visible = False
+            self.btn_manage_members.visible = False
+            self.btn_leave_chat.visible = False
             self.btn_delete_chat.visible = True
 
         self.search_input.value = ""
@@ -459,6 +470,40 @@ class ChatPage(ft.Container):
         )
         self.page.open(dialog)
 
+    def _handle_leave_chat(self, e):
+        if not self.selected_chat_id:
+            return
+
+        def confirm_leave(e):
+            self.chat_repo.remove_user_from_chat(self.selected_chat_id, self.user_dni)
+            self.selected_chat_id = None
+            self.chat_header_text.value = "Selecciona un chat"
+            self.btn_edit_name.visible = False
+            self.btn_manage_members.visible = False
+            self.btn_leave_chat.visible = False
+            self.btn_delete_chat.visible = False
+            self.messages_column.controls.clear()
+            self.page.close(dialog)
+            self._refresh_chats()
+            self.page.pubsub.send_all("new_chat_message")
+
+        dialog = ft.AlertDialog(
+            title=ft.Text("Salirse del grupo"),
+            content=ft.Text(
+                "¿Quieres salirte del grupo? El chat seguirá existiendo para los demás miembros."
+            ),
+            actions=[
+                ft.TextButton("Cancelar", on_click=lambda e: self.page.close(dialog)),
+                ft.ElevatedButton(
+                    "Salirse",
+                    bgcolor=ft.Colors.ORANGE_700,
+                    color="white",
+                    on_click=confirm_leave,
+                ),
+            ],
+        )
+        self.page.open(dialog)
+
     def _handle_delete_chat(self, e):
         if not self.selected_chat_id:
             return
@@ -469,6 +514,7 @@ class ChatPage(ft.Container):
             self.chat_header_text.value = "Selecciona un chat"
             self.btn_edit_name.visible = False
             self.btn_manage_members.visible = False
+            self.btn_leave_chat.visible = False
             self.btn_delete_chat.visible = False
             self.messages_column.controls.clear()
             self.page.close(dialog)
