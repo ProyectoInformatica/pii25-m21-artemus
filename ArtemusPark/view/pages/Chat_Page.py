@@ -95,7 +95,12 @@ class ChatPage(ft.Container):
         )
 
         self.chat_actions = ft.Row(
-            [self.btn_edit_name, self.btn_manage_members, self.btn_leave_chat, self.btn_delete_chat]
+            [
+                self.btn_edit_name,
+                self.btn_manage_members,
+                self.btn_leave_chat,
+                self.btn_delete_chat,
+            ]
         )
 
         self.btn_scroll_bottom = ft.FloatingActionButton(

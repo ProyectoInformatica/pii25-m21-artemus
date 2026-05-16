@@ -289,7 +289,6 @@ class AuthRepository:
         try:
             cursor = conn.cursor(buffered=True)
 
-
             if "password" in kwargs and kwargs["password"]:
                 cursor.execute(
                     "UPDATE User SET password_hash=SHA2(%s, 256) WHERE dni=%s",
