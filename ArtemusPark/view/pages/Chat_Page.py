@@ -203,10 +203,10 @@ class ChatPage(ft.Container):
         is_global = int(chat_id) == 1 or "global" in chat_name.lower()
 
         if is_global:
-            self.btn_edit_name.visible = False # No se edita el nombre del global
+            self.btn_edit_name.visible = False  # No se edita el nombre del global
             self.btn_manage_members.visible = can_manage_all
             self.btn_leave_chat.visible = True
-            self.btn_delete_chat.visible = False # PROHIBIDO BORRAR GLOBAL
+            self.btn_delete_chat.visible = False  # PROHIBIDO BORRAR GLOBAL
         elif is_group:
             self.btn_edit_name.visible = True
             self.btn_manage_members.visible = True
@@ -219,12 +219,12 @@ class ChatPage(ft.Container):
         self.search_input.value = ""
         self._load_messages(chat_id)
         self._refresh_chats()
-        
+
         try:
             self.update()
         except:
             pass
-            
+
         self.page.pubsub.send_all("new_chat_message")
 
     def _handle_search(self, e):
@@ -345,9 +345,11 @@ class ChatPage(ft.Container):
                                             ),
                                             (
                                                 ft.Icon(
-                                                    ft.Icons.DONE_ALL
-                                                    if msg.get("is_read")
-                                                    else ft.Icons.DONE,
+                                                    (
+                                                        ft.Icons.DONE_ALL
+                                                        if msg.get("is_read")
+                                                        else ft.Icons.DONE
+                                                    ),
                                                     size=13,
                                                     color=(
                                                         ft.Colors.BLUE_400
