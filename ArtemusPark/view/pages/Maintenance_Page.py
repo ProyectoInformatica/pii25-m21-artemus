@@ -86,7 +86,7 @@ class MaintenancePage(ft.Container):
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
                         ft.Text(
-                            "Verde: Recibiendo datos | Rojo: Sin conexión (>15s)",
+                            "Verde: Recibiendo datos | Rojo: Sin conexión (>30s)",
                             size=14,
                             color=ft.Colors.GREY_700,
                         ),
