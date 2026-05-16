@@ -94,25 +94,23 @@ class LoginPage(ft.Container):
         )
 
         self.input_fields_container = ft.Container(
-            content=ft.AnimatedSwitcher(
-                self.login_controls,
-                transition=ft.AnimatedSwitcherTransition.FADE,
-                duration=300,
-            ),
+            content=self.login_controls,
             padding=ft.padding.symmetric(vertical=10),
+            alignment=ft.alignment.center,
         )
-        self.animated_switcher = self.input_fields_container.content
 
         self.content = ft.Container(
-            width=580,
+            width=700,
+            height=600,
             padding=30,
             bgcolor=AppColors.BG_CARD,
             border_radius=15,
+            alignment=ft.alignment.center,
             shadow=ft.BoxShadow(blur_radius=15, color=AppColors.SHADOW),
             content=ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 spacing=5,
-                tight=True,  # Ajuste automático de altura
+                alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
                     ft.Image(src="/img/artemusLogo2Negro.png", width=100, height=100),
                     self.title_text,
@@ -138,90 +136,13 @@ class LoginPage(ft.Container):
         ]
         for f in fields:
             f.border_color = AppColors.TEXT_LIGHT_GREY
+            if f.page:
+                f.update()
         self.update()
 
     def _toggle_mode(self, e):
         self.is_registering = not self.is_registering
-        self._reset_error_state(None)
 
-        if self.is_registering:
-            self.title_text.value = "REGISTRO"
-            self.sub_title_text.value = "Crea tu cuenta"
-            self.btn_enter.text = "Registrarse"
-            self.btn_switch.text = "¿Ya tienes cuenta? Login"
-
-            for tf in [
-                self.tf_full_name,
-                self.tf_dni,
-                self.tf_phone,
-                self.tf_street,
-                self.tf_city,
-                self.tf_zip,
-            ]:
-                tf.visible = True
-
-            self.animated_switcher.content = ft.Row(
-                [
-                    ft.Column(
-                        [
-                            self.tf_username,
-                            self.tf_password,
-                            self.tf_full_name,
-                            self.tf_dni,
-                        ],
-                        spacing=10,
-                    ),
-                    ft.Column(
-                        [self.tf_phone, self.tf_street, self.tf_city, self.tf_zip],
-                        spacing=10,
-                    ),
-                ],
-                alignment=ft.MainAxisAlignment.CENTER,
-                spacing=20,
-            )
-        else:
-            self.title_text.value = "ARTEMUS PARK"
-            self.sub_title_text.value = "Identifícate"
-            self.btn_enter.text = "Entrar"
-            self.btn_switch.text = "¿No tienes cuenta? Registro"
-
-            for tf in [
-                self.tf_full_name,
-                self.tf_dni,
-                self.tf_phone,
-                self.tf_street,
-                self.tf_city,
-                self.tf_zip,
-            ]:
-                tf.visible = False
-
-            self.animated_switcher.content = self.login_controls
-
-        self.update()
-
-    def _reset_error_state(self, e):
-        """Limpia los estados de error en los campos de texto."""
-        fields_to_check = [
-            self.tf_username,
-            self.tf_password,
-            self.tf_full_name,
-            self.tf_dni,
-            self.tf_phone,
-            self.tf_street,
-            self.tf_city,
-            self.tf_zip,
-        ]
-        for field in fields_to_check:
-            if field.border_color == ft.Colors.RED:
-                field.border_color = AppColors.TEXT_LIGHT_GREY
-                if field.page:
-                    field.update()
-
-    def _toggle_mode(self, e):
-        """Alterna entre modo Login y Registro con re-parenting correcto."""
-        self.is_registering = not self.is_registering
-
-        # Limpiar valores y errores
         tfs = [
             self.tf_username,
             self.tf_password,
@@ -242,9 +163,6 @@ class LoginPage(ft.Container):
             self.btn_enter.text = "Registrarse"
             self.btn_switch.text = "¿Ya tienes cuenta? Inicia sesión"
 
-            # Aumentar altura para que quepan 4 filas de campos
-            self.input_fields_container.height = 220
-
             for tf in [
                 self.tf_full_name,
                 self.tf_dni,
@@ -255,8 +173,7 @@ class LoginPage(ft.Container):
             ]:
                 tf.visible = True
 
-            # Estructura de 2 columnas para Registro
-            self.animated_switcher.content = ft.Row(
+            self.input_fields_container.content = ft.Row(
                 [
                     ft.Column(
                         [
@@ -289,8 +206,6 @@ class LoginPage(ft.Container):
             self.btn_enter.text = "Entrar al Sistema"
             self.btn_switch.text = "¿No tienes cuenta? Regístrate"
 
-            self.input_fields_container.height = 165
-
             for tf in [
                 self.tf_full_name,
                 self.tf_dni,
@@ -301,11 +216,10 @@ class LoginPage(ft.Container):
             ]:
                 tf.visible = False
 
-            # Restaurar campos al modo Login (1 columna)
             self.login_controls.controls = [self.tf_username, self.tf_password]
-            self.animated_switcher.content = self.login_controls
+            self.input_fields_container.content = self.login_controls
 
-        self.animated_switcher.update()
+        self.input_fields_container.update()
         self.content.update()
         self.update()
 
@@ -358,7 +272,7 @@ class LoginPage(ft.Container):
         else:
             role = self.auth_repo.authenticate(username, password)
             if role:
-                self.on_login_success(username, role)
+                self.on_login_success(username, role, password)
             else:
                 self._show_error("Credenciales incorrectas")
 

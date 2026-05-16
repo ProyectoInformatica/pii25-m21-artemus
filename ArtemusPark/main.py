@@ -1,29 +1,18 @@
 import asyncio
 import time
-import random
 import multiprocessing
 import flet as ft
 from ArtemusPark.repository.Auth_Repository import AuthRepository
-from ArtemusPark.repository.Temperature_Repository import (
-    save_temperature_measurement,
-    load_all_temperature_measurements,
+from ArtemusPark.repository.Requests_Repository import RequestsRepository
+from ArtemusPark.config.Thresholds_Config import (
+    TEMP_THRESHOLD,
+    MQ_THRESHOLD,
+    WIND_WARNING_THRESHOLD_KMH,
+    HUMIDITY_LOW_THRESHOLD,
+    HUMIDITY_HIGH_THRESHOLD,
+    MAX_OCCUPANCY,
+    SENSOR_ONLINE_WINDOW_SECONDS,
 )
-from ArtemusPark.repository.Humidity_Repository import save_humidity_measurement
-from ArtemusPark.repository.Wind_Repository import save_wind_measurement
-from ArtemusPark.repository.Smoke_Repository import save_smoke_measurement
-from ArtemusPark.repository.Door_Repository import save_door_event
-from ArtemusPark.repository.Light_Repository import save_light_event
-
-
-from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
-
-
-from ArtemusPark.model.Temperature_Model import TemperatureModel
-from ArtemusPark.model.Humidity_Model import HumidityModel
-from ArtemusPark.model.Wind_Model import WindModel
-from ArtemusPark.model.Smoke_Model import SmokeModel
-from ArtemusPark.model.Door_Model import DoorModel
-from ArtemusPark.model.Light_Model import LightModel
 
 
 from ArtemusPark.view.pages.Login_Page import LoginPage
@@ -34,92 +23,8 @@ from ArtemusPark.view.pages.History_Page import HistoryPage
 from ArtemusPark.view.pages.Maintenance_Page import MaintenancePage
 from ArtemusPark.view.pages.Requests_Page import RequestsPage
 from ArtemusPark.view.pages.Admin_Page import AdminPage
-
-
-def generate_sensor_snapshot(timestamp: float, all_users: list):
-    """Generates and saves a data snapshot for all configured sensors."""
-
-    for sensor in SENSOR_CONFIG.get("temperature", []):
-        temp_val = int(random.uniform(18, 32))
-        temp_status = "HOT" if temp_val > 30 else "MILD"
-        save_temperature_measurement(
-            TemperatureModel(
-                value=temp_val,
-                status=temp_status,
-                timestamp=timestamp,
-                sensor_id=sensor["id"],
-                name=sensor["name"],
-            )
-        )
-
-    for sensor in SENSOR_CONFIG.get("humidity", []):
-        hum_val = int(random.uniform(30, 65))
-        save_humidity_measurement(
-            HumidityModel(
-                value=hum_val,
-                status="NORMAL",
-                timestamp=timestamp,
-                sensor_id=sensor["id"],
-                name=sensor["name"],
-            )
-        )
-
-    for sensor in SENSOR_CONFIG.get("wind", []):
-        wind_speed = int(random.uniform(0, 25))
-        wind_state = "WARNING" if wind_speed > 20 else "SAFE"
-        save_wind_measurement(
-            WindModel(
-                speed=wind_speed,
-                state=wind_state,
-                sensor_id=sensor["id"],
-                name=sensor["name"],
-                timestamp=timestamp,
-            )
-        )
-
-    for sensor in SENSOR_CONFIG.get("smoke", []):
-        smoke_val = int(random.uniform(0, 50))
-        smoke_status = "CLEAR" if smoke_val < 30 else "WARNING"
-        save_smoke_measurement(
-            SmokeModel(
-                value=smoke_val,
-                status=smoke_status,
-                timestamp=timestamp,
-                sensor_id=sensor["id"],
-                name=sensor["name"],
-            )
-        )
-
-    for sensor in SENSOR_CONFIG.get("door", []):
-        if random.random() < 0.45:
-            is_open = True
-            direction = "IN" if random.random() < 0.6 else "OUT"
-            sim_user = random.choice(all_users) if all_users else "unknown"
-            save_door_event(
-                DoorModel(
-                    is_open=is_open,
-                    sensor_id=sensor["id"],
-                    name=sensor["name"],
-                    direction=direction,
-                    username=sim_user,
-                    timestamp=timestamp,
-                )
-            )
-
-    for sensor in SENSOR_CONFIG.get("light", []):
-        if random.random() < 0.8:
-            is_on = random.choice([True, False])
-            watts = round(random.uniform(100, 250), 2) if is_on else 0.5
-            save_light_event(
-                LightModel(
-                    value=watts,
-                    status="OK",
-                    is_on=is_on,
-                    timestamp=timestamp,
-                    sensor_id=sensor["id"],
-                    name=sensor["name"],
-                )
-            )
+from ArtemusPark.view.pages.Chat_Page import ChatPage
+from ArtemusPark.view.pages.Profile_Page import ProfilePage
 
 
 async def main(page: ft.Page):
@@ -142,16 +47,93 @@ async def main(page: ft.Page):
     service = DashboardService()
 
     auth_repo = AuthRepository()
-    all_users = list(auth_repo.get_all_users().keys())
 
-    async def sensor_simulation_loop():
-        """Periodically generates random sensor data."""
+    async def monitor_loop():
+        """Monitors real sensor data and sends critical alerts via chat."""
+        from ArtemusPark.repository.Chat_Repository import ChatRepository
+
+        chat_repo = ChatRepository()
+        requests_repo = RequestsRepository()
+        system_dni = "12345678X"
+        last_alert_times = {
+            "temperature": 0,
+            "wind": 0,
+            "air_quality": 0,
+            "humidity_low": 0,
+            "humidity_high": 0,
+            "occupancy": 0,
+        }
+        ALERT_COOLDOWN = 20
+
         while True:
             now = time.time()
             try:
-                generate_sensor_snapshot(now, all_users)
+                data = service.get_latest_sensor_data()
+                if data:
+
+                    def fresh(ts_key):
+                        return now - data.get(ts_key, 0) < SENSOR_ONLINE_WINDOW_SECONDS
+
+                    alert_checks = [
+                        (
+                            "temperature",
+                            fresh("temperature_ts")
+                            and data.get("temperature", 0) > TEMP_THRESHOLD,
+                            f"⚠️ ALERTA CRÍTICA: Temperatura elevada ({data['temperature']}ºC) en sector principal.",
+                            "INCIDENT_TEMPERATURE",
+                        ),
+                        (
+                            "wind",
+                            fresh("wind_ts")
+                            and data.get("wind", 0) > WIND_WARNING_THRESHOLD_KMH,
+                            f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados.",
+                            "INCIDENT_WIND",
+                        ),
+                        (
+                            "air_quality",
+                            fresh("air_quality_ts")
+                            and data.get("air_quality", 0) > MQ_THRESHOLD,
+                            f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (CO₂: {data['air_quality']}).",
+                            "INCIDENT_AIR_QUALITY",
+                        ),
+                        (
+                            "humidity_low",
+                            fresh("humidity_ts")
+                            and 0 < data.get("humidity", 0) < HUMIDITY_LOW_THRESHOLD,
+                            f"⚠️ ALERTA CRÍTICA: Humedad muy baja ({data['humidity']}%) — riesgo de incendio o sequía.",
+                            "INCIDENT_HUMIDITY_LOW",
+                        ),
+                        (
+                            "humidity_high",
+                            fresh("humidity_ts")
+                            and data.get("humidity", 0) > HUMIDITY_HIGH_THRESHOLD,
+                            f"⚠️ ALERTA CRÍTICA: Humedad muy alta ({data['humidity']}%) — riesgo sanitario.",
+                            "INCIDENT_HUMIDITY_HIGH",
+                        ),
+                        (
+                            "occupancy",
+                            fresh("occupancy_ts")
+                            and data.get("occupancy", 0) > MAX_OCCUPANCY,
+                            f"⚠️ ALERTA CRÍTICA: Aforo superado ({data['occupancy']} personas). Límite: {MAX_OCCUPANCY}.",
+                            "INCIDENT_OCCUPANCY",
+                        ),
+                    ]
+                    for key, condition, alert_msg, incident_type in alert_checks:
+                        if condition and now - last_alert_times[key] > ALERT_COOLDOWN:
+                            try:
+                                chat_repo.send_message(1, system_dni, alert_msg)
+                                page.pubsub.send_all("new_chat_message")
+                                page.pubsub.send_all({"topic": "bot_alert"})
+                                created_incident = requests_repo.create_system_incident(
+                                    system_dni, alert_msg, incident_type
+                                )
+                                if created_incident:
+                                    page.pubsub.send_all({"topic": "requests_updated"})
+                                last_alert_times[key] = now
+                            except Exception as chat_err:
+                                print(f"Error enviando alerta: {chat_err}")
             except Exception as e:
-                print(f"Error in sensor simulation: {e}")
+                print(f"Error in monitor loop: {e}")
 
             try:
                 page.pubsub.send_all("refresh_dashboard")
@@ -160,23 +142,7 @@ async def main(page: ft.Page):
 
             await asyncio.sleep(3)
 
-    def seed_historical_data_if_needed(days=30):
-        """Seeds historical data if the database is empty or outdated."""
-        now = time.time()
-        temps = load_all_temperature_measurements()
-        if temps:
-            min_ts = min(
-                item.get("timestamp", now) for item in temps if isinstance(item, dict)
-            )
-            if min_ts <= now - (days * 86400):
-                return
-
-        for day in range(days, 0, -1):
-            ts = now - (day * 86400) + random.uniform(0, 86000)
-            generate_sensor_snapshot(ts, all_users)
-
-    page.run_task(sensor_simulation_loop)
-    seed_historical_data_if_needed()
+    page.run_task(monitor_loop)
 
     def change_view(page_name, data=None):
         """Changes the current view in the main content area."""
@@ -189,18 +155,14 @@ async def main(page: ft.Page):
             if user_data and user_data.get("full_name"):
                 display_name = user_data["full_name"]
 
-        if page_name == "admin" and current_role != "admin":
-
-            page.snack_bar = ft.SnackBar(ft.Text("Access Denied"))
-            page.snack_bar.open = True
-            page.update()
-            return
-
         content_area.content = None
 
         if page_name == "dashboard":
             content_area.content = DashboardPage(
-                user_name=display_name, user_role=current_role, on_navigate=change_view
+                user_name=display_name,
+                user_role=current_role,
+                on_navigate=change_view,
+                permissions=session.get("permissions", []),
             )
 
         elif page_name == "history":
@@ -217,8 +179,21 @@ async def main(page: ft.Page):
             )
 
         elif page_name == "admin":
-            content_area.content = AdminPage(
-                user_role=current_role, current_username=current_username
+            if current_role == "admin":
+                content_area.content = AdminPage(
+                    user_role=current_role,
+                    current_username=current_username,
+                    permissions=session.get("permissions", []),
+                )
+            else:
+                content_area.content = ProfilePage(username=current_username)
+
+        elif page_name == "chat":
+            content_area.content = ChatPage(
+                current_username=current_username,
+                current_user_role=current_role,
+                permissions=session.get("permissions", []),
+                private_key=session.get("private_key"),
             )
 
         content_area.update()
@@ -258,13 +233,23 @@ async def main(page: ft.Page):
             page.add(LoginPage(on_login_success=login_success))
             page.update()
 
-    def login_success(username, role):
+    def login_success(username, role, password):
         """Handles successful login and configures the main interface."""
         print(f"Login exitoso: {username} ({role})")
+
+        # Asegurar que tiene llaves RSA (migración para usuarios viejos)
+        pub_key, priv_enc = auth_repo.ensure_keys_exist(username, password)
+
+        # Desencriptar llave privada para la sesión actual
+        from ArtemusPark.service.Crypto_Service import CryptoService
+
+        private_key = CryptoService.decrypt_private_key(priv_enc, password)
+
         permissions = auth_repo.get_user_permissions(username)
         session["role"] = role
         session["username"] = username
         session["permissions"] = permissions
+        session["private_key"] = private_key  # Llave viva en memoria durante la sesión
 
         # Limpiamos antes de añadir la nueva interfaz
         page.controls.clear()

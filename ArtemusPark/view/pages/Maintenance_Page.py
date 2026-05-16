@@ -34,12 +34,12 @@ class MaintenancePage(ft.Container):
                     f"⭐ Mis Sensores Asignados ({len (self .assigned_sensors )})",
                     size=20,
                     weight="bold",
-                    color=AppColors.BG_DARK,
+                    color=ft.Colors.BLACK,
                 ),
                 ft.Text(
                     "Monitorización prioritaria de tus dispositivos asignados",
                     size=14,
-                    color=ft.Colors.GREY_700,
+                    color=ft.Colors.BLACK,
                 ),
                 ft.Container(height=10),
                 self.my_sensors_row,
@@ -86,7 +86,7 @@ class MaintenancePage(ft.Container):
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
                         ft.Text(
-                            "Verde: Recibiendo datos | Rojo: Sin conexión (>15s)",
+                            "Verde: Recibiendo datos | Rojo: Sin conexión (>30s)",
                             size=14,
                             color=ft.Colors.GREY_700,
                         ),
@@ -194,27 +194,31 @@ class MaintenancePage(ft.Container):
 
     def update_data(self):
         """Consulta el estado de salud y regenera las tarjetas"""
-        health_data = self.service.get_sensors_health_status()
+        try:
+            health_data = self.service.get_sensors_health_status()
 
-        self.grid_devices.controls.clear()
+            self.grid_devices.controls.clear()
+            if self.assigned_sensors:
+                self.my_sensors_row.controls.clear()
 
-        if self.assigned_sensors:
-            self.my_sensors_row.controls.clear()
+            for device in health_data:
+                is_assigned = device.get("db_id") in self.assigned_sensors
+                card = self._build_device_card(device, highlight=False)
 
-        for device in health_data:
+                if is_assigned:
+                    highlighted_card = self._build_device_card(device, highlight=True)
+                    self.my_sensors_row.controls.append(highlighted_card)
 
-            is_assigned = device["id"] in self.assigned_sensors
+                self.grid_devices.controls.append(card)
 
-            card = self._build_device_card(device, highlight=False)
+            if self.page:
+                self.update()
 
-            if is_assigned:
-                highlighted_card = self._build_device_card(device, highlight=True)
-                self.my_sensors_row.controls.append(highlighted_card)
-
-            self.grid_devices.controls.append(card)
-
-        if self.page:
-            self.update()
+        except Exception as e:
+            if self.page:
+                self.page.open(
+                    ft.SnackBar(ft.Text(f"Error al actualizar: {e}"), bgcolor="red")
+                )
 
     def _build_device_card(self, device, highlight=False):
         """Crea la tarjeta visual para un dispositivo."""
