@@ -284,9 +284,13 @@ class DashboardPage(ft.Container):
         hour = now.hour
         if OPEN_HOUR <= hour < CLOSE_HOUR:
             self.clock_icon.name = ft.Icons.WB_SUNNY
+            self.clock_icon.color = ft.Colors.AMBER_700
+            self.txt_clock.color = ft.Colors.GREY_800
             self.clock_container.bgcolor = ft.Colors.AMBER_50
         else:
             self.clock_icon.name = ft.Icons.NIGHTLIGHT_ROUND
+            self.clock_icon.color = ft.Colors.WHITE
+            self.txt_clock.color = ft.Colors.WHITE
             self.clock_container.bgcolor = ft.Colors.INDIGO_900
 
     def _build_main_card(self):

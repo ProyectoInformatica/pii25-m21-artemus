@@ -41,15 +41,21 @@ class DashboardService:
         winds = Wind_Repository.load_all_wind_measurements()
         air_qualities = Smoke_Repository.load_all_smoke_measurements()
         lights = Light_Repository.load_all_light_events()
+        doors = Door_Repository.load_all_door_events()
 
         real_occupancy = self._calculate_occupancy()
 
         return {
             "temperature": self._get_last_value(temps, "value", 0),
+            "temperature_ts": self._get_last_value(temps, "timestamp", 0),
             "humidity": self._get_last_value(hums, "value", 0),
+            "humidity_ts": self._get_last_value(hums, "timestamp", 0),
             "wind": self._get_last_value(winds, "speed", 0),
+            "wind_ts": self._get_last_value(winds, "timestamp", 0),
             "air_quality": self._get_last_value(air_qualities, "value", 0),
+            "air_quality_ts": self._get_last_value(air_qualities, "timestamp", 0),
             "occupancy": real_occupancy,
+            "occupancy_ts": self._get_last_value(doors, "timestamp", 0),
             "light_is_on": self._get_last_value(lights, "is_on", False),
             "light_consumption": self._get_last_value(lights, "value", 0),
         }

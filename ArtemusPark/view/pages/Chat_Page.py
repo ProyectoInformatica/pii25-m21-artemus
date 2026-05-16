@@ -123,7 +123,7 @@ class ChatPage(ft.Container):
     def _on_message_received(self, message):
         if message == "new_chat_message":
             if self.selected_chat_id:
-                self._load_messages(self.selected_chat_id, scroll_to_bottom=False)
+                self._load_messages(self.selected_chat_id, scroll_to_bottom=True)
             self._refresh_chats()
         elif isinstance(message, dict) and message.get("topic") == "bot_alert":
             if self.selected_chat_id == 1:
