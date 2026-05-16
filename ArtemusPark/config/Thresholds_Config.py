@@ -11,7 +11,7 @@ WIND_WARNING_THRESHOLD_KMH: int = 20  # Aviso en dashboard
 WIND_RISK_THRESHOLD_KMH: int = 40  # Riesgo alto / alerta crítica
 
 # ── Humedad ───────────────────────────────────────────────────────────────────
-HUMIDITY_LOW_THRESHOLD: int = 20   # % — riesgo de incendio/sequía
+HUMIDITY_LOW_THRESHOLD: int = 20  # % — riesgo de incendio/sequía
 HUMIDITY_HIGH_THRESHOLD: int = 90  # % — riesgo sanitario (hongos, calor húmedo)
 
 # ── Aforo ─────────────────────────────────────────────────────────────────────
