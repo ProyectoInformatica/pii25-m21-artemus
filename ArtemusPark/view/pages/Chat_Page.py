@@ -1,6 +1,8 @@
 import flet as ft
 import json
+from datetime import datetime
 from ArtemusPark.config.Colors import AppColors
+from ArtemusPark.config.Park_Config import OPEN_HOUR, CLOSE_HOUR
 from ArtemusPark.repository.Chat_Repository import ChatRepository
 from ArtemusPark.repository.Auth_Repository import AuthRepository
 from ArtemusPark.service.Dashboard_Service import DashboardService
@@ -121,9 +123,11 @@ class ChatPage(ft.Container):
     def _on_message_received(self, message):
         if message == "new_chat_message":
             if self.selected_chat_id:
-                # Al recibir mensaje de otro, no forzamos scroll si está leyendo arriba
                 self._load_messages(self.selected_chat_id, scroll_to_bottom=False)
             self._refresh_chats()
+        elif isinstance(message, dict) and message.get("topic") == "bot_alert":
+            if self.selected_chat_id == 1:
+                self._load_messages(1, scroll_to_bottom=True)
 
     def _refresh_chats(self):
         if not self.page:
@@ -257,7 +261,7 @@ class ChatPage(ft.Container):
             )
 
             is_bot = msg.get("sender_dni") == "12345678X"
-            is_alert = "ALERTA" in content
+            is_alert = "⚠️ ALERTA" in content
 
             if is_alert:
                 bg_color = ft.Colors.RED_100
@@ -373,6 +377,7 @@ class ChatPage(ft.Container):
 
         if text.lower().startswith("@bot-artemus"):
             self._process_bot_command(text)
+            self._load_messages(self.selected_chat_id, scroll_to_bottom=True)
 
         self.page.pubsub.send_all("new_chat_message")
         self.message_input.focus()
@@ -383,10 +388,24 @@ class ChatPage(ft.Container):
 
     def _process_bot_command(self, text):
         cmd = text.lower().replace("@bot-artemus", "").strip()
-        if "estado" in cmd or "sensores" in cmd:
-            data = self.dashboard_service.get_latest_sensor_data()
+
+        if "ayuda" in cmd or "help" in cmd or "comandos" in cmd:
             response = (
-                f"🤖 **Estado Actual del Parque**:\n"
+                "🤖 Comandos disponibles:\n"
+                "• @Bot-Artemus estado — Sensores en tiempo real\n"
+                "• @Bot-Artemus salud — Estado online/offline de sensores\n"
+                "• @Bot-Artemus promedio — Medias históricas\n"
+                "• @Bot-Artemus alarma — Estado de la alarma de emergencia\n"
+                "• @Bot-Artemus ayuda — Esta ayuda"
+            )
+
+        elif "estado" in cmd or "sensores" in cmd:
+            data = self.dashboard_service.get_latest_sensor_data()
+            hora = datetime.now().hour
+            parque = "Abierto" if OPEN_HOUR <= hora < CLOSE_HOUR else "Cerrado"
+            response = (
+                f"🤖 Estado Actual del Parque:\n"
+                f"🏛️ Parque: {parque}\n"
                 f"🌡️ Temp: {data['temperature']}°C\n"
                 f"💧 Humedad: {data['humidity']}%\n"
                 f"🌬️ Viento: {data['wind']} km/h\n"
@@ -394,7 +413,46 @@ class ChatPage(ft.Container):
                 f"👥 Ocupación: {data['occupancy']} personas\n"
                 f"💡 Luces: {'Encendidas' if data['light_is_on'] else 'Apagadas'}"
             )
-            self.chat_repo.send_message(self.selected_chat_id, "12345678X", response)
+
+        elif "salud" in cmd or "online" in cmd:
+            health = self.dashboard_service.get_sensors_health_status()
+            online = [s for s in health if s["is_online"]]
+            offline = [s for s in health if not s["is_online"]]
+            lines = [f"🤖 Salud de sensores ({len(online)}/{len(health)} online):"]
+            for s in online:
+                lines.append(f"  🟢 {s['name']} — {s['last_value']} ({s['last_seen']})")
+            for s in offline:
+                lines.append(f"  🔴 {s['name']} — Sin señal")
+            response = "\n".join(lines)
+
+        elif "promedio" in cmd or "media" in cmd:
+            avg = self.dashboard_service.get_average_sensor_data()
+
+            def fmt(v, unit):
+                return f"{v}{unit}" if v is not None else "Sin datos"
+
+            response = (
+                f"🤖 Medias históricas:\n"
+                f"🌡️ Temp media: {fmt(avg.get('temperature'), '°C')}\n"
+                f"💧 Humedad media: {fmt(avg.get('humidity'), '%')}\n"
+                f"🌬️ Viento medio: {fmt(avg.get('wind'), ' km/h')}\n"
+                f"🌫️ Aire medio: {fmt(avg.get('air_quality'), ' AQI')}"
+            )
+
+        elif "alarma" in cmd or "emergencia" in cmd or "catastrofe" in cmd:
+            activa = self.dashboard_service.is_catastrophe_mode()
+            if activa:
+                response = "🚨 ALARMA ACTIVA: El modo de catástrofe está activado."
+            else:
+                response = "✅ Sin alarma: El parque opera con normalidad."
+
+        else:
+            response = (
+                "❓ Comando no reconocido. "
+                "Escribe @Bot-Artemus ayuda para ver los comandos disponibles."
+            )
+
+        self.chat_repo.send_message(self.selected_chat_id, "12345678X", response)
 
     def _handle_share_status(self, e):
         if "SEND_MESSAGES" not in self.permissions:
