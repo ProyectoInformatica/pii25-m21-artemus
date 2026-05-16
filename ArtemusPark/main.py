@@ -70,43 +70,50 @@ async def main(page: ft.Page):
             try:
                 data = service.get_latest_sensor_data()
                 if data:
+
                     def fresh(ts_key):
                         return now - data.get(ts_key, 0) < SENSOR_ONLINE_WINDOW_SECONDS
 
                     alert_checks = [
                         (
                             "temperature",
-                            fresh("temperature_ts") and data.get("temperature", 0) > TEMP_THRESHOLD,
+                            fresh("temperature_ts")
+                            and data.get("temperature", 0) > TEMP_THRESHOLD,
                             f"⚠️ ALERTA CRÍTICA: Temperatura elevada ({data['temperature']}ºC) en sector principal.",
                             "INCIDENT_TEMPERATURE",
                         ),
                         (
                             "wind",
-                            fresh("wind_ts") and data.get("wind", 0) > WIND_WARNING_THRESHOLD_KMH,
+                            fresh("wind_ts")
+                            and data.get("wind", 0) > WIND_WARNING_THRESHOLD_KMH,
                             f"⚠️ ALERTA CRÍTICA: Vientos fuertes ({data['wind']} km/h) detectados.",
                             "INCIDENT_WIND",
                         ),
                         (
                             "air_quality",
-                            fresh("air_quality_ts") and data.get("air_quality", 0) > MQ_THRESHOLD,
+                            fresh("air_quality_ts")
+                            and data.get("air_quality", 0) > MQ_THRESHOLD,
                             f"⚠️ ALERTA CRÍTICA: Calidad del aire deficiente (CO₂: {data['air_quality']}).",
                             "INCIDENT_AIR_QUALITY",
                         ),
                         (
                             "humidity_low",
-                            fresh("humidity_ts") and 0 < data.get("humidity", 0) < HUMIDITY_LOW_THRESHOLD,
+                            fresh("humidity_ts")
+                            and 0 < data.get("humidity", 0) < HUMIDITY_LOW_THRESHOLD,
                             f"⚠️ ALERTA CRÍTICA: Humedad muy baja ({data['humidity']}%) — riesgo de incendio o sequía.",
                             "INCIDENT_HUMIDITY_LOW",
                         ),
                         (
                             "humidity_high",
-                            fresh("humidity_ts") and data.get("humidity", 0) > HUMIDITY_HIGH_THRESHOLD,
+                            fresh("humidity_ts")
+                            and data.get("humidity", 0) > HUMIDITY_HIGH_THRESHOLD,
                             f"⚠️ ALERTA CRÍTICA: Humedad muy alta ({data['humidity']}%) — riesgo sanitario.",
                             "INCIDENT_HUMIDITY_HIGH",
                         ),
                         (
                             "occupancy",
-                            fresh("occupancy_ts") and data.get("occupancy", 0) > MAX_OCCUPANCY,
+                            fresh("occupancy_ts")
+                            and data.get("occupancy", 0) > MAX_OCCUPANCY,
                             f"⚠️ ALERTA CRÍTICA: Aforo superado ({data['occupancy']} personas). Límite: {MAX_OCCUPANCY}.",
                             "INCIDENT_OCCUPANCY",
                         ),
