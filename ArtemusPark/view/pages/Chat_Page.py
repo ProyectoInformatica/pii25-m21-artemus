@@ -237,9 +237,7 @@ class ChatPage(ft.Container):
 
             is_me = msg["username"] == self.username
             alignment = (
-                ft.MainAxisAlignment.END
-                if is_me
-                else ft.MainAxisAlignment.START
+                ft.MainAxisAlignment.END if is_me else ft.MainAxisAlignment.START
             )
 
             is_bot = msg.get("sender_dni") == "12345678X"
@@ -248,7 +246,9 @@ class ChatPage(ft.Container):
             if is_alert:
                 bg_color = ft.Colors.RED_100
             else:
-                bg_color = AppColors.CHAT_OWNER_BG if is_me else AppColors.CHAT_INTERLOCUTOR_BG
+                bg_color = (
+                    AppColors.CHAT_OWNER_BG if is_me else AppColors.CHAT_INTERLOCUTOR_BG
+                )
 
             if is_bot:
                 sender_name = "Bot-Artemus"
@@ -289,19 +289,23 @@ class ChatPage(ft.Container):
                         ft.Container(
                             content=ft.Column(
                                 [
-                                    ft.Row(
-                                        [
-                                            ft.Text(
-                                                sender_name,
-                                                size=10,
-                                                weight=ft.FontWeight.BOLD,
-                                                color=sender_color,
-                                            ),
-                                            lock_icon,
-                                        ],
-                                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                                        tight=True,
-                                    ) if not is_me else ft.Container(),
+                                    (
+                                        ft.Row(
+                                            [
+                                                ft.Text(
+                                                    sender_name,
+                                                    size=10,
+                                                    weight=ft.FontWeight.BOLD,
+                                                    color=sender_color,
+                                                ),
+                                                lock_icon,
+                                            ],
+                                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                                            tight=True,
+                                        )
+                                        if not is_me
+                                        else ft.Container()
+                                    ),
                                     ft.Text(content, color=msg_text_color, width=280),
                                     ft.Text(
                                         msg["sent_at"].strftime("%H:%M"),
