@@ -30,6 +30,7 @@ class ChatRepository:
                     FROM Chat c
                              JOIN User_Chat uc ON c.id_chat = uc.id_chat
                     WHERE uc.dni = %s
+                    ORDER BY (c.id_chat = 1) DESC, c.created_at DESC
                     """
             cursor.execute(query, (dni, dni, dni))
             return cursor.fetchall()
@@ -91,7 +92,9 @@ class ChatRepository:
             conn.close()
 
     def delete_chat(self, id_chat):
-        """Deletes a chat and all its messages (cascade)."""
+        """Deletes a chat and all its messages (cascade). Protects Global Chat (id 1)."""
+        if id_chat == 1:
+            return
         conn = get_connection()
         try:
             cursor = conn.cursor(buffered=True)

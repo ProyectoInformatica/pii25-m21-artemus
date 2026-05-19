@@ -176,8 +176,8 @@ class DatabaseManager:
                 (
                     "12345678X",
                     1,
-                    "admin_soto",
-                    "Adrian Soto",
+                    "admin_aldo",
+                    "Aldo Daniel",
                     "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
                     True,
                     "Central Ave 45",

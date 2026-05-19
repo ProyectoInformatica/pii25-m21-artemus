@@ -53,7 +53,7 @@ class ChatPage(ft.Container):
         )
 
         self.message_input = ft.TextField(
-            hint_text="Escribe un mensaje... (@Bot-Artemus estado)",
+            hint_text="Escribe un mensaje... (@Bot-Artemus ayuda)",
             expand=True,
             border_radius=20,
             bgcolor="white",
@@ -126,7 +126,7 @@ class ChatPage(ft.Container):
                 self._load_messages(self.selected_chat_id, scroll_to_bottom=True)
             self._refresh_chats()
         elif isinstance(message, dict) and message.get("topic") == "bot_alert":
-            if self.selected_chat_id == 1:
+            if int(self.selected_chat_id) == 1:
                 self._load_messages(1, scroll_to_bottom=True)
 
     def _refresh_chats(self):
@@ -192,15 +192,21 @@ class ChatPage(ft.Container):
         self.is_group_selected = is_group
         self.btn_scroll_bottom.visible = True
 
+        # RESET ALL ACTIONS
+        self.btn_edit_name.visible = False
+        self.btn_manage_members.visible = False
+        self.btn_leave_chat.visible = False
+        self.btn_delete_chat.visible = False
+
         # PERMISSIONS SYSTEM
         can_manage_all = "MANAGE_CHATS" in self.permissions
-        is_global = chat_id == 1
+        is_global = int(chat_id) == 1 or "global" in chat_name.lower()
 
         if is_global:
-            self.btn_edit_name.visible = can_manage_all
+            self.btn_edit_name.visible = False  # No se edita el nombre del global
             self.btn_manage_members.visible = can_manage_all
-            self.btn_leave_chat.visible = False
-            self.btn_delete_chat.visible = can_manage_all
+            self.btn_leave_chat.visible = True
+            self.btn_delete_chat.visible = False  # PROHIBIDO BORRAR GLOBAL
         elif is_group:
             self.btn_edit_name.visible = True
             self.btn_manage_members.visible = True
@@ -208,14 +214,17 @@ class ChatPage(ft.Container):
             self.btn_delete_chat.visible = can_manage_all
         else:
             # Chat privado 1 a 1
-            self.btn_edit_name.visible = False
-            self.btn_manage_members.visible = False
-            self.btn_leave_chat.visible = False
             self.btn_delete_chat.visible = True
 
         self.search_input.value = ""
         self._load_messages(chat_id)
         self._refresh_chats()
+
+        try:
+            self.update()
+        except:
+            pass
+
         self.page.pubsub.send_all("new_chat_message")
 
     def _handle_search(self, e):
@@ -327,11 +336,34 @@ class ChatPage(ft.Container):
                                         else ft.Container()
                                     ),
                                     ft.Text(content, color=msg_text_color, width=280),
-                                    ft.Text(
-                                        msg["sent_at"].strftime("%H:%M"),
-                                        size=9,
-                                        color=msg_time_color,
-                                        text_align=ft.TextAlign.RIGHT,
+                                    ft.Row(
+                                        [
+                                            ft.Text(
+                                                msg["sent_at"].strftime("%H:%M"),
+                                                size=9,
+                                                color=msg_time_color,
+                                            ),
+                                            (
+                                                ft.Icon(
+                                                    (
+                                                        ft.Icons.DONE_ALL
+                                                        if msg.get("is_read")
+                                                        else ft.Icons.DONE
+                                                    ),
+                                                    size=13,
+                                                    color=(
+                                                        ft.Colors.BLUE_400
+                                                        if msg.get("is_read")
+                                                        else msg_time_color
+                                                    ),
+                                                )
+                                                if is_me
+                                                else ft.Container()
+                                            ),
+                                        ],
+                                        alignment=ft.MainAxisAlignment.END,
+                                        spacing=5,
+                                        tight=True,
                                     ),
                                 ],
                                 spacing=2,
@@ -568,7 +600,7 @@ class ChatPage(ft.Container):
         self.page.open(dialog)
 
     def _handle_delete_chat(self, e):
-        if not self.selected_chat_id:
+        if not self.selected_chat_id or int(self.selected_chat_id) == 1:
             return
 
         def confirm_delete(e):
