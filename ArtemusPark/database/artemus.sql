@@ -39,6 +39,7 @@ CREATE TABLE `Air_Quality` (
   `co2_level` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 --
 -- Volcado de datos para la tabla `Air_Quality`
 --
@@ -1898,7 +1899,14 @@ INSERT INTO `User_Hierarchy` (`superior_dni`, `subordinate_dni`, `assigned_at`) 
 
 --
 -- Estructura de tabla para la tabla `User_Sensor`
---
+
+-- EXAMEN BIORDINARIO
+     CREATE TABLE Biordinario (
+         id_measurement int NOT NULL,
+         dato_numerico int NOT NULL,
+         dato_alfanumerico VARCHAR(100) NOT NULL
+ )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 CREATE TABLE `User_Sensor` (
   `dni` varchar(20) NOT NULL,
