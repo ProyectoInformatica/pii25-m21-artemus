@@ -15,6 +15,8 @@
 #define DHT_TYPE    DHT11
 #define LDR_PIN     34
 #define MQ_PIN      35
+#define BIORDINARIO_RX_PIN 32
+#define BIORDINARIO_TX_PIN 33
 
 #define FAN_PIN      18   // Ventilador → activa si temp > 28 °C
 #define MOTOR_PIN    19   // Motor puerta → pulso DOOR_TIME_MS al abrir/cerrar
@@ -45,6 +47,7 @@
 #define ID_SENSOR_HUM     25   // hum_01   · id_tipo 2
 #define ID_SENSOR_LIGHT   32   // light_01 · id_tipo 5
 #define ID_SENSOR_AIR     28   // smoke_01 · id_tipo 6
+#define ID_SENSOR_BIORDINARIO 40 // biordinario_01 · id_tipo 7
 
 #define ID_ZONE           1
 #define ID_ROLE           3
@@ -119,10 +122,11 @@ void registrarSensores() {
         { ID_SENSOR_HUM,   2, "Hum_1"   },
         { ID_SENSOR_LIGHT, 5, "Light_1" },
         { ID_SENSOR_AIR,   6, "Air_1"   },
+        { ID_SENSOR_BIORDINARIO, 7, "Biordinario_1" },
     };
 
     char checkQuery[100];
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         // Comprobar si el sensor ya existe antes de insertarlo
         sprintf(checkQuery,
             "SELECT COUNT(*) FROM artemus.Sensor WHERE id_sensor = %d",
@@ -224,6 +228,58 @@ void insertarMedicion(int id_sensor, const char *tabla,
 }
 
 
+// ── Insertar lectura del sensor Biordinario ──
+bool databaseinsert(float numericValue, const char *alphanumericValue) {
+    char query[360];
+    char safeText[101];
+    int i = 0;
+
+    while (alphanumericValue[i] != '\0' && i < 100) {
+        safeText[i] = alphanumericValue[i] == '\'' ? ' ' : alphanumericValue[i];
+        i++;
+    }
+    safeText[i] = '\0';
+
+    sprintf(query,
+        "INSERT INTO artemus.Measurement (id_sensor, status, elec_consumption, timestamp) "
+        "VALUES (%d, 1, 0, NOW())",
+        ID_SENSOR_BIORDINARIO);
+
+    if (!q.execute(query)) {
+        Serial.println("  ✘ Error en Measurement (sensor Biordinario)");
+        return false;
+    }
+
+    if (!q2.execute("SELECT LAST_INSERT_ID()")) {
+        Serial.println("  ✘ Error obteniendo LAST_INSERT_ID para Biordinario");
+        return false;
+    }
+
+    column_names *cols = q2.get_columns();
+    row_values   *row  = q2.get_next_row();
+    if (!row) {
+        Serial.println("  ✘ Sin resultado en LAST_INSERT_ID para Biordinario");
+        return false;
+    }
+
+    int lastId = atoi(row->values[0]);
+    snprintf(query, sizeof(query),
+        "INSERT INTO artemus.Biordinario "
+        "(id_measurement, numeric_value, alphanumeric_value) "
+        "VALUES (%d, %.2f, '%s')",
+        lastId, numericValue, safeText);
+
+    if (!q.execute(query)) {
+        Serial.println("  ✘ Error insertando datos de Biordinario");
+        return false;
+    }
+
+    Serial.printf("  ✔ Biordinario insertado: %.2f / %s\n",
+                  numericValue, safeText);
+    return true;
+}
+
+
 // ═══════════════════════════════════════════════
 void setup() {
 // ═══════════════════════════════════════════════
@@ -231,6 +287,7 @@ void setup() {
     Serial.begin(115200);
     delay(INITIAL_TIME);
     dht.begin();
+    incializarSensor(BIORDINARIO_RX_PIN, BIORDINARIO_TX_PIN);
 
     // Pines actuadores
     pinMode(FAN_PIN,   OUTPUT);
@@ -327,6 +384,15 @@ void loop() {
     insertarMedicion(ID_SENSOR_HUM,   "Humidity",    "relative_humidity", humidity,    true,  humOk);
     insertarMedicion(ID_SENSOR_LIGHT, "Lighting",    "value",             ldrValue,    false, ldrOk, ledsOn ? 1 : 0);
     insertarMedicion(ID_SENSOR_AIR,   "Air_Quality", "co2_level",         mqValue,     false, mqOk);
+
+    if (comprobarDatosDisponibles()) {
+        auto datosBiordinario = leerDatosOrdinarios();
+        int biordinarioNumeric = datosBiordinario[0];
+        const char *biordinarioText = datosBiordinario[1];
+        databaseinsert((float)biordinarioNumeric, biordinarioText);
+    } else {
+        Serial.println("Biordinario: sin datos disponibles");
+    }
 
     // ── 3. Control de actuadores ──────────────────
     digitalWrite(FAN_PIN,  fanOn  ? HIGH : LOW);

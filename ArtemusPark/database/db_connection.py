@@ -8,7 +8,7 @@ DB_CONFIG = {
     "host": "localhost",
     "database": "artemus",
     "user": "root",
-    "password": "",
+    "password": "1234",
     "port": 3306,
 }
 
@@ -65,6 +65,7 @@ class DatabaseManager:
                 (4, "Air_Quality"),
                 (5, "Lighting"),
                 (6, "Door"),
+                (7, "Biordinario"),
             ]
             cursor.executemany(
                 "INSERT IGNORE INTO Type (id_type, description) VALUES (%s, %s)", types
@@ -102,6 +103,16 @@ class DatabaseManager:
                 "INSERT IGNORE INTO Role_Permission (id_role, id_permission) VALUES (%s, %s)",
                 role_perms,
             )
+
+            # 3.3 Biordinario sensor readings: one numeric and one alphanumeric value
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS Biordinario (
+                    id_measurement INT PRIMARY KEY,
+                    numeric_value FLOAT NOT NULL,
+                    alphanumeric_value VARCHAR(100) NOT NULL,
+                    FOREIGN KEY (id_measurement) REFERENCES Measurement(id_measurement) ON DELETE CASCADE
+                )
+            """)
 
             # 3.3. Messaging Infrastructure
             # Chat table

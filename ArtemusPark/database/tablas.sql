@@ -168,6 +168,13 @@ CREATE TABLE Air_Quality (
     FOREIGN KEY (id_measurement) REFERENCES Measurement(id_measurement) ON DELETE CASCADE
 );
 
+CREATE TABLE Biordinario (
+    id_measurement INT PRIMARY KEY,
+    numeric_value FLOAT NOT NULL,
+    alphanumeric_value VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_measurement) REFERENCES Measurement(id_measurement) ON DELETE CASCADE
+);
+
 CREATE TABLE Lighting (
     id_measurement INT PRIMARY KEY,
     is_on BOOLEAN NOT NULL DEFAULT FALSE,
@@ -218,7 +225,7 @@ SELECT r.id_role, p.id_permission FROM Role r, Permission p
 WHERE r.role = 'user' AND p.description IN ('VIEW_DASHBOARD', 'VIEW_CHATS', 'SEND_MESSAGES');
 
 INSERT IGNORE INTO Type (description) VALUES 
-('Temperature'), ('Humidity'), ('Wind'), ('Air_Quality'), ('Lighting'), ('Door');
+('Temperature'), ('Humidity'), ('Wind'), ('Air_Quality'), ('Lighting'), ('Door'), ('Biordinario');
 
 -- Default Admin (Password: admin123)
 INSERT IGNORE INTO User (dni, id_role, username, full_name, password_hash, phone, address_street, address_city, address_zip)

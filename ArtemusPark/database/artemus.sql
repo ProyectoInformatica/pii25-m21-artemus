@@ -25,7 +25,7 @@ CREATE DATABASE IF NOT EXISTS `artemus` DEFAULT CHARACTER SET utf8mb4 COLLATE ut
 USE `artemus`;
 
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS `Air_Quality`, `Door`, `Humidity`, `Lighting`, `Temperature`, `Wind`, `Message`, `User_Chat`, `User_Hierarchy`, `User_Sensor`, `Ticket`, `Measurement`, `Sensor`, `Chat`, `User`, `Role_Permission`, `Permission`, `Role`, `Type`, `Zone`;
+DROP TABLE IF EXISTS `Air_Quality`, `Biordinario`, `Door`, `Humidity`, `Lighting`, `Temperature`, `Wind`, `Message`, `User_Chat`, `User_Hierarchy`, `User_Sensor`, `Ticket`, `Measurement`, `Sensor`, `Chat`, `User`, `Role_Permission`, `Permission`, `Role`, `Type`, `Zone`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- --------------------------------------------------------
@@ -479,6 +479,18 @@ CREATE TABLE `Measurement` (
   `status` tinyint(1) DEFAULT '1',
   `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `elec_consumption` float DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Biordinario`
+--
+
+CREATE TABLE `Biordinario` (
+  `id_measurement` int NOT NULL,
+  `numeric_value` float NOT NULL,
+  `alphanumeric_value` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1775,7 +1787,8 @@ INSERT INTO `Type` (`id_type`, `description`) VALUES
 (3, 'Door'),
 (4, 'Wind'),
 (5, 'Lighting'),
-(6, 'Air_Quality');
+(6, 'Air_Quality'),
+(7, 'Biordinario');
 
 -- --------------------------------------------------------
 
@@ -2010,6 +2023,12 @@ ALTER TABLE `Air_Quality`
   ADD PRIMARY KEY (`id_measurement`);
 
 --
+-- Indices de la tabla `Biordinario`
+--
+ALTER TABLE `Biordinario`
+  ADD PRIMARY KEY (`id_measurement`);
+
+--
 -- Indices de la tabla `Chat`
 --
 ALTER TABLE `Chat`
@@ -2227,6 +2246,12 @@ ALTER TABLE `Lighting`
 --
 ALTER TABLE `Measurement`
   ADD CONSTRAINT `measurement_ibfk_1` FOREIGN KEY (`id_sensor`) REFERENCES `Sensor` (`id_sensor`);
+
+--
+-- Filtros para la tabla `Biordinario`
+--
+ALTER TABLE `Biordinario`
+  ADD CONSTRAINT `biordinario_ibfk_1` FOREIGN KEY (`id_measurement`) REFERENCES `Measurement` (`id_measurement`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `Message`
