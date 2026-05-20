@@ -211,6 +211,18 @@ INSERT INTO `Door` (`id_measurement`, `username`, `entry_exit`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `Biordinario`
+--
+
+CREATE TABLE `Biordinario` (
+  `id_measurement` int NOT NULL,
+  `numeric_value` int NOT NULL,
+  `alphanumeric_value` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `Humidity`
 --
 
@@ -1775,7 +1787,8 @@ INSERT INTO `Type` (`id_type`, `description`) VALUES
 (3, 'Door'),
 (4, 'Wind'),
 (5, 'Lighting'),
-(6, 'Air_Quality');
+(6, 'Air_Quality'),
+(7, 'Biordinario');
 
 -- --------------------------------------------------------
 
@@ -2186,7 +2199,7 @@ ALTER TABLE `Ticket`
 -- AUTO_INCREMENT de la tabla `Type`
 --
 ALTER TABLE `Type`
-  MODIFY `id_type` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_type` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `Zone`
@@ -2197,6 +2210,12 @@ ALTER TABLE `Zone`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `Biordinario`
+--
+ALTER TABLE `Biordinario`
+  ADD CONSTRAINT `biordinario_ibfk_1` FOREIGN KEY (`id_measurement`) REFERENCES `Measurement` (`id_measurement`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `Air_Quality`
