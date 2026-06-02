@@ -1,11 +1,10 @@
 import logging
 import time
-import json
 import flet as ft
-from pathlib import Path
 from typing import Dict, Any, List
-from datetime import datetime
-from ArtemusPark.config.Sensor_Config import SENSOR_CONFIG
+from datetime import datetime, timedelta
+from ArtemusPark.database.db_connection import load_sensor_config
+from ArtemusPark.config.Thresholds_Config import SENSOR_ONLINE_WINDOW_SECONDS
 
 from ArtemusPark.model.Door_Model import DoorModel
 from ArtemusPark.repository import (
@@ -24,6 +23,9 @@ class DashboardService:
 
     _catastrophe_active = False
 
+    def __init__(self):
+        self.sensor_config = load_sensor_config()
+
     def set_catastrophe_mode(self, active: bool):
         """Activa o desactiva la alarma globalmente"""
         DashboardService._catastrophe_active = active
@@ -37,17 +39,23 @@ class DashboardService:
         temps = Temperature_Repository.load_all_temperature_measurements()
         hums = Humidity_Repository.load_all_humidity_measurements()
         winds = Wind_Repository.load_all_wind_measurements()
-        smokes = Smoke_Repository.load_all_smoke_measurements()
+        air_qualities = Smoke_Repository.load_all_smoke_measurements()
         lights = Light_Repository.load_all_light_events()
+        doors = Door_Repository.load_all_door_events()
 
         real_occupancy = self._calculate_occupancy()
 
         return {
             "temperature": self._get_last_value(temps, "value", 0),
+            "temperature_ts": self._get_last_value(temps, "timestamp", 0),
             "humidity": self._get_last_value(hums, "value", 0),
+            "humidity_ts": self._get_last_value(hums, "timestamp", 0),
             "wind": self._get_last_value(winds, "speed", 0),
-            "air_quality": self._get_last_value(smokes, "value", 0),
+            "wind_ts": self._get_last_value(winds, "timestamp", 0),
+            "air_quality": self._get_last_value(air_qualities, "value", 0),
+            "air_quality_ts": self._get_last_value(air_qualities, "timestamp", 0),
             "occupancy": real_occupancy,
+            "occupancy_ts": self._get_last_value(doors, "timestamp", 0),
             "light_is_on": self._get_last_value(lights, "is_on", False),
             "light_consumption": self._get_last_value(lights, "value", 0),
         }
@@ -75,26 +83,58 @@ class DashboardService:
         return max(0, count)
 
     def get_temp_chart_data(self) -> List[Dict[str, Any]]:
-        """Prepara datos para el gráfico de temperatura."""
+        """Prepara datos promediados por hora para el gráfico de temperatura (últimas 24 horas)."""
         temps = Temperature_Repository.load_all_temperature_measurements()
-        recent = temps[-10:] if temps else []
-        chart_data = []
-        for i, item in enumerate(recent):
+        if not temps:
+            return []
+
+        now = datetime.now()
+        day_ago = now - timedelta(hours=24)
+
+        # Agrupar valores por hora (0-23)
+        hourly_bins = {}  # int_hour -> list of values
+
+        for item in temps:
             ts = (
                 item.get("timestamp", 0)
                 if isinstance(item, dict)
                 else getattr(item, "timestamp", 0)
             )
-            val = (
-                item.get("value", 0)
-                if isinstance(item, dict)
-                else getattr(item, "value", 0)
-            )
-            try:
-                time_label = datetime.fromtimestamp(ts).strftime("%H:%M:%S")
-            except:
-                time_label = ""
-            chart_data.append({"x": i, "y": float(val), "tooltip": time_label})
+            dt = datetime.fromtimestamp(ts)
+
+            if dt > day_ago:
+                # Calcular a cuántas horas de distancia está del inicio del periodo (day_ago)
+                delta = dt - day_ago
+                hour_index = int(delta.total_seconds() // 3600)
+
+                if 0 <= hour_index < 24:
+                    if hour_index not in hourly_bins:
+                        hourly_bins[hour_index] = []
+
+                    val = (
+                        item.get("value", 0)
+                        if isinstance(item, dict)
+                        else getattr(item, "value", 0)
+                    )
+                    hourly_bins[hour_index].append(float(val))
+
+        chart_data = []
+        for h in range(24):
+            if h in hourly_bins:
+                values = hourly_bins[h]
+                avg_val = sum(values) / len(values)
+                # La etiqueta muestra la hora de inicio del bloque promediado
+                time_label = (day_ago + timedelta(hours=h)).strftime("%H:00")
+                chart_data.append(
+                    {
+                        "x": float(h),
+                        "y": round(avg_val, 2),
+                        "tooltip": f"Media: {round(avg_val, 1)}°C\nHora: {time_label}",
+                    }
+                )
+
+        # No es estrictamente necesario si iteramos el rango 24, pero asegura orden
+        chart_data.sort(key=lambda p: p["x"])
         return chart_data
 
     def get_recent_events(self) -> List[Dict[str, Any]]:
@@ -106,7 +146,7 @@ class DashboardService:
         def get_sensor_name(s_type, s_id):
             if not s_id:
                 return "Desconocido"
-            for s in SENSOR_CONFIG.get(s_type, []):
+            for s in self.sensor_config.get(s_type, []):
                 if s["id"] == s_id:
                     return s["name"]
             return s_id
@@ -159,30 +199,35 @@ class DashboardService:
         return combined[:15]
 
     def get_history_by_date(self, date_str: str) -> List[Dict[str, Any]]:
-        """Carga el historial de una fecha específica desde los archivos JSON."""
+        """Carga el historial de una fecha específica desde la BBDD."""
         history = []
-        base_dir = Path(__file__).resolve().parent.parent / "json"
 
         sources = [
-            ("temperature", "temp", "Temperatura", "value"),
-            ("humidity", "hum", "Humedad", "value"),
-            ("wind", "wind", "Viento", "speed"),
-            ("smoke", "smoke", "Calidad Aire", "value"),
-            ("door", "door", "Puerta", "name"),
-            ("light", "light", "Luz", "value"),
+            (
+                Temperature_Repository.load_temperature_measurements_by_date(date_str),
+                "Temperatura",
+                "value",
+            ),
+            (
+                Humidity_Repository.load_humidity_measurements_by_date(date_str),
+                "Humedad",
+                "value",
+            ),
+            (
+                Wind_Repository.load_wind_measurements_by_date(date_str),
+                "Viento",
+                "speed",
+            ),
+            (
+                Smoke_Repository.load_smoke_measurements_by_date(date_str),
+                "Calidad Aire",
+                "value",
+            ),
+            (Door_Repository.load_door_events_by_date(date_str), "Puerta", "is_open"),
+            (Light_Repository.load_light_events_by_date(date_str), "Luz", "value"),
         ]
 
-        def load_file(subdir, prefix):
-            file_path = base_dir / subdir / f"{prefix }_{date_str }.json"
-            if file_path.exists():
-                try:
-                    return json.loads(file_path.read_text(encoding="utf-8"))
-                except:
-                    return []
-            return []
-
-        for subdir, prefix, type_label, detail_key in sources:
-            data_list = load_file(subdir, prefix)
+        for data_list, type_label, detail_key in sources:
             for item in data_list:
                 ts = item.get("timestamp", 0)
                 val = item.get(detail_key, "--")
@@ -195,7 +240,7 @@ class DashboardService:
 
                 try:
                     time_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
-                except:
+                except Exception:
                     time_str = "Error fecha"
 
                 history.append(
@@ -204,7 +249,7 @@ class DashboardService:
                         "time_str": time_str,
                         "type": type_label,
                         "location": "Zona Parque",
-                        "detail": f"{val }",
+                        "detail": f"{val}",
                         "status": str(status),
                     }
                 )
@@ -216,85 +261,16 @@ class DashboardService:
         self, min_days: int, max_days: int
     ) -> List[Dict[str, Any]]:
         """
-        Carga el historial filtrando los archivos JSON existentes cuya fecha
-        caiga dentro del rango de días relativos a hoy.
+        Carga el historial cuya fecha caiga dentro del rango de días relativos a hoy.
         min_days: Días atrás mínimos (ej. 6).
         max_days: Días atrás máximos (ej. 8).
         """
         history = []
-        base_dir = Path(__file__).resolve().parent.parent / "json"
         today = datetime.now().date()
 
-        sources = [
-            ("temperature", "temp", "Temperatura", "value"),
-            ("humidity", "hum", "Humedad", "value"),
-            ("wind", "wind", "Viento", "speed"),
-            ("smoke", "smoke", "Calidad Aire", "value"),
-            ("door", "door", "Puerta", "name"),
-            ("light", "light", "Luz", "value"),
-        ]
-
-        for subdir, prefix, type_label, detail_key in sources:
-            dir_path = base_dir / subdir
-            if not dir_path.exists():
-                continue
-
-            for file_path in dir_path.glob(f"{prefix }_*.json"):
-                try:
-                    file_date_str = file_path.stem.replace(f"{prefix }_", "")
-                    file_date = datetime.strptime(file_date_str, "%Y-%m-%d").date()
-
-                    days_diff = (today - file_date).days
-
-                    if min_days <= days_diff <= max_days:
-                        content = json.loads(file_path.read_text(encoding="utf-8"))
-                        if isinstance(content, list):
-                            for item in content:
-                                ts = item.get("timestamp", 0)
-                                val = item.get(detail_key, "--")
-                                status = item.get("status", "Info")
-
-                                if type_label == "Puerta":
-                                    status = (
-                                        "Abierta" if item.get("is_open") else "Cerrada"
-                                    )
-                                elif type_label == "Luz":
-                                    status = "ON" if item.get("is_on") else "OFF"
-
-                                try:
-                                    time_str = datetime.fromtimestamp(ts).strftime(
-                                        "%Y-%m-%d %H:%M:%S"
-                                    )
-                                except:
-                                    time_str = "Error fecha"
-
-                                history.append(
-                                    {
-                                        "timestamp": ts,
-                                        "time_str": time_str,
-                                        "type": type_label,
-                                        "location": "Zona Parque",
-                                        "detail": f"{val }",
-                                        "status": str(status),
-                                    }
-                                )
-                        else:
-                            logging.warning(
-                                f"  File {file_path .name } content is not a list. Skipping."
-                            )
-                except ValueError as ve:
-                    logging.error(
-                        f"Error al parsear la fecha del archivo {file_path .name }: {ve }"
-                    )
-                    continue
-                except json.JSONDecodeError as jde:
-                    logging.error(
-                        f"Error al decodificar JSON de {file_path .name }: {jde }"
-                    )
-                    continue
-                except Exception as e:
-                    logger.error(f"Error procesando archivo {file_path }: {e }")
-                    continue
+        for days_back in range(min_days, max_days + 1):
+            date_str = (today - timedelta(days=days_back)).strftime("%Y-%m-%d")
+            history.extend(self.get_history_by_date(date_str))
 
         history.sort(key=lambda x: x["timestamp"], reverse=True)
         return history
@@ -360,42 +336,50 @@ class DashboardService:
 
     def get_sensors_health_status(self) -> List[Dict[str, Any]]:
         """Verifica si los sensores configurados están enviando datos recientemente."""
+        self.sensor_config = load_sensor_config()
         now = time.time()
-        threshold = 15
+        threshold = SENSOR_ONLINE_WINDOW_SECONDS
         health_report = []
 
         all_data = {
             "temperature": Temperature_Repository.load_all_temperature_measurements(),
             "humidity": Humidity_Repository.load_all_humidity_measurements(),
             "wind": Wind_Repository.load_all_wind_measurements(),
-            "smoke": Smoke_Repository.load_all_smoke_measurements(),
+            "air_quality": Smoke_Repository.load_all_smoke_measurements(),
             "door": Door_Repository.load_all_door_events(),
-            "light": Light_Repository.load_all_light_events(),
+            "lighting": Light_Repository.load_all_light_events(),
         }
 
         icon_map = {
             "temperature": ft.Icons.THERMOSTAT,
             "humidity": ft.Icons.WATER_DROP,
             "wind": ft.Icons.AIR,
-            "smoke": ft.Icons.CLOUD,
+            "air_quality": ft.Icons.CLOUD,
             "door": ft.Icons.SENSOR_DOOR,
-            "light": ft.Icons.LIGHTBULB,
+            "lighting": ft.Icons.LIGHTBULB,
         }
 
-        for sensor_type, sensors in SENSOR_CONFIG.items():
+        for sensor_type, sensors in self.sensor_config.items():
             type_data = all_data.get(sensor_type, [])
 
             for sensor_config in sensors:
                 s_id = sensor_config["id"]
                 s_name = sensor_config["name"]
+                db_id = sensor_config.get("db_id")
 
                 sensor_data = [
                     d
                     for d in type_data
-                    if (isinstance(d, dict) and d.get("sensor_id") == s_id)
+                    if (
+                        isinstance(d, dict)
+                        and (d.get("sensor_id") == s_id or d.get("sensor_id") == db_id)
+                    )
                     or (
                         not isinstance(d, dict)
-                        and getattr(d, "sensor_id", None) == s_id
+                        and (
+                            getattr(d, "sensor_id", None) == s_id
+                            or getattr(d, "sensor_id", None) == db_id
+                        )
                     )
                 ]
 
@@ -437,14 +421,16 @@ class DashboardService:
                         val = (
                             last_item.get("speed")
                             if isinstance(last_item, dict)
-                            else last_item.speed
+                            else getattr(last_item, "speed", 0)
                         )
                         last_value = f"{val } km/h"
-                    elif sensor_type == "smoke":
+                    elif sensor_type == "air_quality":
                         val = (
-                            last_item.get("value")
+                            last_item.get("value") or last_item.get("co2_level")
                             if isinstance(last_item, dict)
-                            else last_item.value
+                            else getattr(
+                                last_item, "value", getattr(last_item, "co2_level", 0)
+                            )
                         )
                         last_value = f"AQI {val }"
                     elif sensor_type == "door":
@@ -454,7 +440,7 @@ class DashboardService:
                             else last_item.is_open
                         )
                         last_value = "Abierta" if is_open else "Cerrada"
-                    elif sensor_type == "light":
+                    elif sensor_type == "lighting":
                         is_on = (
                             last_item.get("is_on")
                             if isinstance(last_item, dict)
@@ -465,6 +451,7 @@ class DashboardService:
                 health_report.append(
                     {
                         "id": s_id,
+                        "db_id": db_id,
                         "name": s_name,
                         "type": sensor_type,
                         "status": "En Línea" if is_online else "Sin Señal",

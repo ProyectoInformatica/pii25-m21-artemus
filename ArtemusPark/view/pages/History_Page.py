@@ -1,6 +1,4 @@
-import time
 import flet as ft
-from datetime import datetime, timedelta
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.service.Dashboard_Service import DashboardService
 
@@ -13,13 +11,13 @@ class HistoryPage(ft.Container):
         self.bgcolor = AppColors.BG_MAIN
 
         self.service = DashboardService()
-        self.range_limits = (28, 35)
-        self.sort_descending = False
+        self.range_limits = (0, 1)  # Default: Last 24h
+        self.sort_descending = True  # Default: Most recent first
         self._is_mounted = False
 
         self.sort_button = ft.IconButton(
-            icon=ft.Icons.ARROW_UPWARD,
-            tooltip="Orden: Más antiguo primero",
+            icon=ft.Icons.ARROW_DOWNWARD,
+            tooltip="Orden: Más reciente primero",
             on_click=self._toggle_sort,
             icon_color=ft.Colors.BLUE,
         )
@@ -80,7 +78,7 @@ class HistoryPage(ft.Container):
                 ft.Tabs(
                     label_color=ft.Colors.BLACK,
                     unselected_label_color=ft.Colors.BLACK87,
-                    selected_index=0,
+                    selected_index=2,  # Default to '1 dia' tab
                     on_change=self._on_range_change,
                     tabs=[
                         ft.Tab(text="1 mes"),
@@ -108,6 +106,8 @@ class HistoryPage(ft.Container):
         self._is_mounted = True
         self.page.pubsub.subscribe(self._on_message)
         self.load_data()
+        if self.service.is_catastrophe_mode():
+            self.bgcolor = ft.Colors.RED_900
 
     def will_unmount(self):
         """2. Se ejecuta al salir: Nos desconectamos."""
@@ -120,22 +120,28 @@ class HistoryPage(ft.Container):
 
         if message == "refresh_dashboard":
             self.load_data()
+        elif message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_MAIN
+            self.update()
 
     def _toggle_sort(self, e):
         self.sort_descending = not self.sort_descending
+        # Si sort_descending es True, queremos los más RECIENTES arriba (Flecha abajo)
         if self.sort_descending:
             self.sort_button.icon = ft.Icons.ARROW_DOWNWARD
             self.sort_button.tooltip = "Orden: Más reciente primero"
         else:
             self.sort_button.icon = ft.Icons.ARROW_UPWARD
             self.sort_button.tooltip = "Orden: Más antiguo primero"
+
         self.sort_button.update()
         self.load_data()
 
     def _on_range_change(self, e):
         index = e.control.selected_index
-        self.data_table.rows.clear()
-        self.update()
 
         if index == 0:
             self.range_limits = (28, 35)
@@ -150,8 +156,21 @@ class HistoryPage(ft.Container):
         """Pide el historial al servicio y rellena la tabla con datos reales según el rango."""
         logs = self.service.get_history_by_range(*self.range_limits)
 
-        logs.sort(key=lambda x: x["timestamp"], reverse=self.sort_descending)
-        logs = logs[:30]
+        if logs:
+            # Aseguramos ordenamiento numérico por timestamp
+            try:
+                logs.sort(
+                    key=lambda x: float(x.get("timestamp", 0)),
+                    reverse=self.sort_descending,
+                )
+            except (ValueError, TypeError):
+                # Fallback por si el timestamp no es convertible a float
+                logs.sort(
+                    key=lambda x: x.get("timestamp", 0), reverse=self.sort_descending
+                )
+
+            # Limitamos a los 50 más relevantes según el orden elegido
+            logs = logs[:50]
 
         self.data_table.rows.clear()
 
@@ -159,12 +178,15 @@ class HistoryPage(ft.Container):
             self.table_content.scroll = None
             self.table_content.alignment = ft.MainAxisAlignment.CENTER
             self.table_content.controls = [
-                ft.Text(
-                    "No hay datos disponibles para mostrar.",
-                    weight=ft.FontWeight.BOLD,
-                    size=16,
-                    color=ft.Colors.BLACK54,
-                    text_align=ft.TextAlign.CENTER,
+                ft.Container(
+                    content=ft.Text(
+                        "No hay datos disponibles para mostrar en este rango.",
+                        weight=ft.FontWeight.BOLD,
+                        size=16,
+                        color=ft.Colors.BLACK,
+                        text_align=ft.TextAlign.CENTER,
+                    ),
+                    padding=50,
                 )
             ]
         else:
@@ -172,10 +194,10 @@ class HistoryPage(ft.Container):
             self.table_content.alignment = ft.MainAxisAlignment.START
             for log in logs:
                 row = self._create_row(
-                    log["time_str"],
-                    log["type"],
-                    log["location"],
-                    str(log["detail"]),
+                    log.get("time_str", "-"),
+                    log.get("type", "-"),
+                    log.get("location", "-"),
+                    str(log.get("detail", "-")),
                 )
                 self.data_table.rows.append(row)
             self.table_content.controls = [self.data_table]

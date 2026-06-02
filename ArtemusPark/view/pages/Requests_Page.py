@@ -3,6 +3,7 @@ from datetime import datetime
 from ArtemusPark.config.Colors import AppColors
 from ArtemusPark.repository.Requests_Repository import RequestsRepository
 from ArtemusPark.repository.Auth_Repository import AuthRepository
+from ArtemusPark.service.Dashboard_Service import DashboardService
 
 
 class RequestsPage(ft.Container):
@@ -30,9 +31,27 @@ class RequestsPage(ft.Container):
         )
 
     def did_mount(self):
+        self.page.pubsub.subscribe(self._on_message)
         self._load_requests()
+        if DashboardService().is_catastrophe_mode():
+            self.bgcolor = ft.Colors.RED_900
+
+    def will_unmount(self):
+        self.page.pubsub.unsubscribe()
+
+    def _on_message(self, message):
+        if message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_MAIN
+            self.update()
+        elif isinstance(message, dict) and message.get("topic") == "requests_updated":
+            self._load_requests()
 
     def _load_requests(self):
+        if not self.page:
+            return
         reqs = self.req_repo.get_all_requests()
         reqs.sort(key=lambda x: x.get("timestamp", 0), reverse=True)
 
@@ -49,7 +68,10 @@ class RequestsPage(ft.Container):
             for req in reqs:
                 self.requests_column.controls.append(self._build_request_card(req))
 
-        self.requests_column.update()
+        try:
+            self.requests_column.update()
+        except Exception:
+            pass
 
     def _build_request_card(self, req):
         status = req.get("status")

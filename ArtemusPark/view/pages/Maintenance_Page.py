@@ -6,23 +6,25 @@ from ArtemusPark.repository.Requests_Repository import RequestsRepository
 
 
 class MaintenancePage(ft.Container):
-    def __init__(self, current_username=None):
+    def __init__(self, current_username=None, user_role=None):
         super().__init__()
         self.expand = True
         self.padding = 20
         self.bgcolor = AppColors.BG_MAIN
         self.service = DashboardService()
         self.current_username = current_username
+        self.current_role = user_role
         self.auth_repo = AuthRepository()
         self.req_repo = RequestsRepository()
         self._is_mounted = False
 
         self.assigned_sensors = []
-        self.current_role = None
         if self.current_username:
-            user_data = self.auth_repo.get_all_users().get(self.current_username, {})
+            user_data = self.auth_repo.get_user_by_username(self.current_username)
             self.assigned_sensors = user_data.get("assigned_sensors", [])
-            self.current_role = user_data.get("role")
+            # If current_role was not passed, use the one from database
+            if not self.current_role:
+                self.current_role = user_data.get("role")
 
         self.my_sensors_row = ft.Row(spacing=20, scroll=ft.ScrollMode.AUTO)
         self.my_sensors_container = ft.Column(
@@ -32,12 +34,12 @@ class MaintenancePage(ft.Container):
                     f"⭐ Mis Sensores Asignados ({len (self .assigned_sensors )})",
                     size=20,
                     weight="bold",
-                    color=AppColors.BG_DARK,
+                    color=ft.Colors.BLACK,
                 ),
                 ft.Text(
                     "Monitorización prioritaria de tus dispositivos asignados",
                     size=14,
-                    color=ft.Colors.GREY_700,
+                    color=ft.Colors.BLACK,
                 ),
                 ft.Container(height=10),
                 self.my_sensors_row,
@@ -55,13 +57,14 @@ class MaintenancePage(ft.Container):
             controls=[],
         )
 
+        # Allow admins to also generate tickets if they are doing maintenance work
         self.btn_request_change = ft.ElevatedButton(
             "Solicitar Cambio de Sensores",
             icon=ft.Icons.EDIT_NOTE,
             bgcolor=ft.Colors.BLUE_GREY_100,
             color=ft.Colors.BLUE_GREY_900,
             on_click=self._open_request_dialog,
-            visible=bool(self.current_username) and self.current_role != "admin",
+            visible=bool(self.current_username),
         )
 
         self.content = ft.Column(
@@ -83,7 +86,7 @@ class MaintenancePage(ft.Container):
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
                         ft.Text(
-                            "Verde: Recibiendo datos | Rojo: Sin conexión (>15s)",
+                            "Verde: Recibiendo datos | Rojo: Sin conexión (>30s)",
                             size=14,
                             color=ft.Colors.GREY_700,
                         ),
@@ -105,6 +108,8 @@ class MaintenancePage(ft.Container):
         self._is_mounted = True
         self.page.pubsub.subscribe(self._on_message)
         self.update_data()
+        if self.service.is_catastrophe_mode():
+            self.bgcolor = ft.Colors.RED_900
 
     def will_unmount(self):
         """Limpia suscripciones."""
@@ -116,6 +121,12 @@ class MaintenancePage(ft.Container):
 
         if message == "refresh_dashboard":
             self.update_data()
+        elif message == "catastrophe_mode":
+            self.bgcolor = ft.Colors.RED_900
+            self.update()
+        elif message == "normal_mode":
+            self.bgcolor = AppColors.BG_MAIN
+            self.update()
 
     def _open_request_dialog(self, e):
         self.tf_request_msg = ft.TextField(
@@ -157,43 +168,57 @@ class MaintenancePage(ft.Container):
             self.tf_request_msg.update()
             return
 
-        self.req_repo.create_request(self.current_username, msg)
         try:
-            self.page.pubsub.send_all({"topic": "requests_updated"})
-        except Exception:
-            pass
-        self.page.close(self.dlg_request)
+            self.req_repo.create_request(self.current_username, msg)
+            try:
+                self.page.pubsub.send_all({"topic": "requests_updated"})
+            except Exception:
+                pass
+            self.page.close(self.dlg_request)
 
-        self.page.snack_bar = ft.SnackBar(
-            content=ft.Text("Solicitud enviada correctamente"), bgcolor="green"
-        )
-        self.page.snack_bar.open = True
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text("Solicitud enviada correctamente"), bgcolor="green"
+                )
+            )
+        except Exception as ex:
+            self.page.open(
+                ft.SnackBar(
+                    content=ft.Text(f"Error al enviar solicitud: {str(ex)}"),
+                    bgcolor="red",
+                )
+            )
+
         if self.page:
             self.page.update()
 
     def update_data(self):
         """Consulta el estado de salud y regenera las tarjetas"""
-        health_data = self.service.get_sensors_health_status()
+        try:
+            health_data = self.service.get_sensors_health_status()
 
-        self.grid_devices.controls.clear()
+            self.grid_devices.controls.clear()
+            if self.assigned_sensors:
+                self.my_sensors_row.controls.clear()
 
-        if self.assigned_sensors:
-            self.my_sensors_row.controls.clear()
+            for device in health_data:
+                is_assigned = device.get("db_id") in self.assigned_sensors
+                card = self._build_device_card(device, highlight=False)
 
-        for device in health_data:
+                if is_assigned:
+                    highlighted_card = self._build_device_card(device, highlight=True)
+                    self.my_sensors_row.controls.append(highlighted_card)
 
-            is_assigned = device["id"] in self.assigned_sensors
+                self.grid_devices.controls.append(card)
 
-            card = self._build_device_card(device, highlight=False)
+            if self.page:
+                self.update()
 
-            if is_assigned:
-                highlighted_card = self._build_device_card(device, highlight=True)
-                self.my_sensors_row.controls.append(highlighted_card)
-
-            self.grid_devices.controls.append(card)
-
-        if self.page:
-            self.update()
+        except Exception as e:
+            if self.page:
+                self.page.open(
+                    ft.SnackBar(ft.Text(f"Error al actualizar: {e}"), bgcolor="red")
+                )
 
     def _build_device_card(self, device, highlight=False):
         """Crea la tarjeta visual para un dispositivo."""

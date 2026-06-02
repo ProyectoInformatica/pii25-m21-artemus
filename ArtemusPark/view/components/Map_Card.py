@@ -3,7 +3,7 @@ from ArtemusPark.config.Colors import AppColors
 
 
 class MapCard(ft.Container):
-    def __init__(self, on_sensor_click=None):
+    def __init__(self, on_sensor_click=None, permissions=None):
         super().__init__()
         self.border_radius = 12
         self.bgcolor = ft.Colors.WHITE
@@ -11,6 +11,7 @@ class MapCard(ft.Container):
         self.border = ft.border.all(1, ft.Colors.GREY_300)
         self.alignment = ft.alignment.center
         self.on_sensor_click = on_sensor_click
+        self.permissions = permissions or []
 
         self.map_size = 400
 
@@ -39,6 +40,7 @@ class MapCard(ft.Container):
 
         self.markers = {}
         self.original_colors = {}
+        self.sensor_online = {}  # key → bool
         self.content = self._build_map()
 
     def _build_map(self):
@@ -100,8 +102,46 @@ class MapCard(ft.Container):
 
     def _on_marker_click(self, e):
         """Maneja el clic en un marcador y llama al callback principal"""
+        key = e.control.data
+        if not self.sensor_online.get(key, True):
+            if self.page:
+                self.page.open(
+                    ft.SnackBar(
+                        content=ft.Text(
+                            f"Sensor sin conexión — no hay datos disponibles para '{key}'",
+                            color=AppColors.TEXT_WHITE,
+                        ),
+                        bgcolor=ft.Colors.GREY_700,
+                    )
+                )
+            return
         if self.on_sensor_click:
-            self.on_sensor_click(e.control.data)
+            self.on_sensor_click(key)
+
+    def set_types_online_status(self, status: dict):
+        """Actualiza el estado online/offline de cada tipo de sensor en el mapa.
+
+        status: {map_key: bool} — True si al menos un sensor del tipo está online.
+        """
+        for key, is_online in status.items():
+            if self.sensor_online.get(key) == is_online:
+                continue  # sin cambio, evitar update innecesario que causa flickeo
+            self.sensor_online[key] = is_online
+            if key not in self.markers:
+                continue
+            marker = self.markers[key]
+            if is_online:
+                if key != "lights":
+                    marker.bgcolor = self.original_colors.get(key, ft.Colors.BLUE)
+                marker.opacity = 1.0
+            else:
+                marker.bgcolor = ft.Colors.GREY_400
+                marker.opacity = 0.4
+            if marker.page:
+                try:
+                    marker.update()
+                except Exception:
+                    pass
 
     def update_marker_status_by_type(self, sensor_type, has_data):
         """Pone el marcador en gris si no hay datos, o restaura su color si hay datos."""
@@ -120,7 +160,11 @@ class MapCard(ft.Container):
                     marker.bgcolor = self.original_colors.get(key, ft.Colors.BLUE)
             else:
                 marker.bgcolor = ft.Colors.GREY
-            marker.update()
+            if marker.page:
+                try:
+                    marker.update()
+                except Exception:
+                    pass
 
     def update_light_marker_status(self, is_on: bool, consumption: float):
         """Actualiza el marcador de luces y el texto de consumo."""
@@ -132,7 +176,11 @@ class MapCard(ft.Container):
             )
             marker.bgcolor = ft.Colors.ORANGE_500 if is_on else ft.Colors.GREY_500
             marker.tooltip = "Encendido" if is_on else "Apagado"
-            marker.update()
+            if marker.page:
+                try:
+                    marker.update()
+                except Exception:
+                    pass
 
     def update_sensor_data(self, data: dict):
         """Actualiza tooltips y estados de los marcadores"""
@@ -159,5 +207,10 @@ class MapCard(ft.Container):
 
     def _update_marker(self, key, text):
         if key in self.markers:
-            self.markers[key].tooltip = text
-            self.markers[key].update()
+            marker = self.markers[key]
+            marker.tooltip = text
+            if marker.page:
+                try:
+                    marker.update()
+                except Exception:
+                    pass
