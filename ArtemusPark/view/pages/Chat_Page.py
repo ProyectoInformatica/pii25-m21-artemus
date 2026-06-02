@@ -126,7 +126,7 @@ class ChatPage(ft.Container):
                 self._load_messages(self.selected_chat_id, scroll_to_bottom=True)
             self._refresh_chats()
         elif isinstance(message, dict) and message.get("topic") == "bot_alert":
-            if int(self.selected_chat_id) == 1:
+            if self.selected_chat_id and int(self.selected_chat_id) == 1:
                 self._load_messages(1, scroll_to_bottom=True)
 
     def _refresh_chats(self):
