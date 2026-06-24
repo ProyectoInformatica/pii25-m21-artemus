@@ -21,6 +21,19 @@
 #define LEDS_PIN     12   // LEDs       → activa si luz < 3000
 #define DOOR_TIME_MS 2500 // Duración del pulso del motor (ms)
 
+// ── IDs de sensores en BD ─────────────────────────
+#define ID_SENSOR_TEMP    22   // temp_01  · id_tipo 1
+#define ID_SENSOR_HUM     25   // hum_01   · id_tipo 2
+#define ID_SENSOR_LIGHT   32   // light_01 · id_tipo 5
+#define ID_SENSOR_AIR     28   // smoke_01 · id_tipo 6
+#define ID_SENSOR_BIORDINARIO 60 // Biordinario · id_tipo 9
+
+#define BIORDINARIO_RX_PIN    16
+#define BIORDINARIO_TX_PIN    17
+
+#define ID_ZONE           1
+#define ID_ROLE           3
+
 
 // ── Umbrales de control ───────────────────────────
 #define TEMP_THRESHOLD   28.0
@@ -40,20 +53,9 @@
 #define DAYLIGHT_OFFSET_SEC 3600   // +1h adicional en verano (CEST)
 
 
-// ── IDs de sensores en BD ─────────────────────────
-#define ID_SENSOR_TEMP    22   // temp_01  · id_tipo 1
-#define ID_SENSOR_HUM     25   // hum_01   · id_tipo 2
-#define ID_SENSOR_LIGHT   32   // light_01 · id_tipo 5
-#define ID_SENSOR_AIR     28   // smoke_01 · id_tipo 6
-
-#define ID_ZONE           1
-#define ID_ROLE           3
-
-
 // ── Credenciales WiFi ─────────────────────────────
-char ssid[] = "igomez-fedora";
-char pass[] = "cacadevaca";
-
+char ssid[] = "Iphone_pablo";
+char pass[] = "Nomerobes567";
 
 // ── Credenciales MySQL ────────────────────────────
 IPAddress server_addr(172, 27, 81, 221);
@@ -63,13 +65,36 @@ char db_password[] = "tu_password";
 
 
 // ── Objetos globales ──────────────────────────────
-// WiFiClient client ya está declarado dentro de MySQL_Generic.h
+WiFiClient       client; 
 MySQL_Connection conn((Client *)&client);
 DHT              dht(DHT_PIN, DHT_TYPE);
-MySQL_Query      q(&conn);    // globales para evitar fragmentación de heap
-MySQL_Query      q2(&conn);   // globales para evitar fragmentación de heap
+MySQL_Query      q(&conn);    
+MySQL_Query      q2(&conn);   
 
-bool ultimoEstadoParque = false; // detecta transición abierto/cerrado del parque
+
+bool ultimoEstadoParque = false;
+
+// EXAMEN SENSOR BIORDINARIO
+struct DatosOrdinarios {
+    int datoNum;
+    char datoAlfa[5];
+};
+
+void inicializarSensor(int pin_RX, int pin_TX) {
+    Serial.printf("Sensor Biordinario inicializado (RX:%d, TX:%d)\n", pin_RX, pin_TX);
+}
+
+bool comprobarDatosDisponibles() {
+    return (random(0, 100) > 70);
+}
+
+DatosOrdinarios leerDatosOrdinarios() {
+    DatosOrdinarios d;
+    d.datoNum = random(10, 500);
+    const char* estados[] = {"1", "2", "3", "4"};
+    strcpy(d.datoAlfa, estados[random(0, 4)]);
+    return d;
+}
 
 
 // ── Control de la puerta ──────────────────────────
@@ -119,11 +144,11 @@ void registrarSensores() {
         { ID_SENSOR_HUM,   2, "Hum_1"   },
         { ID_SENSOR_LIGHT, 5, "Light_1" },
         { ID_SENSOR_AIR,   6, "Air_1"   },
+        { ID_SENSOR_BIORDINARIO, 7, "Bio_1" },
     };
 
     char checkQuery[100];
-    for (int i = 0; i < 4; i++) {
-        // Comprobar si el sensor ya existe antes de insertarlo
+    for (int i = 0; i < 5; i++) {
         sprintf(checkQuery,
             "SELECT COUNT(*) FROM artemus.Sensor WHERE id_sensor = %d",
             sensores[i].id);
@@ -152,72 +177,63 @@ void registrarSensores() {
             Serial.printf("  ✔ Sensor '%s' (id=%d) registrado\n",
                           sensores[i].name, sensores[i].id);
         } else {
-            Serial.printf("  ✘ Error al registrar sensor '%s', posiblemente ya registrado \n", sensores[i].name);
+            Serial.printf("  ✘ Error al registrar sensor '%s'\n", sensores[i].name);
         }
     }
 }
 
-
-// ── Función auxiliar: insertar Measurement + tabla específica ──
-void insertarMedicion(int id_sensor, const char *tabla,
-                      const char *campo, float valor, bool esFloat, bool ok, int is_on = -1) {
-    char query[300];
-
-    // 1. Insertar en Measurement con estado según si el sensor funciona
+// Reutilizo el metodo que ya tengo añadiendole los campos que necesita el BIO
+void dataBaseInsert(int id_sensor, const char *tabla,
+                      const char *campo, float valor, bool esFloat, bool ok, 
+                      int is_on = -1, const char* valor_extra = NULL) {
+    char query[400];
     sprintf(query,
         "INSERT INTO artemus.Measurement (id_sensor, status, elec_consumption, timestamp) "
         "VALUES (%d, %d, 0, NOW())",
-        id_sensor, ok ? 1 : 0);  // 1 = OK, 0 = ERROR
-
+        id_sensor, ok ? 1 : 0);
     if (!q.execute(query)) {
         Serial.printf("  ✘ Error en Measurement (sensor %d)\n", id_sensor);
         return;
     }
     Serial.printf("  ✔ Measurement insertado (sensor %d) — estado: %s\n",
                   id_sensor, ok ? "OK" : "ERROR");
-
-    // Si el sensor falló no insertamos en la tabla específica
     if (!ok) return;
-
-    // 2. Obtener el ID recién insertado
     if (!q2.execute("SELECT LAST_INSERT_ID()")) {
         Serial.println("  ✘ Error obteniendo LAST_INSERT_ID");
         return;
     }
-
-    column_names *cols = q2.get_columns();
-    row_values   *row  = q2.get_next_row();
+    row_values *row = q2.get_next_row();
     if (!row) {
         Serial.println("  ✘ Sin resultado en LAST_INSERT_ID");
         return;
     }
 
     int lastId = atoi(row->values[0]);
-    Serial.printf("  → id_measurement: %d\n", lastId);
 
-    // 3. Insertar en tabla específica con el ID real
-    if (is_on >= 0) {
-        if (esFloat) {
-            sprintf(query,
-                "INSERT INTO artemus.%s (id_measurement, is_on, %s) VALUES (%d, %d, %.2f)",
-                tabla, campo, lastId, is_on, valor);
-        } else {
-            sprintf(query,
-                "INSERT INTO artemus.%s (id_measurement, is_on, %s) VALUES (%d, %d, %d)",
-                tabla, campo, lastId, is_on, (int)valor);
-        }
-    } else if (esFloat) {
-        sprintf(query,
-            "INSERT INTO artemus.%s (id_measurement, %s) VALUES (%d, %.2f)",
-            tabla, campo, lastId, valor);
+    // Inserto los datos en la tabla de Biordinario
+    if (strcmp(tabla, "Biordinario") == 0) {
+        sprintf(query, "INSERT INTO artemus.Biordinario (id_measurement, valor_int, valor_char) VALUES (%d, %d, '%s')",
+                lastId, (int)valor, valor_extra ? valor_extra : "");
     } else {
-        sprintf(query,
-            "INSERT INTO artemus.%s (id_measurement, %s) VALUES (%d, %d)",
-            tabla, campo, lastId, (int)valor);
+        if (is_on >= 0) {
+            if (esFloat) {
+                sprintf(query, "INSERT INTO artemus.%s (id_measurement, is_on, %s) VALUES (%d, %d, %.2f)",
+                        tabla, campo, lastId, is_on, valor);
+            } else {
+                sprintf(query, "INSERT INTO artemus.%s (id_measurement, is_on, %s) VALUES (%d, %d, %d)",
+                        tabla, campo, lastId, is_on, (int)valor);
+            }
+        } else if (esFloat) {
+            sprintf(query, "INSERT INTO artemus.%s (id_measurement, %s) VALUES (%d, %.2f)",
+                    tabla, campo, lastId, valor);
+        } else {
+            sprintf(query, "INSERT INTO artemus.%s (id_measurement, %s) VALUES (%d, %d)",
+                    tabla, campo, lastId, (int)valor);
+        }
     }
 
     if (q.execute(query)) {
-        Serial.printf("  ✔ %s.%s = %.2f insertado\n", tabla, campo, valor);
+        Serial.printf("  ✔ %s guardado (ID:%d)\n", tabla, lastId);
     } else {
         Serial.printf("  ✘ Error en %s (sensor %d)\n", tabla, id_sensor);
     }
@@ -241,7 +257,6 @@ void setup() {
     digitalWrite(MOTOR_PIN, LOW);
     digitalWrite(LEDS_PIN,  LOW);
 
-
     // Conexión WiFi
     Serial.print("Conectando a WiFi");
     WiFi.begin(ssid, pass);
@@ -264,6 +279,8 @@ void setup() {
 
     // Registrar sensores físicos en la BD
     registrarSensores();
+    
+    inicializarSensor(BIORDINARIO_RX_PIN, BIORDINARIO_TX_PIN);
 }
 
 
@@ -273,7 +290,7 @@ void loop() {
 
     Serial.printf("[MEM] Heap libre: %d bytes\n", ESP.getFreeHeap());
 
-        // Reconectar WiFi si se perdió
+    // Reconectar WiFi si se perdió
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("WiFi perdido, reconectando...");
         WiFi.disconnect();
@@ -293,7 +310,6 @@ void loop() {
         }
     }
 
-    // Reconectar si se perdió la conexión
     if (!conn.connected()) {
         Serial.println("Reconectando a MySQL...");
         conn.connectNonBlocking(server_addr, server_port, db_user, db_password);
@@ -323,10 +339,15 @@ void loop() {
                   ldrValue, mqValue);
 
     // ── 2. Insertar mediciones en BD ──────────────
-    insertarMedicion(ID_SENSOR_TEMP,  "Temperature", "temperature",       temperature, true,  tempOk);
-    insertarMedicion(ID_SENSOR_HUM,   "Humidity",    "relative_humidity", humidity,    true,  humOk);
-    insertarMedicion(ID_SENSOR_LIGHT, "Lighting",    "value",             ldrValue,    false, ldrOk, ledsOn ? 1 : 0);
-    insertarMedicion(ID_SENSOR_AIR,   "Air_Quality", "co2_level",         mqValue,     false, mqOk);
+    dataBaseInsert(ID_SENSOR_TEMP,  "Temperature", "temperature",       temperature, true,  tempOk);
+    dataBaseInsert(ID_SENSOR_HUM,   "Humidity",    "relative_humidity", humidity,    true,  humOk);
+    dataBaseInsert(ID_SENSOR_LIGHT, "Lighting",    "value",             (float)ldrValue,    false, ldrOk, ledsOn ? 1 : 0);
+    dataBaseInsert(ID_SENSOR_AIR,   "Air_Quality", "co2_level",         (float)mqValue,     false, mqOk);
+    if (comprobarDatosDisponibles()) {
+        Serial.println("\n Biordinarios");
+        DatosOrdinarios datos = leerDatosOrdinarios();
+        dataBaseInsert(ID_SENSOR_BIORDINARIO, "Biordinario", "valor_int", (float)datos.datoNum, false, true, -1, datos.datoAlfa);
+    }
 
     // ── 3. Control de actuadores ──────────────────
     digitalWrite(FAN_PIN,  fanOn  ? HIGH : LOW);
